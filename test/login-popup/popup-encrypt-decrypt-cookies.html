@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<web-comp>
+    <a href="login">login</a>
+</web-comp>
+<script>
+
+
+  //imported pure functions begins
+  function getCookieValue(cookie, key) {
+    return cookie?.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop();
+  }
+
+  function uint8ToHexString(ar) {
+    return Array.from(ar).map(b => ('00' + b.toString(16)).slice(-2)).join('');
+  }
+
+  function hexStringToUint8(str) {
+    return new Uint8Array(str.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+  }
+
+  function toBase64url(base64str) {
+    return base64str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
+
+  function fromBase64url(base64urlStr) {
+    base64urlStr = base64urlStr.replace(/-/g, '+').replace(/_/g, '/');
+    if (base64urlStr.length % 4 === 2)
+      return base64urlStr + '==';
+    if (base64urlStr.length % 4 === 3)
+      return base64urlStr + '=';
+    return base64urlStr;
+  }
+
+  async function passHash(pw) {
+    return cachedPassHash || (cachedPassHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw)));
+  }
+
+  async function makeKeyAESGCM(password, iv) {
+    const pwHash = await passHash(password);
+    const alg = {name: 'AES-GCM', iv: iv};                            // specify algorithm to use
+    return await crypto.subtle.importKey('raw', pwHash, alg, false, ['decrypt', 'encrypt']);  // use pw to generate key
+  }
+
+  async function encryptAESGCM(password, iv, plaintext) {
+    const key = await makeKeyAESGCM(password, iv);
+    const ptUint8 = new TextEncoder().encode(plaintext);                               // encode plaintext as UTF-8
+    const ctBuffer = await crypto.subtle.encrypt({name: key.algorithm.name, iv: iv}, key, ptUint8);                   // encrypt plaintext using key
+    const ctArray = Array.from(new Uint8Array(ctBuffer));                              // ciphertext as byte array
+    return ctArray.map(byte => String.fromCharCode(byte)).join('');             // ciphertext as string
+  }
+
+  async function decryptAESGCM(password, iv, ctStr) {
+    const key = await makeKeyAESGCM(password, iv);
+    const ctUint8 = new Uint8Array(ctStr.match(/[\s\S]/g).map(ch => ch.charCodeAt(0))); // ciphertext as Uint8Array
+    const plainBuffer = await crypto.subtle.decrypt({name: key.algorithm.name, iv: iv}, key, ctUint8);                 // decrypt ciphertext using key
+    return new TextDecoder().decode(plainBuffer);                                       // return the plaintext
+  }
+
+  async function encryptData(data) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const cipher = await encryptAESGCM(SECRET, iv, data);
+    return uint8ToHexString(iv) + '.' + toBase64url(btoa(cipher));
+  }
+
+  async function decryptData(data, password) {
+    const [ivText, cipherB64url] = data.split('.');
+    const iv = hexStringToUint8(ivText);
+    const cipher = atob(fromBase64url(cipherB64url));
+    const payload = await decryptAESGCM(password, iv, cipher);
+    let [iat, ttl, someOtherState] = payload.split('.');
+    return [iat, ttl];
+  }
+
+  //imported pure functions ends
+
+  //max. the getState(ttl) and checkData(iat, ttl) functions are application specific, don't mix them in with the list of pure functions.
+  function getState(ttl) {
+    return [Date.now(), STATE_PARAM_TTL, uint8ToHexString(crypto.getRandomValues(new Uint8Array(8)))].join('.');
+  }
+
+  function checkTTL(iat, ttl) {
+    const now = Date.now();
+    const stillTimeToLive = now < iat + ttl;
+    const notAFutureDream = iat < now;
+    return stillTimeToLive && notAFutureDream;
+  }
+
+
+  // const link = document.querySelector("web-comp");
+  // link.addEventListener("click", e => handleEvent(e));
+  let SECRET = "klasjdfoqjpwoekfj!askdfj"
+  const ROOT = window.location.origin;
+  const STATE_PARAM_TTL = 3 * 60;
+  const SESSION_TTL = 60 * 60 * 24 * 7;
+  let cachedPassHash;
+
+  class WebComp extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({mode: "open"});
+      this.shadowRoot.innerHTML = "<slot></slot>";
+      this.shadowRoot.addEventListener("click", e => handleEvent(e))
+    }
+  }
+
+  customElements.define("web-comp", WebComp);
+
+  function popupParameters() {
+    const width = Math.min(600, window.screen.width);
+    const height = Math.min(600, window.screen.height);
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    return "resizable,scrollbars,status,opener," +
+      Object.entries({width, height, left, top}).map(kv => kv.join('=')).join(',');
+  }
+
+  function receiveLoginData(e) {
+    debugger;
+    if (e.origin !== "${popupOrigin}" || e.source !== loginWindow)
+      return;
+    window.location = '${popupOrigin}';
+  }
+
+  window.addEventListener('message', receiveLoginData);
+
+  let loginWindow;
+  let loginWindowUrl;
+  let stateParam;
+
+
+  async function handleEvent(e) {
+    e.preventDefault();
+    const url = new URLSearchParams(window.location.search);
+    const action = e.target.href.split("/").pop();
+
+    const state = getState(STATE_PARAM_TTL);
+    const encryptedState = await encryptData(state);
+
+
+    if (!url.get('state')) {
+      const newurl = window.location.origin + window.location.pathname + '?state=' + encodeURIComponent(encryptedState);
+      window.history.pushState({path: newurl}, '', newurl);  //tricky way to set param after click without reload
+      // stateParam = url.get('state'); //this does not work
+      let stateParam0 = url.get('state');
+      stateParam = window.location.search.split("state=")[1]; //todo: figure out how to fix this. .get('state') does not work here
+    }
+
+    if (action === "login" && stateParam) {
+
+      let test = url.get('state');
+
+      let [_iat, _ttl] = await decryptData(stateParam, SECRET); // return decrypted value.
+      if (!checkTTL(parseInt(_iat), parseInt(_ttl)))    //Expiration check
+        throw new Error("Error: state param timed out");
+      let sessionID = JSON.stringify({iat: _iat, ttl: _ttl, userId: "Max"});
+      let encryptedSessionID = await encryptData(sessionID);
+
+      // if (!loginWindow || loginWindow.closed) {
+      //   loginWindow = window.open('popup-login.html', "_blank", popupParameters());
+      //   loginWindow.focus();
+      // }
+      // else if (loginWindowUrl !== url)
+      //   loginWindow.location = url;
+      // loginWindowUrl = url;
+
+      // document.cookie = `SESSIONID=${encryptedSessionID}; HttpOnly; Secure; SameSite=Strict; Path=/; Domain=${ROOT};`
+
+
+    }
+
+    if (!action && stateParam) {
+      let [_iat, _ttl] = await decryptData(stateParam, SECRET);
+      if (!checkTTL(_iat, _ttl))
+        return new Response("Error: state param timed out");
+      let sessionID = JSON.stringify({iat: Date.now(), ttl: SESSION_TTL, uid: "Max"});
+      let encryptedSessionID = await encryptData(sessionID);
+      return new Response(`<a href="/showCookie">get cookies</a>`, {
+        status: 200,
+        headers: {
+          'content-type': 'text/html',
+          'Set-Cookie': `SESSIONID=${encryptedSessionID}; HttpOnly; Secure; SameSite=Strict; Path=/; Domain=${ROOT};`
+        }
+      });
+    }
+
+    if (action === "showCookie") {
+      const cookie = getCookieValue(request.headers.get('cookie'), 'SESSIONID');
+      if (cookie) {
+        let [cookieData, ignore] = await decryptData(cookie, SECRET);
+        let cookieDataObj = JSON.parse(cookieData);
+        if (!checkTTL(cookieDataObj.iat, cookieDataObj.ttl))
+          return new Response("Error: session timed out");
+        return new Response(cookieDataObj.uid);
+      }
+      return new Response("no cookie! :(");
+    }
+
+
+  }
+
+  window.addEventListener('fetch', e => handleRequest(e.request));
+</script>
+
+
+</body>
+</html>

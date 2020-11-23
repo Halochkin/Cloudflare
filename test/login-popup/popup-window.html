@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<a href="login">login</a>
+<ul></ul>
+<script>
+  let loginWindow;
+  const aLink = document.querySelector("a");
+  let ul = document.querySelector("ul");
+  aLink.addEventListener("click", handleEvent);
+  window.addEventListener("message", handleMessage)
+
+
+  function handleMessage(e) {
+    let li = document.createElement("li");
+    li.innerText = e.data;
+    ul.appendChild(li);
+  }
+
+  function popupParameters() {
+    const width = Math.min(600, window.screen.width);
+    const height = Math.min(600, window.screen.height);
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    return "resizable,scrollbars,status,opener," +
+      Object.entries({width, height, left, top}).map(kv => kv.join('=')).join(',');
+  }
+
+  function handleEvent(e) {
+    e.preventDefault();
+    let url = "popup-login.html";
+    if (!loginWindow || loginWindow.closed)
+      loginWindow = window.open(url, "_blank", popupParameters());
+    loginWindow.focus();
+  }
+
+</script>
+</body>
+</html>

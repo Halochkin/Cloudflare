@@ -1,0 +1,516 @@
+<!--&lt;!&ndash;todo   cryoto.subtle.sign and Web Crypto API.subtl.verify methods?&ndash;&gt;-->
+
+
+<!--<input class="sign-button" type="button" value="Sign">-->
+<!--<input class="verify-button" type="button" value="Verify">-->
+
+
+<!--<script>-->
+<!--  (() => {-->
+
+<!--    /*-->
+<!--    Store the calculated signature here, so we can verify it later.-->
+<!--    */-->
+<!--    let signature;-->
+
+<!--    /*-->
+<!--    Fetch the contents of the "message" textbox, and encode it-->
+<!--    in a form we can use for sign operation.-->
+<!--    */-->
+<!--    function getMessageEncoding() {-->
+<!--      let message = "Some value ";-->
+<!--      let enc = new TextEncoder();-->
+<!--      return enc.encode(message);-->
+<!--    }-->
+
+<!--    /*-->
+<!--    Get the encoded message-to-sign, sign it and display a representation-->
+<!--    of the first part of it in the "signature" element.-->
+<!--    */-->
+
+<!--    async function signMessage(privateKey) {-->
+<!--      let encoded = getMessageEncoding();-->
+<!--      signature = await window.Web Crypto API.subtle.sign(-->
+<!--        "RSASSA-PKCS1-v1_5",-->
+<!--        privateKey,-->
+<!--        encoded-->
+<!--      );-->
+
+<!--      let buffer = new Uint8Array(signature, 0, 5);-->
+<!--      console.timeEnd("window.Web Crypto API.subtle.sign() time");-->
+<!--    }-->
+
+<!--    /*-->
+<!--    Fetch the encoded message-to-sign and verify it against the stored signature.-->
+<!--    * If it checks out, set the "valid" class on the signature.-->
+<!--    * Otherwise set the "invalid" class.-->
+<!--    */-->
+<!--    async function verifyMessage(publicKey) {-->
+<!--      let encoded = getMessageEncoding();-->
+<!--      let result = await window.Web Crypto API.subtle.verify(-->
+<!--        "RSASSA-PKCS1-v1_5",-->
+<!--        publicKey,-->
+<!--        signature,-->
+<!--        encoded-->
+<!--      );-->
+<!--      console.timeEnd("window.Web Crypto API.subtle.verify() time");-->
+
+<!--    }-->
+
+<!--    window.Web Crypto API.subtle.generateKey(-->
+<!--      {-->
+<!--        name: "RSASSA-PKCS1-v1_5",-->
+<!--        modulusLength: 2048,-->
+<!--        publicExponent: new Uint8Array([1, 0, 1]),-->
+<!--        hash: "SHA-256",-->
+<!--      },-->
+<!--      true,-->
+<!--      ["sign", "verify"]-->
+<!--    ).then((keyPair) => {-->
+<!--      const signButton = document.querySelector(".sign-button");-->
+<!--      signButton.addEventListener("click", () => {-->
+<!--        console.time("window.Web Crypto API.subtle.sign() time");-->
+<!--        signMessage(keyPair.privateKey);-->
+<!--      });-->
+
+<!--      const verifyButton = document.querySelector(" .verify-button");-->
+<!--      verifyButton.addEventListener("click", () => {-->
+<!--        console.time("window.Web Crypto API.subtle.verify() time");-->
+<!--        verifyMessage(keyPair.publicKey);-->
+<!--      });-->
+<!--    });-->
+
+<!--  })();-->
+
+
+<!--</script>-->
+
+<!-- -->
+
+
+<section class="examples">
+    <section class="sign-verify rsassa-pkcs1">
+        <h2 class="sign-verify-heading">RSASSA-PKCS1-v1_5</h2>
+        <section class="sign-verify-controls">
+            <div class="message-control">
+                <label for="rsassa-pkcs1-message">Enter a message to sign:</label>
+                <input type="text" id="rsassa-pkcs1-message" name="message" size="25" value="The owl hoots at midnight">
+            </div>
+            <div class="signature">Signature:<span
+                    class="signature-value valid">158,145,24,206,114...[256 bytes total]</span></div>
+            <input class="sign-button" type="button" value="Sign">
+            <input class="verify-button" type="button" value="Verify">
+        </section>
+    </section>
+
+    <section class="sign-verify rsa-pss">
+        <h2 class="sign-verify-heading">RSA-PSS</h2>
+        <section class="sign-verify-controls">
+            <div class="message-control">
+                <label for="rsa-pss-message">Enter a message to sign:</label>
+                <input type="text" id="rsa-pss-message" name="message" size="25" value="The tiger prowls at dawn">
+            </div>
+            <div class="signature">Signature:<span class="signature-value"></span></div>
+            <input class="sign-button" type="button" value="Sign">
+            <input class="verify-button" type="button" value="Verify">
+        </section>
+    </section>
+
+    <section class="sign-verify ecdsa">
+        <h2 class="sign-verify-heading">ECDSA</h2>
+        <section class="sign-verify-controls">
+            <div class="message-control">
+                <label for="ecdsa-message">Enter a message to sign:</label>
+                <input type="text" id="ecdsa-message" name="message" size="25" value="The eagle flies at twilight">
+            </div>
+            <div class="signature">Signature:<span class="signature-value"></span></div>
+            <input class="sign-button" type="button" value="Sign">
+            <input class="verify-button" type="button" value="Verify">
+        </section>
+    </section>
+
+    <section class="sign-verify hmac">
+        <h2 class="sign-verify-heading">HMAC</h2>
+        <section class="sign-verify-controls">
+            <div class="message-control">
+                <label for="hmac-message">Enter a message to sign:</label>
+                <input type="text" id="hmac-message" name="message" size="25" value="The bunny hops at teatime">
+            </div>
+            <div class="signature">Signature:<span class="signature-value"></span></div>
+            <input class="sign-button" type="button" value="Sign">
+            <input class="verify-button" type="button" value="Verify">
+        </section>
+    </section>
+</section>
+
+
+<script>
+
+  (() => {
+
+    /*
+    Store the calculated signature here, so we can verify it later.
+    */
+    let signature;
+
+    /*
+    Fetch the contents of the "message" textbox, and encode it
+    in a form we can use for sign operation.
+    */
+    function getMessageEncoding() {
+      const messageBox = document.querySelector("#ecdsa-message");
+      let message = messageBox.value;
+      let enc = new TextEncoder();
+      return enc.encode(message);
+    }
+
+    /*
+    Get the encoded message-to-sign, sign it and display a representation
+    of the first part of it in the "signature" element.
+    */
+    async function signMessage(privateKey) {
+      const signatureValue = document.querySelector(".ecdsa .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      signature = await window.crypto.subtle.sign(
+        {
+          name: "ECDSA",
+          hash: {name: "SHA-384"},
+        },
+        privateKey,
+        encoded
+      );
+
+      signatureValue.classList.add('fade-in');
+      signatureValue.addEventListener('animationend', () => {
+        signatureValue.classList.remove('fade-in');
+      });
+      let buffer = new Uint8Array(signature, 0, 5);
+      signatureValue.textContent = `${buffer}...[${signature.byteLength} bytes total]`;
+      console.timeEnd("ecdsa : window.crypto.subtle.sign() time");
+    }
+
+    /*
+    Fetch the encoded message-to-sign and verify it against the stored signature.
+    * If it checks out, set the "valid" class on the signature.
+    * Otherwise set the "invalid" class.
+    */
+    async function verifyMessage(publicKey) {
+      const signatureValue = document.querySelector(".ecdsa .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      let result = await window.crypto.subtle.verify(
+        {
+          name: "ECDSA",
+          hash: {name: "SHA-384"},
+        },
+        publicKey,
+        signature,
+        encoded
+      );
+      console.timeEnd("ecdsa : window.crypto.subtle.verify() time");
+      signatureValue.classList.add(result ? "valid" : "invalid");
+    }
+
+    /*
+    Generate a sign/verify key, then set up event listeners
+    on the "Sign" and "Verify" buttons.
+    */
+    window.crypto.subtle.generateKey(
+      {
+        name: "ECDSA",
+        namedCurve: "P-384"
+      },
+      true,
+      ["sign", "verify"]
+    ).then((keyPair) => {
+      const signButton = document.querySelector(".ecdsa .sign-button");
+      signButton.addEventListener("click", () => {
+        console.time("ecdsa : window.crypto.subtle.sign() time");
+        signMessage(keyPair.privateKey);
+      });
+
+      const verifyButton = document.querySelector(".ecdsa .verify-button");
+      verifyButton.addEventListener("click", () => {
+        console.time("ecdsa : window.crypto.subtle.verify() time");
+        verifyMessage(keyPair.publicKey);
+      });
+    });
+
+  })();
+
+
+  (() => {
+
+    /*
+    Store the calculated signature here, so we can verify it later.
+    */
+    let signature;
+
+    /*
+    Fetch the contents of the "message" textbox, and encode it
+    in a form we can use for sign operation.
+    */
+    function getMessageEncoding() {
+      const messageBox = document.querySelector("#hmac-message");
+      let message = messageBox.value;
+      let enc = new TextEncoder();
+      return enc.encode(message);
+    }
+
+    /*
+    Get the encoded message-to-sign, sign it and display a representation
+    of the first part of it in the "signature" element.
+    */
+    async function signMessage(key) {
+      const signatureValue = document.querySelector(".hmac .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      signature = await window.crypto.subtle.sign(
+        "HMAC",
+        key,
+        encoded
+      );
+
+      signatureValue.classList.add('fade-in');
+      signatureValue.addEventListener('animationend', () => {
+        signatureValue.classList.remove('fade-in');
+      });
+      console.timeEnd("hmac : window.crypto.subtle.sign() time");
+      let buffer = new Uint8Array(signature, 0, 5);
+      signatureValue.textContent = `${buffer}...[${signature.byteLength} bytes total]`;
+    }
+
+    /*
+    Fetch the encoded message-to-sign and verify it against the stored signature.
+    * If it checks out, set the "valid" class on the signature.
+    * Otherwise set the "invalid" class.
+    */
+    async function verifyMessage(key) {
+      const signatureValue = document.querySelector(".hmac .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      let result = await window.crypto.subtle.verify(
+        "HMAC",
+        key,
+        signature,
+        encoded
+      );
+      console.timeEnd("hmac : window.crypto.subtle.verify() time");
+      signatureValue.classList.add(result ? "valid" : "invalid");
+    }
+
+    /*
+    Generate a sign/verify key, then set up event listeners
+    on the "Sign" and "Verify" buttons.
+    */
+    window.crypto.subtle.generateKey(
+      {
+        name: "HMAC",
+        hash: {name: "SHA-512"}
+      },
+      true,
+      ["sign", "verify"]
+    ).then((key) => {
+      const signButton = document.querySelector(".hmac .sign-button");
+      signButton.addEventListener("click", () => {
+        console.time("hmac : window.crypto.subtle.sign() time");
+        signMessage(key);
+      });
+
+      const verifyButton = document.querySelector(".hmac .verify-button");
+      console.time("hmac : window.crypto.subtle.verify() time");
+      verifyButton.addEventListener("click", () => {
+        verifyMessage(key);
+      });
+    });
+
+  })();
+  (() => {
+
+    /*
+    Store the calculated signature here, so we can verify it later.
+    */
+    let signature;
+
+    /*
+    Fetch the contents of the "message" textbox, and encode it
+    in a form we can use for sign operation.
+    */
+    function getMessageEncoding() {
+      const messageBox = document.querySelector("#rsa-pss-message");
+      let message = messageBox.value;
+      let enc = new TextEncoder();
+      return enc.encode(message);
+    }
+
+    /*
+    Get the encoded message-to-sign, sign it and display a representation
+    of the first part of it in the "signature" element.
+    */
+    async function signMessage(privateKey) {
+      const signatureValue = document.querySelector(".rsa-pss .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      signature = await window.crypto.subtle.sign(
+        {
+          name: "RSA-PSS",
+          saltLength: 32,
+        },
+        privateKey,
+        encoded
+      );
+
+      signatureValue.classList.add('fade-in');
+      signatureValue.addEventListener('animationend', () => {
+        signatureValue.classList.remove('fade-in');
+      });
+      let buffer = new Uint8Array(signature, 0, 5);
+      signatureValue.textContent = `${buffer}...[${signature.byteLength} bytes total]`;
+    }
+
+    /*
+    Fetch the encoded message-to-sign and verify it against the stored signature.
+    * If it checks out, set the "valid" class on the signature.
+    * Otherwise set the "invalid" class.
+    */
+    async function verifyMessage(publicKey) {
+      const signatureValue = document.querySelector(".rsa-pss .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      let result = await window.crypto.subtle.verify(
+        {
+          name: "RSA-PSS",
+          saltLength: 32,
+        },
+        publicKey,
+        signature,
+        encoded
+      );
+
+      signatureValue.classList.add(result ? "valid" : "invalid");
+    }
+
+    /*
+    Generate a sign/verify key, then set up event listeners
+    on the "Sign" and "Verify" buttons.
+    */
+    window.crypto.subtle.generateKey(
+      {
+        name: "RSA-PSS",
+        // Consider using a 4096-bit key for systems that require long-term security
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+      },
+      true,
+      ["sign", "verify"]
+    ).then((keyPair) => {
+      const signButton = document.querySelector(".rsa-pss .sign-button");
+      signButton.addEventListener("click", () => {
+        signMessage(keyPair.privateKey);
+      });
+
+      const verifyButton = document.querySelector(".rsa-pss .verify-button");
+      verifyButton.addEventListener("click", () => {
+        verifyMessage(keyPair.publicKey);
+      });
+    });
+
+  })();
+  (() => {
+
+    /*
+    Store the calculated signature here, so we can verify it later.
+    */
+    let signature;
+
+    /*
+    Fetch the contents of the "message" textbox, and encode it
+    in a form we can use for sign operation.
+    */
+    function getMessageEncoding() {
+      const messageBox = document.querySelector("#rsassa-pkcs1-message");
+      let message = messageBox.value;
+      let enc = new TextEncoder();
+      return enc.encode(message);
+    }
+
+    /*
+    Get the encoded message-to-sign, sign it and display a representation
+    of the first part of it in the "signature" element.
+    */
+    async function signMessage(privateKey) {
+      const signatureValue = document.querySelector(".rsassa-pkcs1 .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      signature = await window.crypto.subtle.sign(
+        "RSASSA-PKCS1-v1_5",
+        privateKey,
+        encoded
+      );
+
+      signatureValue.classList.add('fade-in');
+      signatureValue.addEventListener('animationend', () => {
+        signatureValue.classList.remove('fade-in');
+      });
+      let buffer = new Uint8Array(signature, 0, 5);
+      signatureValue.textContent = `${buffer}...[${signature.byteLength} bytes total]`;
+    }
+
+    /*
+    Fetch the encoded message-to-sign and verify it against the stored signature.
+    * If it checks out, set the "valid" class on the signature.
+    * Otherwise set the "invalid" class.
+    */
+    async function verifyMessage(publicKey) {
+      const signatureValue = document.querySelector(".rsassa-pkcs1 .signature-value");
+      signatureValue.classList.remove("valid", "invalid");
+
+      let encoded = getMessageEncoding();
+      let result = await window.crypto.subtle.verify(
+        "RSASSA-PKCS1-v1_5",
+        publicKey,
+        signature,
+        encoded
+      );
+
+      signatureValue.classList.add(result ? "valid" : "invalid");
+    }
+
+    /*
+    Generate a sign/verify key, then set up event listeners
+    on the "Sign" and "Verify" buttons.
+    */
+    window.crypto.subtle.generateKey(
+      {
+        name: "RSASSA-PKCS1-v1_5",
+        // Consider using a 4096-bit key for systems that require long-term security
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+      },
+      true,
+      ["sign", "verify"]
+    ).then((keyPair) => {
+      const signButton = document.querySelector(".rsassa-pkcs1 .sign-button");
+      signButton.addEventListener("click", () => {
+        signMessage(keyPair.privateKey);
+      });
+
+      const verifyButton = document.querySelector(".rsassa-pkcs1 .verify-button");
+      verifyButton.addEventListener("click", () => {
+        verifyMessage(keyPair.publicKey);
+      });
+    });
+
+  })();
+
+</script>
