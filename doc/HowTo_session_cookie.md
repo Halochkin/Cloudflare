@@ -1,6 +1,5 @@
 # HowTo: session cookie
 
-
 Session cookies, aka. ForgetMe cookies, are delete by the browser every time the full browser window with that cookie is closed by the user (closing a tab in a window is not enough to forget a session cookie). To create a forgetMe cookie simply do NOT set neither `Max-Age` nor `Expires` attributes on the cookie.
 
 ```javascript

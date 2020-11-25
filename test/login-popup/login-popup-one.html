@@ -1,10 +1,18 @@
 hello sunshine
 <h1>ONE</h1>
 <script>
-  const secureCallbackDomain = 'http://localhost:63342';
 
-  setTimeout(function () {
-    window.opener.postMessage('hello sunshine ONE', secureCallbackDomain);
-    window.close();
-  }, 2000);
+  const object1 = {
+    property1: 42
+  };
+
+  const descriptor1 = Object.getOwnPropertyDescriptor(object1, 'property1');
+
+
+
+   let addEventListenerOG = Object.getOwnPropertyDescriptor(EventTarget.prototype, "addEventListener");
+
+
+   debugger
+
 </script>
