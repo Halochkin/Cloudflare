@@ -18,10 +18,12 @@ Let's look at an example
 
 4. If a non-html file requested, its content will be presented with the corresponding value `content-type'.
 
+## HowTo: HTMLRewriter 
+
 5. An element handler responds to any incoming element, when attached using the .on function of an `HTMLRewriter` instance. The element handler respond to `element(el)` when `.on(element, Element Handler)` is called. It allows:
    * Implement the default logic for the `<base>` element. The server does not allow to implement the `<base>` element default action.  The `LinkToStyle` class used to define a new relative path to the file.    
    * Select a relative .css document and add its value inside the `<style>` tag. That is, convert it to HTML format.
-6. The `HTMLRewriter` class allows to build comprehensive and expressive HTML parsers inside of a Cloudflare Workers application. It allows to use CSS selectors to create a sample of elements that call the element handler for each element to be passed. After searching for each element of the sample, the result is new Response containing the processed elements. 
+6. The `HTMLRewriter` class allows build comprehensive and expressive HTML parsers inside of a Cloudflare Workers application. It allows to use CSS selectors to create a sample of elements that call the element handler for each element to be passed. After searching for each element of the sample, the result is new Response containing the processed elements. 
 
 ```javascript
 const HTML = `<html>                                               <!--[2]-->                                 
