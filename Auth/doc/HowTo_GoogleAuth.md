@@ -59,7 +59,10 @@ Let's consider the authentication lifecycle:
 Create new _KV_ and inside **KV Namespace Bindings** add variable
    * `KV_AUTH` - link to KV which uses as database.
 
-5. Inside `handleRequest()` put the code
+## `handleRequest` function
+
+Put the code
+
   ```javascript
 async function handleRequest(request) {
   try {
