@@ -55,7 +55,7 @@ The authentication lifecycle the same as in [google auth](HowTo_GoogleAuth.md#li
    
 ## `handleRequest` function
 
-Use the Google [`handleRequest()`](HowTo_GoogleAuth.md#handlerequest-function). use `githubProcessTokenPackage()` instead of `googleProcessTokenPackage()`.
+Copy code from Google [`handleRequest()`](HowTo_GoogleAuth.md#handlerequest-function). Use `githubProcessTokenPackage()` instead of `googleProcessTokenPackage()`.
 
 ## Process Github Access Token
 To get Github access token `githubProcessTokenPackage()` is used.
