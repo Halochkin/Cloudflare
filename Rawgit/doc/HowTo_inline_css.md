@@ -25,6 +25,7 @@ Let's look at an example
    * Select a relative .css document and add its value inside the `<style>` tag. That is, convert it to HTML format.
 6. The `HTMLRewriter` class allows build comprehensive and expressive HTML parsers inside of a Cloudflare Workers application. It allows to use CSS selectors to create a sample of elements that call the element handler for each element to be passed. After searching for each element of the sample, the result is new Response containing the processed elements. 
 
+## Example
 ```javascript
 const HTML = `<html>                                               <!--[2]-->                                 
 <head>

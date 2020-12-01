@@ -1,6 +1,6 @@
  # HowTo inline JavaScript
 
-JS Inline is similar to [inline CSS](HowTo_inline_css.md). 
+JS Inline is similar to [inline CSS](HowTo_inline_css.md). Use `linkToStyle()` from [inine CSS example](HowTo_inline_css.md#example)
 
 The difference is in the use of additional element handlers : `InlineMutator` and `ScriptInliner`;
 
@@ -40,7 +40,6 @@ class ScriptInliner {
 }
 
 class InlineMutator {
-
     constructor(cookie, base) {
         this.cookie = cookie;
         this.firstBase = base;
@@ -69,28 +68,6 @@ class InlineMutator {
     }
 }
 
-class LinkToStyle {
-
-    constructor(location) {
-        this.firstBase = location.href;
-        this.secondBase = undefined;
-    }
-
-    async element(el) {
-        if (el.tagName === 'base') {
-            if (!this.secondBase)
-                this.secondBase = new URL(el.getAttribute('href'), this.firstBase).href;
-            return;
-        }
-
-        const href = el.getAttribute('href');
-        const url = new URL(href, this.secondBase || this.firstBase);
-        const body = FILES[url.pathname];
-        if (body)
-            el.replace(`<style>${body}</style>`, { html: true });
-    }
-}
-
 async function handleRequest(request) {
     const url = new URL(request.url);
     const path = url.pathname;
@@ -98,7 +75,7 @@ async function handleRequest(request) {
     const headers = { "content-type": 'text/' + path.substr(path.lastIndexOf('.') + 1) };
     if (!('text/' + path.substr(path.lastIndexOf('.') + 1) === 'text/html'))
         return new Response(body, { status: 200, headers });
-    const linkToStyle = new LinkToStyle(url);
+    const linkToStyle = new LinkToStyle(url);                                                                
     const inlineMutator = new InlineMutator('Mr. Sunshine', url);                                                  //[1]
     const scriptInliner = new ScriptInliner({ username: 'Mr. Sunshiny Day' });                                     //[2]
     return new HTMLRewriter()

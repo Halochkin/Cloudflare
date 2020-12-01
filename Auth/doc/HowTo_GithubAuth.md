@@ -44,7 +44,7 @@ The authentication lifecycle the same as in [google auth](HowTo_GoogleAuth.md#li
    * `GITHUB_OAUTH_LINK: https://github.com/login/oauth/authorize` - to obtain user authorization, handle active session lookup, authenticates the user, and obtains user consent.
    * `GITHUB_REDIRECT https://github-auth.maksgalochkin2.workers.dev/callback/github` redirect url after successful authentication. 
    * `GITHUB_TOKEN	https://github.com/login/oauth/access_token` Github access token. 
-   * `COUNTER_KEY=dvAV77q6uaIOSzE_cgq6Bs_q-vojyIglNLW8lWHtiGUuWM03mLCZnaWIqTtlWYhk` - counterapi.xyz key. Check [HowToatomicCounter](https://github.com/orstavik/cloudflare-tutorial/blob/main/docs/2_worker_tricks/HowTo_atomicCounter.md) for description.
+   * `COUNTER_KEY=dvAV77q6uaIOSzE_cgq6Bs_q-vojyIglNLW8lWHtiGUuWM03mLCZnaWIqTtlWYhk` - `counterapi.xyz` key. Check [HowToatomicCounter](https://github.com/orstavik/cloudflare-tutorial/blob/main/docs/2_worker_tricks/HowTo_atomicCounter.md) for description.
    * `SECRET=klasjdfoqjpwoekfj!askdfj` - cypher key.
    * `SESSION_COOKIE_NAME=GOOGLE_SESSIONID` - name of the cookies which contains encrypted sessionSecret. 
    * `SESSION_ROOT=google-auth.maksgalochkin2` - worker root url.
