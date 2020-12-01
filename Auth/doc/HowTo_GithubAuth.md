@@ -18,7 +18,7 @@ vs.
 
 ## Lifecycle
 
-The authentication lifecycle the same as in [google auth](HowTo_GoogleAuth.md#lifecycle)
+The authentication lifecycle the same as in [google auth](HowTo_GoogleAuth.md#lifecycle).
 
 ## Create and configure Github App
 
@@ -50,7 +50,7 @@ The authentication lifecycle the same as in [google auth](HowTo_GoogleAuth.md#li
    * `SESSION_ROOT=google-auth.maksgalochkin2` - worker root url.
    * `SESSION_TTL=2592000` - session time to live.
    * `STATE_PARAM_TTL=180` - state param time to live.
- Create new _KV_ and inside **KV Namespace Bindings** add variable
+ Create new _KV_ and inside **KV Namespace Bindings** and define variable:
    * `KV_AUTH` - link to KV which uses as database.
    
 ## `handleRequest` function
