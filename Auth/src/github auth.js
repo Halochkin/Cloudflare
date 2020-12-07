@@ -1,7 +1,27 @@
-addEventListener('fetch', e => e.respondWith(handleRequest(e.request)));
+// _globals
+//   SECRET
+//   SESSION_ROOT
+//   STATE_PARAM_TTL
+//   SESSION_TTL
+//   KV_AUTH
+//......
+//   SESSION_COOKIE_NAME
+//   GOOGLE_CLIENTID
+//   GOOGLE_CLIENTSECRET
+//   GOOGLE_CODE_LINK
+//   GOOGLE_OAUTH_LINK
+//   GOOGLE_REDIRECT
+//   GITHUB_CLIENTID
+//   GITHUB_CLIENTSECRET
+//   GITHUB_CODE_LINK
+//   GITHUB_OAUTH_LINK
+//   GITHUB_REDIRECT
+//   COUNTER_DOMAIN
+//   COUNTER_KEY
 
-const STATE_PARAM_TTL = 3 * 60;
+let cachedPassHash;
 
+//imported pure functions begins
 function randomString(length) {
   const iv = crypto.getRandomValues(new Uint8Array(length));
   return Array.from(iv).map(b => ('00' + b.toString(16)).slice(-2)).join('');
@@ -11,9 +31,11 @@ function getCookieValue(cookie, key) {
   return cookie?.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop();
 }
 
-//Base64url
-function toBase64url(base64str) {
-  return base64str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+function bakeCookie(name, value, domain, ttl) {
+  let cookie = `${name}=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Domain=${domain};`;
+  if (ttl !== '')
+    cookie += 'Max-age=' + ttl + ';';
+  return cookie;
 }
 
 function uint8ToHexString(ar) {
@@ -24,6 +46,9 @@ function hexStringToUint8(str) {
   return new Uint8Array(str.match(/.{2}/g).map(byte => parseInt(byte, 16)));
 }
 
+function toBase64url(base64str) {
+  return base64str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
 
 function fromBase64url(base64urlStr) {
   base64urlStr = base64urlStr.replace(/-/g, '+').replace(/_/g, '/');
@@ -33,8 +58,6 @@ function fromBase64url(base64urlStr) {
     return base64urlStr + '=';
   return base64urlStr;
 }
-
-let cachedPassHash;
 
 async function passHash(pw) {
   return cachedPassHash || (cachedPassHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw)));
@@ -49,7 +72,7 @@ async function makeKeyAESGCM(password, iv) {
 async function encryptAESGCM(password, iv, plaintext) {
   const key = await makeKeyAESGCM(password, iv);
   const ptUint8 = new TextEncoder().encode(plaintext);                               // encode plaintext as UTF-8
-  const ctBuffer = await crypto.subtle.encrypt({name: key.algorithm.name, iv: iv}, key, ptUint8); // encrypt plaintext using key
+  const ctBuffer = await crypto.subtle.encrypt({name: key.algorithm.name, iv: iv}, key, ptUint8);                   // encrypt plaintext using key
   const ctArray = Array.from(new Uint8Array(ctBuffer));                              // ciphertext as byte array
   return ctArray.map(byte => String.fromCharCode(byte)).join('');             // ciphertext as string
 }
@@ -61,18 +84,35 @@ async function decryptAESGCM(password, iv, ctStr) {
   return new TextDecoder().decode(plainBuffer);                                       // return the plaintext
 }
 
-function getState(ttl) {
-  return [Date.now(), ttl, uint8ToHexString(crypto.getRandomValues(new Uint8Array(8)))].join('.');
-}
-
-async function getEncryptedData(data) {
+async function encryptData(data, password) {
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const cipher = await encryptAESGCM(SECRET, iv, data);
+  const cipher = await encryptAESGCM(password, iv, data);
   return uint8ToHexString(iv) + '.' + toBase64url(btoa(cipher));
 }
 
-//GET REDIRECT AND POST ACCESS_TOKEN
-function makeRedirect(path, params) {
+async function decryptData(data, password) {
+  try {
+    const [ivText, cipherB64url] = data.split('.');
+    const iv = hexStringToUint8(ivText);
+    const cipher = atob(fromBase64url(cipherB64url));
+    return await decryptAESGCM(password, iv, cipher);
+  } catch (err) {
+    throw 'error decrypting: ' + data;
+  }
+}
+
+function checkTTL(iat, ttl) {
+  const now = Date.now();
+  if (iat > now)
+    throw 'BAD: iat issued in the future';
+  if (now > iat + ttl)
+    throw 'timed out';
+}
+
+//imported pure functions ends
+
+//imported authentication functions
+function redirectUrl(path, params) {
   return path + '?' + Object.entries(params).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
 }
 
@@ -84,74 +124,132 @@ async function fetchAccessToken(path, data) {
   });
 }
 
-async function githubProcessTokenPackage(code) {
-  const accessTokenPackage = await fetchAccessToken(GITHUB_TOKEN, {   //[1]
-    code,
-    client_id: GITHUB_CLIENT_ID,
-    client_secret: GITHUB_CLIENT_SECRET,
-    redirect_uri: GITHUB_REDIRECT_URL,
+async function githubProcessTokenPackage(code, state) {
+  const accessTokenPackage = await fetchAccessToken(GITHUB_CODE_LINK, {
+    code: code,
+    client_id: GITHUB_CLIENTID,
+    client_secret: GITHUB_CLIENTSECRET,
+    redirect_uri: GITHUB_REDIRECT,
+    state
   });
 
-  const tokenText = await accessTokenPackage.text();                              //[2]
-  console.log(tokenText)
+  const data = await accessTokenPackage.text();
 
-  const access_token = tokenText.split('&')[0].split("=")[1];                     //[3]
-  const user = await fetch('https://api.github.com/user', {                       //[4]
+  console.log(data)
+
+  return new Response("hello" + data)
+
+  const x = {};
+  data.split('&').map(pair => pair.split('=')).forEach(([k, v]) => x[k] = v);
+  const accessToken = x['access_token'];
+  const user = await fetch('https://api.github.com/user', {
     headers: {
-      'Authorization': 'token ' + access_token,
-      'User-Agent': 'maksgalochkin2',
-      'Accept': 'application/vnd.github.v3.raw+json'
+      'Authorization': 'token ' + accessToken,
+      'User-Agent': '2js-no',
+      'Accept': 'application/vnd.github.v3+json'
     }
   });
   const userData = await user.json();
-  return {                                                                        //[5]
-    name: userData.name,
-    id: userData.id
-  };
+  return ['gi' + userData.id, 'github.com/' + userData.login];
 }
 
-function checkTTL(iat, ttl) {
-  const now = Date.now();
-  const stillTimeToLive = now < iat + ttl;
-  const notAFutureDream = iat < now;
-  return stillTimeToLive && notAFutureDream;
+//imported authentication functions ends
+
+//imported counter
+const hitCounter = `https://api.countapi.xyz/hit/${SESSION_ROOT}/${COUNTER_KEY}`;
+
+async function count() {
+  const nextCount = await fetch(hitCounter);
+  const data = await nextCount.json();
+  return data.value;
 }
 
-async function decryptData(data, password) {
-  const [ivText, cipherB64url] = data.split('.');
-  const iv = hexStringToUint8(ivText);
-  const cipher = atob(fromBase64url(cipherB64url));
-  const payload = await decryptAESGCM(password, iv, cipher);
-  let [iat, ttl, someOtherState] = payload.split('.');
-  return [iat, ttl];
+//imported counter ends
+
+async function getOrSetUid(providerId) {
+  const oldUid = await KV_AUTH.get(providerId);
+  if (oldUid)
+    return oldUid;
+  const newUid = (await count()).toString(36);
+  console.log(newUid, 000)
+  await KV_AUTH.put(providerId, newUid);
+  await KV_AUTH.put('_' + newUid, providerId);
+  return newUid;
 }
 
+async function login(provider, stateSecret) {
+  return redirectUrl(GITHUB_OAUTH_LINK, {
+    state: stateSecret,
+    client_id: GITHUB_CLIENTID,
+    redirect_url: GITHUB_REDIRECT,
+    scope: 'user'
+  });
+  throw 'login error: incorrect provider: ' + provider;
+}
+
+function selfClosingMessage(msg, domain) {
+  return `<script>
+  window.opener.postMessage('${msg}', 'https://${domain}'); 
+  window.close();
+</script>`;
+}
 
 async function handleRequest(request) {
-  const url = new URL(request.url);                                                                         //[2]
-  const state = getState(STATE_PARAM_TTL);                                                                  //[3]
-  const encryptedState = await getEncryptedData(state);                                                     //[4]
-  const [empty, action] = url.pathname.split('/');                                                          //[5]
+  try {
+    console.log("Start")
+    const url = new URL(request.url);
+    const [ignore, action, provider] = url.pathname.split('/');
 
-  if (action === "login") {                                                                                 //[6]
-    let redirect = makeRedirect(GITHUB_OAUTH_LINK, {                                                      //[7]
-      state: encryptedState,
-      client_id: GITHUB_CLIENT_ID,
-      redirect_url: GITHUB_REDIRECT_URL,
-      scope: 'user',
-    });
-    return Response.redirect(redirect);                                                                   //[8]
-  }
-  if (action === "callback") {                                                                              //[9]
-    const stateParam = url.searchParams.get('state');                                                     //[10]
-    let [_iat, _ttl] = await decryptData(stateParam, SECRET); // return decrypted value.
-    if (!checkTTL(_iat, _ttl))    //Expiration check
-      return new Response("Error: state param timed out");
-    let code = url.searchParams.get("code");                                                              //[13]
-    let userToken = await githubProcessTokenPackage(code);                                                //[14]
-    return new Response(JSON.stringify(userToken));                                                       //[15]
-  }
+    if (action === 'login') {
+      //1. make state secret
+      const stateSecret = await encryptData(JSON.stringify({
+        iat: Date.now(),
+        ttl: STATE_PARAM_TTL,
+        provider: provider,
+        rm: url.searchParams.get('remember-me')
+      }), SECRET);
+      //2. redirect to openid provider using state secret
+      return Response.redirect(await login(provider, stateSecret));
+    }
 
-  const mainpage = `<a href='/login'>login github</a>`;
-  return new Response(mainpage, {headers: {'Content-Type': 'text/html'}});                              //[1]
+    if (action === 'callback') {
+      //1. decrypt and verify state secret
+      const stateSecret = url.searchParams.get('state');
+      const state = JSON.parse(await decryptData(stateSecret, SECRET));
+      // console.log(state, "state")
+      checkTTL(state.iat, state.ttl);
+      if (state.provider !== provider)
+        throw 'BAD: valid stateSecret but unknown provider?';
+
+      //2. process callback using code and state
+      const code = url.searchParams.get('code');
+      const [providerId, username] = await githubProcessTokenPackage(code, stateSecret);
+      return new Response(providerId + username)
+      //3. get the uid for the providerId
+      const uid = await getOrSetUid(providerId);
+
+      //4. make the session secret and session object
+      const iat = Date.now();
+      const ttl = state.rm === null ? null : SESSION_TTL;
+      const sessionObject = {uid, username, provider, iat, ttl, v: 27};
+      console.log(sessionObject, 999)
+      const sessionSecret = await encryptData(JSON.stringify(sessionObject), SECRET);
+
+      //   const txtIn = selfClosingMessage(JSON.stringify(sessionObject), SESSION_ROOT);
+      const cookieIn = bakeCookie(SESSION_COOKIE_NAME, sessionSecret, SESSION_ROOT, sessionObject.ttl);
+      //   return new Response(txtIn, {status: 200, headers: {'content-type': 'text/html', 'Set-Cookie': cookieIn}});
+      return new Response(sessionObject, {status: 200, headers: {'content-type': 'text/html', 'Set-Cookie': cookieIn}});
+
+    }
+    if (action === 'logout') {
+      const txtOut = selfClosingMessage('', SESSION_ROOT);
+      const cookieOut = bakeCookie(SESSION_COOKIE_NAME, 'LoggingOut', SESSION_ROOT, 0);
+      return new Response(txtOut, {status: 200, headers: {'content-type': 'text/html', 'Set-Cookie': cookieOut}});
+    }
+    throw `wrong action: ${action} in ${url.pathname}`;
+  } catch (err) {
+    return new Response(err.message, {status: 401});
+  }
 }
+
+addEventListener('fetch', e => e.respondWith(handleRequest(e.request)));

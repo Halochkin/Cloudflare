@@ -29,7 +29,7 @@ function randomString(length) {
 }
 
 function getCookieValue(cookie, key) {
-  return cookie?.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop();
+  return cookie ?.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`) ?.pop();
 }
 
 function bakeCookie(name, value, domain, ttl) {
@@ -68,14 +68,14 @@ async function passHash(pw) {
 
 async function makeKeyAESGCM(password, iv) {
   const pwHash = await passHash(password);
-  const alg = {name: 'AES-GCM', iv: iv};                            // specify algorithm to use
+  const alg = { name: 'AES-GCM', iv: iv };                            // specify algorithm to use
   return await crypto.subtle.importKey('raw', pwHash, alg, false, ['decrypt', 'encrypt']);  // use pw to generate key
 }
 
 async function encryptAESGCM(password, iv, plaintext) {
   const key = await makeKeyAESGCM(password, iv);
   const ptUint8 = new TextEncoder().encode(plaintext);                               // encode plaintext as UTF-8
-  const ctBuffer = await crypto.subtle.encrypt({name: key.algorithm.name, iv: iv}, key, ptUint8);                   // encrypt plaintext using key
+  const ctBuffer = await crypto.subtle.encrypt({ name: key.algorithm.name, iv: iv }, key, ptUint8);                   // encrypt plaintext using key
   const ctArray = Array.from(new Uint8Array(ctBuffer));                              // ciphertext as byte array
   return ctArray.map(byte => String.fromCharCode(byte)).join('');             // ciphertext as string
 }
@@ -83,7 +83,7 @@ async function encryptAESGCM(password, iv, plaintext) {
 async function decryptAESGCM(password, iv, ctStr) {
   const key = await makeKeyAESGCM(password, iv);
   const ctUint8 = new Uint8Array(ctStr.match(/[\s\S]/g).map(ch => ch.charCodeAt(0))); // ciphertext as Uint8Array
-  const plainBuffer = await crypto.subtle.decrypt({name: key.algorithm.name, iv: iv}, key, ctUint8);                 // decrypt ciphertext using key
+  const plainBuffer = await crypto.subtle.decrypt({ name: key.algorithm.name, iv: iv }, key, ctUint8);                 // decrypt ciphertext using key
   return new TextDecoder().decode(plainBuffer);                                       // return the plaintext
 }
 
@@ -108,10 +108,16 @@ function checkTTL(iat, ttl) {
   const now = Date.now();
   if (iat > now)
     throw 'BAD: iat issued in the future';
-  if (now > iat + ttl)
+  if (now > iat + ttl)    //now 15:00  iat 10:00  + 6mth in ms
     throw 'timed out';
 }
 
+function getLoginTime() {
+  const date = new Date();
+  const year = date.getFullYear() % 100;
+  const month = date.getMonth() + 1;
+  return [year, month];
+}
 //imported pure functions ends
 
 //imported authentication functions
@@ -122,7 +128,7 @@ function redirectUrl(path, params) {
 async function fetchAccessToken(path, data) {
   return await fetch(path, {
     method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: Object.entries(data).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&')
   });
 }
@@ -138,14 +144,8 @@ async function googleProcessTokenPackage(code) {
     }
   );
   const jwt = await tokenPackage.json();
-  const [year, month] = getLoginTime();
-  const [header, payloadB64url, signature] = jwt.id_token.split('.');
-  const payloadText = atob(fromBase64url(payloadB64url));
-  const payload = JSON.parse(payloadText);
-  return ['go' + payload.sub, payload.email];
+  return jwt.id_token;
 }
-
-
 
 //imported counter
 const hitCounter = `https://api.countapi.xyz/hit/${SESSION_ROOT}/${COUNTER_KEY}`;
@@ -169,14 +169,14 @@ async function getOrSetUid(providerId) {
 }
 
 async function login(stateSecret) {
-    return redirectUrl(GOOGLE_OAUTH_LINK, {
-      state: stateSecret,
-      nonce: randomString(12),
-      client_id: GOOGLE_CLIENTID,
-      redirect_uri: GOOGLE_REDIRECT,
-      scope: 'openid email',
-      response_type: 'code',
-    });
+  return redirectUrl(GOOGLE_OAUTH_LINK, {
+    state: stateSecret,
+    nonce: randomString(12),
+    client_id: GOOGLE_CLIENTID,
+    redirect_uri: GOOGLE_REDIRECT,
+    scope: 'openid email profile',
+    response_type: 'code',
+  });
 }
 
 
@@ -191,8 +191,23 @@ async function handleRequest(request) {
   try {
     const url = new URL(request.url);
     const [ignore, action, provider] = url.pathname.split('/');
-
     if (action === 'login') {
+      //rolling cookie
+      const cookies = request.headers.get('cookie');
+      const jwtCookie = getCookieValue(cookies, 'sessionIDJwtCookie');
+      if (jwtCookie) {
+        let jwtObj = JSON.parse(atob(fromBase64url(jwtCookie)));
+        //make string to decrypt
+        let decryptedPayloadawait = await decryptData(jwtObj.header.iv + "." + jwtObj.payload);
+        if (Date.now() < jwtObj.header.Iat + jwtObj.header.Uat) {  //fix this, because checkTTL throws errors.  try catch here, I think no. Just check wheather cookies is not expired and return responce with existing cookies. If expired just let browser to make redirect to /callback ???
+          // refesh jwt cookie iat
+          jwtObj.header.iat = Date.now();
+          // make new cookie
+          const jwtCookie = bakeCookie("sessionIDJwtCookie", toBase64url(btoa(JSON.stringify(jwtObj)), SECRET), SESSION_ROOT, jwtObj.header.uat)
+          return new Response(decryptedPayloadawait + "fromCookie", { status: 200, headers: { 'content-type': 'text/html', 'Set-Cookie': jwtCookie } });
+        }
+
+      }
       //1. make state secret
       const stateSecret = await encryptData(JSON.stringify({
         iat: Date.now(),
@@ -201,7 +216,7 @@ async function handleRequest(request) {
         rm: url.searchParams.get('remember-me')
       }), SECRET);
       //2. redirect to openid provider using state secret
-      return Response.redirect(await login( stateSecret));
+      return Response.redirect(await login(stateSecret));
     }
 
     if (action === 'callback') {
@@ -214,29 +229,55 @@ async function handleRequest(request) {
 
       //2. process callback using code and state
       const code = url.searchParams.get('code');
-      const [providerId, username] = await googleProcessTokenPackage(code);
+
+      // handle JWT
+      const jwt = await googleProcessTokenPackage(code);
+      const [header, payloadB64url, signature] = jwt.split('.');
+      //   const [year, month] = getLoginTime();
+      const payloadText = atob(fromBase64url(payloadB64url));
+      const payloadObj = JSON.parse(payloadText);
+
+      const providerId = 'go' + payloadObj.sub;
+      const username = payloadObj.email; // cant shortcut, bug with a dot
+      // just encrypt whole payload obj. Of course I can encrypt only some properties
+      let encryptedPayload = (await encryptData(payloadText, SECRET)).split(".");
+
+      const iat = Date.now();
+      const jwtUatMonths = 6;
+
+      const uatMs = 60 * 60 * 24 * 30 * jwtUatMonths;
+      // make JWT
+      let handledJwt = {
+        header: {
+          alg: "aes256-gcm",
+          iv: encryptedPayload[0],    // encrypted payload string iv
+          key: new Date().getUTCMonth() + 1,
+          Iat: iat,
+          Uat: uatMs
+        },
+        payload: encryptedPayload[1]    //encrypted payload cypher string
+      }
 
       //3. get the uid for the providerId
       const uid = await getOrSetUid(providerId);
-
       //4. make the session secret and session object
-      const iat = Date.now();
       const ttl = state.rm === null ? null : SESSION_TTL;
-      const sessionObject = {uid, username, provider, iat, ttl, v: 27};
+      const sessionObject = { uid, username, provider, iat, ttl, v: 27 };
       const sessionSecret = await encryptData(JSON.stringify(sessionObject), SECRET);
-
       const txtIn = selfClosingMessage(JSON.stringify(sessionObject), SESSION_ROOT);
       const cookieIn = bakeCookie(SESSION_COOKIE_NAME, sessionSecret, SESSION_ROOT, sessionObject.ttl);
-      return new Response(txtIn, {status: 200, headers: {'content-type': 'text/html', 'Set-Cookie': cookieIn}});
+      //JWT cookie
+      const jwtCookie = bakeCookie("sessionIDJwtCookie", toBase64url(btoa(JSON.stringify(handledJwt)), SECRET), SESSION_ROOT, uatMs)
+      return new Response(JSON.stringify(sessionObject), { status: 200, headers: { 'content-type': 'text/html', 'Set-Cookie': cookieIn, 'Set-Cookie': jwtCookie } });
     }
     if (action === 'logout') {
       const txtOut = selfClosingMessage('', SESSION_ROOT);
       const cookieOut = bakeCookie(SESSION_COOKIE_NAME, 'LoggingOut', SESSION_ROOT, 0);
-      return new Response(txtOut, {status: 200, headers: {'content-type': 'text/html', 'Set-Cookie': cookieOut}});
+      return new Response(txtOut, { status: 200, headers: { 'content-type': 'text/html', 'Set-Cookie': cookieOut } });
     }
     throw `wrong action: ${action} in ${url.pathname}`;
   } catch (err) {
-    return new Response(err.message, {status: 401});
+    return new Response(err.message, { status: 401 });
   }
 }
 
