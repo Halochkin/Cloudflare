@@ -66,8 +66,8 @@ or
 1. **Typemustmatch:** can leak status code and content-type to third-party scripts. //todo: research this more
 2. **Simplicity.** One level is per def simpler than two levels. Produces much clearer code, both server side and browser side. User only need to check message body, and dont worry that browser or other client stuff will react strange on different headers that are not 200.
 3. **Status code = documentation code = confusion.** Everybody agrees that people often confuse 403 with 404 f.ex., and that this doesn't matter much as long as it is in the 400 range. But people also use 200 and 404 differently. And this ruffles some featers. The point here is that the status code functions as documentation shortcuts, but these shortcuts are used differently by different people. And this confusion might be more problematic than knowing you don't know to begin with. If you think an error in a server must be presented as a 4xx code, and then it is a 2xx code, then that might make you look elsewhere for hours, instead of looking inside the request you thought was wrong in the beginning. The answer is, you can't rely on shortcut documentation. You make your interface intuitive and you document it individually. Always. 
-4. Some internet devices (some firewalls and corporate proxies, for example) intercept HTTP 4xx and 5xx and prevent the response from being returned to the viewer. If you substitute 200, the response typically won't be intercepted.
-5. You might want to return a 200 status code (OK) and static website so your customers don't know that your website is down.
+4. **Reliability** Some internet devices (some firewalls and corporate proxies, for example) intercept HTTP 4xx and 5xx and prevent the response from being returned to the viewer. If you substitute 200, the response typically won't be intercepted.
+5. **Privacy** You might want to return a 200 status code (OK) and static website so your customers don't know that your website is down.
  
  **Faults**
  
