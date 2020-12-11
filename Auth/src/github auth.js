@@ -134,11 +134,7 @@ async function githubProcessTokenPackage(code, state) {
   });
 
   const data = await accessTokenPackage.text();
-
-  console.log(data)
-
   return new Response("hello" + data)
-
   const x = {};
   data.split('&').map(pair => pair.split('=')).forEach(([k, v]) => x[k] = v);
   const accessToken = x['access_token'];
@@ -232,7 +228,6 @@ async function handleRequest(request) {
       const iat = Date.now();
       const ttl = state.rm === null ? null : SESSION_TTL;
       const sessionObject = {uid, username, provider, iat, ttl, v: 27};
-      console.log(sessionObject, 999)
       const sessionSecret = await encryptData(JSON.stringify(sessionObject), SECRET);
 
       //   const txtIn = selfClosingMessage(JSON.stringify(sessionObject), SESSION_ROOT);

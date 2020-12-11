@@ -1,26 +1,23 @@
-// _globals
-//   SECRET
-//   SESSION_ROOT
-//   STATE_PARAM_TTL
-//   SESSION_TTL
-//   KV_AUTH
-//......
-//   SESSION_COOKIE_NAME
-//   GOOGLE_CLIENTID
-//   GOOGLE_CLIENTSECRET
-//   GOOGLE_CODE_LINK
-//   GOOGLE_OAUTH_LINK
-//   GOOGLE_REDIRECT
+// when you log in, you get the key of the month. And then, your session will roll as long as the month is no more than 6mnths in the past.
+//   And then, you can update the 6mnths keys that are not currently in use without disturbing anything.
+
+// So, if you login on sept.11.2001, the keynr is 0109. Then, next time you send the cookie to the server worker is oct 23 2001. Your cookie is then rolled, because the month is then 0110, only one month later. You stay active every month, but on 0203 (March 2002), you must log in again, because the cookie can only be rolled 6mnths.
+//   And yes. We need jwt. Because we also need IAT (issue at time) in the header. And then the key numbers can be simple number 1-12 again.
+//   And then we can base the rolling algorithm based on the iat. If we also add an UAT (updated at time).
+// Ok.
+//   Jwt
+// { header:
+// {alg: "aes256-gcm",
+//   iv: hexString,
+//   key: 1-12,
+//   Iat: 11.9.2001,
+//   Uat: 5.10.2001
+// },
+//   payload: encryptedText,
+//     signature: null
+// }
 
 
-//   GITHUB_CLIENTID
-//   GITHUB_CLIENTSECRET
-//   GITHUB_CODE_LINK
-//   GITHUB_OAUTH_LINK
-//   GITHUB_REDIRECT
-
-//   COUNTER_DOMAIN
-//   COUNTER_KEY
 
 //imported pure functions begins
 function randomString(length) {

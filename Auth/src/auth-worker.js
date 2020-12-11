@@ -70,3 +70,5 @@ async function handleRequest(req) {
 }
 
 addEventListener('fetch', e => e.respondWith(handleRequest(e.request)));
+
+
