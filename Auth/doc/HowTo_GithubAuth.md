@@ -55,7 +55,7 @@ The authentication lifecycle the same as in [google auth](HowTo_GoogleAuth.md#li
    
 ## `handleRequest` function
 
-Copy code from Google [`handleRequest()`](HowTo_GoogleAuth.md#handlerequest-function). Use `githubProcessTokenPackage()` instead of `googleProcessTokenPackage()`.
+How to get JWT described in [HowTo: JWT](HowTo_JWT.md#3-process-google-access-token). Use `githubProcessTokenPackage()` instead of `googleProcessTokenPackage()` and github auth links when make redirect url.
 
 ## Process Github Access Token
 To get Github access token `githubProcessTokenPackage()` is used.
@@ -70,7 +70,7 @@ async function githubProcessTokenPackage(code) {
     });
   const tokenText = await accessTokenPackage.text();                              //[2]
   const x = {};
-  data.split('&').map(pair => pair.split('=')).forEach(([k, v]) => x[k] = v);
+  tokenText.split('&').map(pair => pair.split('=')).forEach(([k, v]) => x[k] = v);
   const accessToken = x['access_token'];                                          //[3]
   const user = await fetch('https://api.github.com/user', {                       //[4]
     headers: {

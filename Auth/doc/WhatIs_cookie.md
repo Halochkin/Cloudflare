@@ -27,10 +27,10 @@ The session identifier is automatically saved in the user's browser as a cookie,
  - `max-age` - lifetime of cookie in seconds. If specified, it overrides the expires value;
  - `domain` - limits the scope of cookie validity to the specified domain and all its subdomains;
  - `path`  - is a path that limits the scope of the cookie. `It consists of directory components, separated by the symbol /`. A cookie is included in requests whose URI starts with the corresponding path components. If no attribute is set, the path is taken from the request URI.
-- `secure` - the flag set in Secure allows the transfer of cookies only through a secure channel. In particular, if the flag is set, the cookie will not be transmitted `over HTTP, but will be over HTTPS`. By default, the flag is not set.
+ - `secure` - the flag set in Secure allows the transfer of cookies only through a secure channel. In particular, if the flag is set, the cookie will not be transmitted `over HTTP, but will be over HTTPS`. By default, the flag is not set.
  - `httponly` - the flag set in HttpOnly, limits the scope of cookie use only within the HTTP protocol. If this flag is enabled, it will not be possible to access cookies from JavaScript through the browser API. This flag is not set by default.
 
- > Session cookies are removed when the client shuts down. Cookies are session cookies if they don't specify the `Expires` or `Max-Age` attributes.
+ > Session cookies removed when the client shuts down. Cookies are session cookies if they don't specify the `Expires` or `Max-Age` attributes.
 
 ## remember me vs forget me
  
