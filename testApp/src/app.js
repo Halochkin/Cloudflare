@@ -62,7 +62,7 @@ class App extends HTMLElement {
         border: 0.5px solid gray;
         background-color: antiquewhite;
         padding: 3px;
-        margin: 1px;
+        margin: 10px;
         width: auto;
     }
 

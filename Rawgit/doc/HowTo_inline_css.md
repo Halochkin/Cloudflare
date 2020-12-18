@@ -14,7 +14,7 @@ Let's look at an example
 
 2.  Let us assume that we have two folders: `test` and `test2`. Both are in the same root folder. Inside both folders are 2 `.css` files: `test.css` and `test2.css`. Css files define the opposite `color` and `background` properties of the text. Inside the `test` folder is an additional `index.html` which contain HTML template from a previous step. Properties and values of the `FILES` object match the structure and content of each file.
 
-3. Get `url.path` from after `fetch` event, and use its value to select "file content" from the `FILES` object.
+3. Get `url.path` from `fetch` event url, and use its value to select "file content" from the `FILES` object.
 
 4. If a non-html file requested, its content will be presented with the corresponding value `content-type'.
 
