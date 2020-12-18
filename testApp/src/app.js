@@ -107,7 +107,6 @@ class App extends HTMLElement {
     //input
     this.button = this.shadowRoot.querySelector("button");
     this.input.addEventListener("keydown", this.handleInput.bind(this));
-    this.shadowRoot.addEventListener('selectstart', e => e.preventDefault());
 
     this.wordIndex = 0;
     this.startTime = 0;
