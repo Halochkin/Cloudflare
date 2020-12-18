@@ -111,11 +111,9 @@ class App extends HTMLElement {
 
     this.wordIndex = 0;
     this.startTime = 0;
-
     this.inputValues = [];
-
     this.previousSessions = new Map();
-    this.sessionHistory = [];
+    this.sessionTrack = [];
 
     this.words = this.expression.trim().split(" ");
     this.render(this.wordIndex, 0, undefined);
@@ -130,11 +128,12 @@ class App extends HTMLElement {
     let div2 = document.createElement("div");
     let input = document.createElement("textarea");
     let span = document.createElement("span");
-    span.textContent = "X";
 
+    span.textContent = "X";
     input.setAttribute("readonly", "")
     div2.classList.add("prev-speed");
     div.classList.add("prev-wrapper")
+
     div.appendChild(input);
     div.appendChild(div2);
     div.appendChild(span);
@@ -157,7 +156,6 @@ class App extends HTMLElement {
     this.resultsBoard.appendChild(div)
   }
 
-
   render(wordIndex, characterIndex) {
     let word = wordIndex !== this.words.length - 1 ? this.words[wordIndex] + " " : this.words[wordIndex];
     this.typedCharacters.textContent = word.slice(0, characterIndex) || ""; // correctly typed *words*
@@ -166,12 +164,11 @@ class App extends HTMLElement {
     this.tail.textContent = this.words.slice(wordIndex + 1, this.words.length).join(" ")  // all next words
   }
 
-
   refresh() {
     this.expectedCharacter.textContent = "";
     this.correctWords.textContent = "";
     this.inputValues = [];
-    this.sessionHistory = [];
+    this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
     this.showPrevious();
@@ -181,14 +178,12 @@ class App extends HTMLElement {
     this.render(0, 0, undefined);
   }
 
-
   //https://www.speedtypingonline.com/typing-equations
   // here we just take expression length to count characters, and split array to count words
   countWPM(durationMs) {
     let minutes = (durationMs) / 1000 / 60;
     return {wpm: (this.words.length / 5) / minutes, cpm: this.expression.length / minutes}
   }
-
 
   handleInput(e) {
     if (!this.startTime) {
@@ -199,16 +194,15 @@ class App extends HTMLElement {
 
     if (key.length === 1) { //filter technical keys (Enter etc) but allow all another (even non a-Z)
       this.inputValues.push(key)
-      this.sessionHistory.push([key, Date.now() - this.startTime]);
+      this.sessionTrack.push([key, Date.now() - this.startTime]);
     }
 
     let characterIndex = this.inputValues.length;  //get current character
     let wordIndex = this.wordIndex;     // cet index of current word
 
-
     if (e.key === "Backspace" && this.inputValues.length) {
       this.inputValues.pop();        // remove last character
-      this.sessionHistory.push([key, Date.now() - this.startTime]);
+      this.sessionTrack.push([key, Date.now() - this.startTime]);
 
       characterIndex--;             // decrease manually, not outside. not happy about it
       this.render(wordIndex, characterIndex, key);
@@ -234,16 +228,13 @@ class App extends HTMLElement {
       this.correctWords.textContent += key;
       let result = this.countWPM(Date.now() - this.startTime);
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
-      this.previousSessions.set(result, this.sessionHistory);
+      this.previousSessions.set(result, this.sessionTrack);
       return this.refresh();
     }
 
     this.render(wordIndex, characterIndex, key)
     this.wordIndex = wordIndex;
-
-
   }
-
 }
 
 customElements.define("type-racer", App);
