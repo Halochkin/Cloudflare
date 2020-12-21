@@ -78,25 +78,6 @@ class App extends HTMLElement {
 
     }
 
-    header {
-        height: 5vh;
-        background-color: darkblue;
-        padding: 1vh;
-        color: white;
-        font-family: "Roboto Light";
-    }
-
-    .auth-logo {
-        height: 100%;
-        margin-left: 1vh;
-        float: right
-    }
-
-    #login-label {
-        float: right;
-        height: 100%;
-    }
-
     .close-btn {
         float: left;
         margin: 1vh;
