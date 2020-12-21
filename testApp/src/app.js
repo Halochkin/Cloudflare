@@ -2,7 +2,7 @@ class App extends HTMLElement {
   constructor() {
     super();
     // this.expression = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus maximus erat. Praesent luctus, quam nec consequat sagittis, justo erat iaculis mauris, sodales tristique odio enim non erat. Curabitur dapibus fermentum tellus ac viverra. Sed eros lorem, bibendum sit amet nisl sit amet, ultricies posuere ipsum. "
-    this.expression = "Lorem ipsum dolor sit amet.";
+    this.expression = "Lorem";
     this.attachShadow({mode: "open"});
     this.shadowRoot.innerHTML = `
 <style>
@@ -29,40 +29,41 @@ class App extends HTMLElement {
 
     #main-result {
         background-color: khaki;
-        width: 31vw;
-        height: 6vh;
         text-align: center;
         padding: 1px;
         display: block;
         float: right;
+        height: fit-content;
+        width: fit-content;
     }
 
     textarea {
-        width: 58vw;
+        width: 60vw;
         height: auto;
     }
 
     #expected {
         background-color: rgba(0, 128, 6, 0.29);
         border-radius: 5px;
+        font-size: 25px;
     }
 
     #main-input {
         user-select: none;
-        width: 52vw;
+        width: 65vw;
     }
 
     .prev-speed {
         float: right;
-        width: 26vw;
-        font-size: 15px;
+        width: fit-content;
+        font-size: 2vw;
     }
 
     .prev-wrapper {
         border: 0.5px solid gray;
         background-color: antiquewhite;
-        padding: 3px;
-        margin: 10px;
+        padding: 1vw;
+        margin: 1vw;
         width: auto;
     }
 
@@ -71,9 +72,61 @@ class App extends HTMLElement {
         border-radius: 5px;
         padding: 10px;
     }
+
+    #app {
+        padding: 0 3vw 3vw 3vw;
+
+    }
+
+    header {
+        height: 5vh;
+        background-color: darkblue;
+        padding: 1vh;
+        color: white;
+        font-family: "Roboto Light";
+    }
+
+    .auth-logo {
+        height: 100%;
+        margin-left: 1vh;
+        float: right
+    }
+
+    #login-label {
+        float: right;
+        height: 100%;
+    }
+
+    .close-btn {
+        float: left;
+        margin: 1vh;
+        font-size: 3vw;
+        color: red;
+        font-family: cursive;
+        cursor: pointer;
+
+    }
+
+    .repeat-btn {
+        color: #607D8B;
+        font-family: cursive;
+        cursor: pointer;
+        float: left;
+        margin: 1vh;
+        font-size: 3vw;
+    }
+    
 </style>
 
+<!--<header>-->
+<!-- TYPING RACE-->
+<!--<span id="login-label">Log in to store your results-->
+<!--<a href="/login/google"><img class="auth-logo" src="../static/img/google.png" alt="google auth"></a>-->
+<!--<a href="/login/github"><img class="auth-logo" src="../static/img/github.png" alt="github auth"></a>-->
+<!--</span>-->
+<!--</header>-->
 
+<div id="app">
 <div id="previous-results"></div>
 <hr>
 
@@ -90,14 +143,16 @@ class App extends HTMLElement {
 <br>
 <div>
     <input id="main-input" aria-selected="false" type="text"> <span id="main-result"></span>
-</div>`;
+</div>
+ </div>
+`;
 
     this.input = this.shadowRoot.querySelector("#main-input");
     this.result = this.shadowRoot.querySelector("#main-result");
     this.resultsBoard = this.shadowRoot.querySelector("#previous-results");
     // sentence
     this.correctWords = this.shadowRoot.querySelector("#done"); //only correct inputs
-//
+
     //separate word
     this.typedCharacters = this.shadowRoot.querySelector("#typed");  //currently typing word, can
     this.expectedCharacter = this.shadowRoot.querySelector("#expected");
@@ -118,30 +173,14 @@ class App extends HTMLElement {
     this.render(this.wordIndex, 0, undefined);
   }
 
-  //test function. Map must be replace to kv
-  showPrevious() {
-    if (!this.previousSessions.size)
-      return;
 
-    let div = document.createElement("div");
-    let div2 = document.createElement("div");
-    let input = document.createElement("textarea");
-    let span = document.createElement("span");
+  repeatSession(ctx, input, div){
+    if(input.value.length)
+      input.value = "";
+    //get item value position inside map
+    let item = Array.prototype.indexOf.call(input.parentNode.parentElement.children, input.parentNode);
 
-    span.textContent = "X";
-    input.setAttribute("readonly", "")
-    div2.classList.add("prev-speed");
-    div.classList.add("prev-wrapper")
-
-    div.appendChild(input);
-    div.appendChild(div2);
-    div.appendChild(span);
-
-    span.addEventListener("click", function (e) {
-      this.parentNode.parentElement.removeChild(div);
-    });
-
-    let [speed, characters] = [...this.previousSessions][this.previousSessions.size - 1];
+    let [speed, characters] = [...ctx.previousSessions][item];
     for (const character of characters) {
       setTimeout(() => {
         if (character[0] !== "Backspace")
@@ -151,8 +190,54 @@ class App extends HTMLElement {
       }, character[1]);
 
     }
-    div2.textContent = "wpm: " + speed.wpm.toFixed(1) + "    cpm: " + speed.cpm.toFixed(1);
-    this.resultsBoard.appendChild(div)
+    div.textContent = "wpm: " + speed.wpm.toFixed(1) + "    cpm: " + speed.cpm.toFixed(1);
+
+  }
+
+  //test function. Map must be replace to kv
+  showPrevious() {
+    if (!this.previousSessions.size)
+      return;
+
+    let div = document.createElement("div");
+    let div2 = document.createElement("div");
+    let input = document.createElement("textarea");
+    let span1 = document.createElement("span");
+    let span2 = document.createElement("span");
+
+    span1.classList.add("close-btn")
+    span2.classList.add("repeat-btn")
+    span1.textContent = "X";
+    span2.textContent = "↻";
+
+    input.setAttribute("readonly", "")
+    div2.classList.add("prev-speed");
+    div.classList.add("prev-wrapper")
+
+    div.appendChild(input);
+    div.appendChild(div2);
+    div.appendChild(span1);
+    div.appendChild(span2);
+
+    span1.addEventListener("click",  (e)=> {
+      let grandParent = input.parentNode.parentElement;
+      let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
+      let key = [...this.previousSessions][item][0];
+
+      this.previousSessions.delete(key);
+
+      // delete from dom
+      grandParent.removeChild(div);
+
+    });
+    span2.addEventListener("click",  (e) =>{
+      //closure
+      this.repeatSession(this, input, div2);
+    });
+
+    this.resultsBoard.appendChild(div);
+    this.repeatSession(this, input, div2);
+
   }
 
   render(wordIndex, characterIndex) {
