@@ -229,6 +229,7 @@ async function handleRequest(request) {
 
       // handle JWT
       const jwt = await googleProcessTokenPackage(code);
+
       const [header, payloadB64url, signature] = jwt.split('.');
       //   const [year, month] = getLoginTime();
       const payloadText = atob(fromBase64url(payloadB64url));
@@ -236,6 +237,7 @@ async function handleRequest(request) {
 
       const providerId = 'go' + payloadObj.sub;
       const username = payloadObj.email; // cant shortcut, bug with a dot
+
       // just encrypt whole payload obj. Of course I can encrypt only some properties
       let encryptedPayload = (await encryptData(payloadText, SECRET)).split(".");
 

@@ -16,7 +16,7 @@ In order to add Google social login to a web application it is necessary:
 10. Go back to the **Credentials**" tab.
 11 Click the **Create credentials** button, choose **Create OAuth client ID** from the list.
 12. Select **Web application** as **Application type**. 
-    1. Add a link to your application as a "Authorized JavaScript origins" value (for example `https://maxworker.maksgalochkin2.workers.dev`).
+    1. Add a link to your application as "Authorized JavaScript origins" value (for example `https://maxworker.maksgalochkin2.workers.dev`).
     2. As the value "**Authorized redirect URIs**" you need to specify the link that will be opened after successful authentication (for example `https://maxworker.maksgalochkin2.workers.dev/callback`).
     3. Press the **Save** button. 
 13. API will generate **Client ID** and **Client secret**.
