@@ -273,8 +273,8 @@ class App extends HTMLElement {
       this.render(wordIndex, characterIndex, key);
     }
 
-    // When press Space
-    if (key === " " && this.expectedCharacter.textContent === " " && wordIndex !== this.words.length - 1 && this.inputValues[this.inputValues.length - 2] !== " ") {
+    // When press Space     (wordIndex !== this.words.length - 1 && this.inputValues[this.inputValues.length - 2] !== " "
+    if (key === " " && this.expectedCharacter.textContent === " " && this.input.value === this.words[this.wordIndex] ) {
       wordIndex++;    //switch to next word after press Space
       characterIndex = 0;    //start count character from 0
       this.input.value = null;  //refresh input field
