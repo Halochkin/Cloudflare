@@ -142,7 +142,6 @@ class App extends HTMLElement {
     //fetch event handler
 
 
-
     this.wordIndex = 0;
     this.characterIndex = 0;
     this.startTime = 0;
@@ -172,9 +171,6 @@ class App extends HTMLElement {
     div.textContent = "wpm: " + speed.wpm.toFixed(1) + "    cpm: " + speed.cpm.toFixed(1);
 
   }
-
-
-
 
 
   //test function. Map must be replaced to kv
@@ -252,7 +248,7 @@ class App extends HTMLElement {
   }
 
 
-    handleInput(e) {
+  handleInput(e) {
     if (!this.startTime)
       this.startTime = Date.now();
     const key = e.key;
@@ -302,47 +298,6 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
-
-
-      // fetch(window.location.href, {
-      //   method: 'post',
-      //   headers: {
-      //     'Accept': 'application/json, text/plain, */*',
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({a: 7, str: 'Some string: &=&'})
-      // }).then(res=>res.json())
-      //   .then(res => console.log(res));
-
-      var json = {
-        json: JSON.stringify({
-          a: 1,
-          b: 2
-        }),
-        delay: 3
-      };
-
-      fetch(window.location.href, {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        },
-        body: 'json=' + encodeURIComponent(JSON.stringify(json.json)) + '&delay=' + json.delay
-      })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (result) {
-          alert(result);
-        })
-        .catch (function (error) {
-          console.log('Request failed', error);
-        });
-
-
-
-
       return this.refresh();
     }
 
@@ -355,5 +310,36 @@ class App extends HTMLElement {
     this.render(this.wordIndex, this.characterIndex, selectionStart)
   }
 }
+
+
+(() => {
+  console.log("start")
+  // POST request using fetch()
+  fetch("https://typing-race.maksgalochkin2.workers.dev/", {
+
+    // Adding method type
+    method: "POST",
+
+    // Adding body or contents to send
+    body: JSON.stringify({
+      title: "foo",
+      body: "bar",
+      userId: 1
+    }),
+
+    // Adding headers to the request
+    headers: {
+      "Content-type": "application/json; charset=UTF-8"
+    },
+    mode: 'no-cors'
+  })
+
+    // Converting to JSON
+    .then(response => response.text())
+
+    // Displaying results to console
+    .then(json => console.log(json));
+})();
+
 
 customElements.define("type-racer", App);
