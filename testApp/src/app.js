@@ -46,6 +46,10 @@ class App extends HTMLElement {
         background-color: rgba(0, 128, 6, 0.29);
         border-radius: 5px;
         font-size: 25px;
+        
+        background-image: url(data:image/gif;base64,R0lGODlhAQAoAPABAERmZv///yH5BAg1AAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAAQAoAAACBYSPqctYACH5BAg1AAAALAAAAAABACgAgP///////wIFhI+py1gAOw==);
+    background-repeat: repeat-y;
+}
     }
 
     #main-input {
@@ -96,17 +100,9 @@ class App extends HTMLElement {
         margin: 1vh;
         font-size: 3vw;
     }
+ 
     
 </style>
-
-<!--<header>-->
-<!-- TYPING RACE-->
-<!--<span id="login-label">Log in to store your results-->
-<!--<a href="/login/google"><img class="auth-logo" src="../static/img/google.png" alt="google auth"></a>-->
-<!--<a href="/login/github"><img class="auth-logo" src="../static/img/github.png" alt="github auth"></a>-->
-<!--</span>-->
-<!--</header>-->
-
 <div id="app">
 <div id="previous-results"></div>
 <hr>
@@ -133,7 +129,6 @@ class App extends HTMLElement {
     this.resultsBoard = this.shadowRoot.querySelector("#previous-results");
     // sentence
     this.correctWords = this.shadowRoot.querySelector("#done"); //only correct inputs
-
     //separate word
     this.typedCharacters = this.shadowRoot.querySelector("#typed");  //currently typing word, can
     this.expectedCharacter = this.shadowRoot.querySelector("#expected");
@@ -144,19 +139,28 @@ class App extends HTMLElement {
     this.button = this.shadowRoot.querySelector("button");
     this.input.addEventListener("keydown", this.handleInput.bind(this));
 
+    //fetch event handler
+    window.addEventListener("fetch", function (e) {
+
+      let event = e;
+      debugger;
+
+    })
+
+
     this.wordIndex = 0;
+    this.characterIndex = 0;
     this.startTime = 0;
     this.inputValues = [];
     this.previousSessions = new Map();
     this.sessionTrack = [];
-
     this.words = this.expression.trim().split(" ");
-    this.render(this.wordIndex, 0, undefined);
+    this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
 
-  repeatSession(ctx, input, div){
-    if(input.value.length)
+  repeatSession(ctx, input, div) {
+    if (input.value.length)
       input.value = "";
     //get item value position inside map
     let item = Array.prototype.indexOf.call(input.parentNode.parentElement.children, input.parentNode);
@@ -169,14 +173,23 @@ class App extends HTMLElement {
         else
           input.value = input.value.slice(0, input.value.length - 1);  //delete character
       }, character[1]);
-
     }
     div.textContent = "wpm: " + speed.wpm.toFixed(1) + "    cpm: " + speed.cpm.toFixed(1);
 
   }
 
-  //test function. Map must be replace to kv
-  showPrevious() {
+
+   async postDataToServer(data) {
+       return await fetch(window.location.href, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: data
+      });
+  }
+
+
+  //test function. Map must be replaced to kv
+  getAllSessions() {
     if (!this.previousSessions.size)
       return;
 
@@ -200,7 +213,7 @@ class App extends HTMLElement {
     div.appendChild(span1);
     div.appendChild(span2);
 
-    span1.addEventListener("click",  (e)=> {
+    span1.addEventListener("click", (e) => {
       let grandParent = input.parentNode.parentElement;
       let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
       let key = [...this.previousSessions][item][0];
@@ -211,7 +224,7 @@ class App extends HTMLElement {
       grandParent.removeChild(div);
 
     });
-    span2.addEventListener("click",  (e) =>{
+    span2.addEventListener("click", (e) => {
       //closure
       this.repeatSession(this, input, div2);
     });
@@ -225,7 +238,7 @@ class App extends HTMLElement {
     let word = wordIndex !== this.words.length - 1 ? this.words[wordIndex] + " " : this.words[wordIndex];
     this.typedCharacters.textContent = word.slice(0, characterIndex) || ""; // correctly typed *words*
     this.expectedCharacter.textContent = word.charAt(characterIndex);      //expected character
-    this.remainedCharacters.textContent = word.slice(characterIndex + 1, word.length); //+1 because expected also incude  <typed><expeted><remained> (<He><l><lo>)
+    this.remainedCharacters.textContent = word.slice(characterIndex + 1, word.length);
     this.tail.textContent = this.words.slice(wordIndex + 1, this.words.length).join(" ")  // all next words
   }
 
@@ -236,7 +249,7 @@ class App extends HTMLElement {
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
-    this.showPrevious();
+    this.getAllSessions();
     setTimeout(() => {
       this.input.value = null;
     })
@@ -244,61 +257,72 @@ class App extends HTMLElement {
   }
 
   //https://www.speedtypingonline.com/typing-equations
-  // here we just take expression length to count characters, and split array to count words
   countWPM(durationMs) {
     let minutes = (durationMs) / 1000 / 60;
     return {wpm: (this.words.length / 5) / minutes, cpm: this.expression.length / minutes}
   }
 
-  handleInput(e) {
-    if (!this.startTime) {
-      this.startTime = Date.now();
-    }
 
+  async handleInput(e) {
+    if (!this.startTime)
+      this.startTime = Date.now();
     const key = e.key;
 
-    if (key.length === 1) { //filter technical keys (Enter etc) but allow all another (even non a-Z)
-      this.inputValues.push(key)
-      this.sessionTrack.push([key, Date.now() - this.startTime]);
-    }
+    let selectionStart = e.currentTarget.selectionStart;
+    let selectionEnd = e.currentTarget.selectionEnd;
+    let selectionRange = selectionEnd - selectionStart;
 
-    let characterIndex = this.inputValues.length;  //get current character
-    let wordIndex = this.wordIndex;     // cet index of current word
+    if (key.length === 1) { //exclude technical keys (Enter etc) but allow all another (even non a-Z) //todo regex here?
+      if (selectionRange) {
+        this.inputValues.splice(selectionStart, selectionRange, key);
+        this.characterIndex = selectionStart + 1;
+      } else {
+        this.inputValues.splice(selectionStart, 0, key);
+        this.characterIndex = this.inputValues.length;
+      }
+      this.sessionTrack.push([key, Date.now() - this.startTime, this.characterIndex]);
+    }
 
     if (e.key === "Backspace" && this.inputValues.length) {
-      this.inputValues.pop();        // remove last character
+      if (selectionRange) {  //someone selected text and removed
+        this.characterIndex = selectionStart;
+        this.inputValues.splice(selectionStart, selectionRange);
+      } else if (selectionStart !== 0) {
+        this.characterIndex--;
+        this.inputValues.splice(selectionStart - 1, 1);
+      } else
+        this.inputValues.pop();
       this.sessionTrack.push([key, Date.now() - this.startTime]);
-
-      characterIndex--;             // decrease manually, not outside. not happy about it
-      this.render(wordIndex, characterIndex, key);
+      this.render(this.wordIndex, this.characterIndex, key);
     }
 
-    // When press Space     (wordIndex !== this.words.length - 1 && this.inputValues[this.inputValues.length - 2] !== " "
-    if (key === " " && this.expectedCharacter.textContent === " " && this.input.value === this.words[this.wordIndex] ) {
-      wordIndex++;    //switch to next word after press Space
-      characterIndex = 0;    //start count character from 0
-      this.input.value = null;  //refresh input field
+    // When press Space
+    if (key === " " && this.expectedCharacter.textContent === " " && this.input.value === this.words[this.wordIndex] && selectionEnd === this.words[this.wordIndex].length) {
+      this.wordIndex++;    //switch to next word after press Space
+      this.characterIndex = 0;    //start count character from 0
+      setTimeout(() => {
+        this.input.value = null;
+      })
       this.inputValues = [];    //refresh typed characters
-      this.correctWords.textContent += this.words[wordIndex - 1] + " "; // move previous word to non-editable span
+      this.correctWords.textContent += this.words[this.wordIndex - 1] + " "; // move previous word to non-editable span
+    }
+
+    //last character of last word
+    if (this.wordIndex === this.words.length - 1 && this.characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
+      let result = this.countWPM(Date.now() - this.startTime);
+      this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
+      this.previousSessions.set(result, this.sessionTrack);
+      await this.postDataToServer(JSON.stringify(Array.from(this.previousSessions.entries())));
+      return this.refresh();
     }
 
     //error handler
     if (this.inputValues.length && this.inputValues[this.inputValues.length - 1] !== this.expectedCharacter.textContent)
-      this.typedCharacters.classList.add("err");          // add error if wrong character
-    if (this.typedCharacters.textContent === this.inputValues.join(""))
-      this.typedCharacters.classList.remove("err");   //remove error after fixing all errors
+      this.typedCharacters.classList.add("err");          // add error
+    if (this.typedCharacters.textContent === this.inputValues.join("") || this.inputValues.join("") === this.words[this.wordIndex] || this.inputValues.join("") === this.words[this.wordIndex].slice(0, this.characterIndex))
+      this.typedCharacters.classList.remove("err");   //remove error
 
-    //last character of last word
-    if (wordIndex === this.words.length - 1 && characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
-      this.correctWords.textContent += key;
-      let result = this.countWPM(Date.now() - this.startTime);
-      this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
-      this.previousSessions.set(result, this.sessionTrack);
-      return this.refresh();
-    }
-
-    this.render(wordIndex, characterIndex, key)
-    this.wordIndex = wordIndex;
+    this.render(this.wordIndex, this.characterIndex, selectionStart)
   }
 }
 
