@@ -140,12 +140,7 @@ class App extends HTMLElement {
     this.input.addEventListener("keydown", this.handleInput.bind(this));
 
     //fetch event handler
-    window.addEventListener("fetch", function (e) {
 
-      let event = e;
-      debugger;
-
-    })
 
 
     this.wordIndex = 0;
@@ -179,13 +174,7 @@ class App extends HTMLElement {
   }
 
 
-   async postDataToServer(data) {
-       return await fetch(window.location.href, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: data
-      });
-  }
+
 
 
   //test function. Map must be replaced to kv
@@ -263,7 +252,7 @@ class App extends HTMLElement {
   }
 
 
-  async handleInput(e) {
+    handleInput(e) {
     if (!this.startTime)
       this.startTime = Date.now();
     const key = e.key;
@@ -312,7 +301,48 @@ class App extends HTMLElement {
       let result = this.countWPM(Date.now() - this.startTime);
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
-      await this.postDataToServer(JSON.stringify(Array.from(this.previousSessions.entries())));
+
+
+
+      // fetch(window.location.href, {
+      //   method: 'post',
+      //   headers: {
+      //     'Accept': 'application/json, text/plain, */*',
+      //     'Content-Type': 'application/json'
+      //   },
+      //   body: JSON.stringify({a: 7, str: 'Some string: &=&'})
+      // }).then(res=>res.json())
+      //   .then(res => console.log(res));
+
+      var json = {
+        json: JSON.stringify({
+          a: 1,
+          b: 2
+        }),
+        delay: 3
+      };
+
+      fetch(window.location.href, {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        },
+        body: 'json=' + encodeURIComponent(JSON.stringify(json.json)) + '&delay=' + json.delay
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (result) {
+          alert(result);
+        })
+        .catch (function (error) {
+          console.log('Request failed', error);
+        });
+
+
+
+
       return this.refresh();
     }
 
