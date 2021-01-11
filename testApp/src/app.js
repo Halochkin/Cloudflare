@@ -152,7 +152,6 @@ class App extends HTMLElement {
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
-
   repeatSession(ctx, input, div) {
     if (input.value.length)
       input.value = "";
@@ -248,7 +247,7 @@ class App extends HTMLElement {
   }
 
 
-  handleInput(e) {
+  async handleInput(e) {
     if (!this.startTime)
       this.startTime = Date.now();
     const key = e.key;
@@ -298,33 +297,11 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
-      console.log("start")
-      // POST request using fetch()
-      fetch("https://typing-race.maksgalochkin2.workers.dev/test/index.html", {
-
-        // Adding method type
-        method: "POST",
-
-        mode: 'no-cors',
-        // Adding body or contents to send
-        body: JSON.stringify({
-          title: "foo",
-          body: "bar",
-          userId: 1
-        }),
-
-        // Adding headers to the request
-        headers: {
-          "Content-type": "text/plain;charset=UTF-8"
-        }
-      })
-        // Converting to JSON
-        .then(response => response.text())
-
-        // Displaying results to console
-        .then(json => console.log(json));
-
-
+      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/test/index.html", JSON.stringify({
+        title: "foo",
+        body: "bar",
+        userId: 1
+      }))
       return this.refresh();
     }
 
@@ -336,6 +313,25 @@ class App extends HTMLElement {
 
     this.render(this.wordIndex, this.characterIndex, selectionStart)
   }
+
+  async postData(url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'no-cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+    return response.json(); // parses JSON response into native JavaScript objects
+  }
 }
+
 
 customElements.define("type-racer", App);
