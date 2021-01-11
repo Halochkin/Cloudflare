@@ -297,11 +297,13 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
-      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/test/index.html", {
+      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", {
         title: "foo",
         body: "bar",
         userId: 1
-      })
+      });
+
+
       return this.refresh();
     }
 
