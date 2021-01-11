@@ -300,7 +300,7 @@ class App extends HTMLElement {
 
       console.log("start")
       // POST request using fetch()
-      fetch("https://typing-race.maksgalochkin2.workers.dev/test/index.html", {
+      fetch("https://typing-race.maksgalochkin2.workers.dev/", {
 
         // Adding method type
         method: "POST",
