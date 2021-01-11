@@ -300,7 +300,7 @@ class App extends HTMLElement {
 
       console.log("start")
       // POST request using fetch()
-      fetch("https://typing-race.maksgalochkin2.workers.dev/", {
+      fetch("https://typing-race.maksgalochkin2.workers.dev/test/index.html", {
 
         // Adding method type
         method: "POST",
@@ -318,7 +318,6 @@ class App extends HTMLElement {
           "Content-type": "text/plain;charset=UTF-8"
         }
       })
-
         // Converting to JSON
         .then(response => response.text())
 
