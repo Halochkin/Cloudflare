@@ -2,7 +2,7 @@ class App extends HTMLElement {
   constructor() {
     super();
     // this.expression = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus maximus erat. Praesent luctus, quam nec consequat sagittis, justo erat iaculis mauris, sodales tristique odio enim non erat. Curabitur dapibus fermentum tellus ac viverra. Sed eros lorem, bibendum sit amet nisl sit amet, ultricies posuere ipsum. "
-    this.expression = "Lorem ipsum ";
+    this.expression = "l";
     this.attachShadow({mode: "open"});
     this.shadowRoot.innerHTML = `
 <style>
@@ -297,12 +297,16 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
-      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", {
+      let data = JSON.stringify({
         title: "foo",
         body: "bar",
         userId: 1
-      });
+      })
+      console.log(data);
 
+      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
+
+      console.log(res);
 
       return this.refresh();
     }
