@@ -259,7 +259,7 @@ class App extends HTMLElement {
       // redirect: 'follow', // manual, *follow, error
       // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       // body: data // body data type must match "Content-Type" header
-      body: JSON.stringify(data) // body data type must match "Content-Type" header
+      body: data // body data type must match "Content-Type" header
     });
     return  response;// parses JSON response into native JavaScript objects
 
