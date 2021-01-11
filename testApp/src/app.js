@@ -298,6 +298,34 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
+      console.log("start")
+      // POST request using fetch()
+      fetch("https://typing-race.maksgalochkin2.workers.dev/test/index.html", {
+
+        // Adding method type
+        method: "POST",
+
+        mode: 'no-cors',
+        // Adding body or contents to send
+        body: JSON.stringify({
+          title: "foo",
+          body: "bar",
+          userId: 1
+        }),
+
+        // Adding headers to the request
+        headers: {
+          "Content-type": "text/plain;charset=UTF-8"
+        }
+      })
+
+        // Converting to JSON
+        .then(response => response.text())
+
+        // Displaying results to console
+        .then(json => console.log(json));
+
+
       return this.refresh();
     }
 
@@ -310,36 +338,5 @@ class App extends HTMLElement {
     this.render(this.wordIndex, this.characterIndex, selectionStart)
   }
 }
-
-
-(() => {
-  console.log("start")
-  // POST request using fetch()
-  fetch("https://typing-race.maksgalochkin2.workers.dev/", {
-
-    // Adding method type
-    method: "POST",
-
-    // Adding body or contents to send
-    body: JSON.stringify({
-      title: "foo",
-      body: "bar",
-      userId: 1
-    }),
-
-    // Adding headers to the request
-    headers: {
-      "Content-type": "application/json; charset=UTF-8"
-    },
-    mode: 'no-cors'
-  })
-
-    // Converting to JSON
-    .then(response => response.text())
-
-    // Displaying results to console
-    .then(json => console.log(json));
-})();
-
 
 customElements.define("type-racer", App);
