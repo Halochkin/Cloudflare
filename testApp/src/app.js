@@ -253,13 +253,14 @@ class App extends HTMLElement {
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       credentials: 'same-origin', // include, *same-origin, omit
       headers: {
-        'content-type': 'application/json'
+        // 'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
       redirect: 'follow', // manual, *follow, error
       referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: data // body data type must match "Content-Type" header
     });
-    return response.text();// parses JSON response into native JavaScript objects
+    return response.json();// parses JSON response into native JavaScript objects
 
     // Default options are marked with *
   }
@@ -320,11 +321,11 @@ class App extends HTMLElement {
       //   userId: 1
       // }
 
-      let data = "max halochkin"
+      let data = JSON.stringify({"max halochkin": "abcde"});
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
-      let parsedRes = await res.text();
+      let parsedRes = await res.json();
 
       console.log("RES", res, parsedRes)
       return this.refresh();
