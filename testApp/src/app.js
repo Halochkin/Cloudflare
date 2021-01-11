@@ -250,7 +250,7 @@ class App extends HTMLElement {
     try {
       const response = await fetch(url, {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'same-origin', // no-cors, *cors, same-origin
+        mode: 'no-cors', // no-cors, *cors, same-origin
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
@@ -259,12 +259,11 @@ class App extends HTMLElement {
         },
         redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: data // body data type must match "Content-Type" header
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
       });
-      return await response.json() // parses JSON response into native JavaScript objects
+      return response// parses JSON response into native JavaScript objects
     } catch (e) {
       console.trace(e)
-
     }
     // Default options are marked with *
   }
@@ -319,17 +318,17 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
-      let data = JSON.stringify({
+      let data = {
         title: "foo",
         body: "bar",
         userId: 1
-      })
-
-      try {
-        let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
-      } catch (e) {
-        console.trace(e)
       }
+
+      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
+
+      let parsedRes = await res.json();
+
+      console.log("RES", res, parsedRes)
       return this.refresh();
     }
 
