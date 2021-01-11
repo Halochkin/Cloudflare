@@ -247,24 +247,20 @@ class App extends HTMLElement {
   }
 
   async postData(url = '', data = {}) {
-    try {
-      const response = await fetch(url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'no-cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-          'Content-Type': 'application/json'
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: JSON.stringify(data) // body data type must match "Content-Type" header
-      });
-      return response// parses JSON response into native JavaScript objects
-    } catch (e) {
-      console.trace(e)
-    }
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'no-cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'content-type': 'application/json'
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: data // body data type must match "Content-Type" header
+    });
+    return response.text();// parses JSON response into native JavaScript objects
+
     // Default options are marked with *
   }
 
@@ -318,15 +314,17 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
-      let data = {
-        title: "foo",
-        body: "bar",
-        userId: 1
-      }
+      // let data = {
+      //   title: "foo",
+      //   body: "bar",
+      //   userId: 1
+      // }
+
+      let data = "max halochkin"
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
-      let parsedRes = await res.json();
+      let parsedRes = await res.text();
 
       console.log("RES", res, parsedRes)
       return this.refresh();
