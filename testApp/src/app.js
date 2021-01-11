@@ -250,7 +250,7 @@ class App extends HTMLElement {
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
-        "Access-Control-Allow-Origin" : "*",
+        "Access-Control-Allow-Origin": "*",
       },
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       mode: 'no-cors', // no-cors, *cors, same-origin
@@ -261,7 +261,7 @@ class App extends HTMLElement {
       // body: data // body data type must match "Content-Type" header
       body: data // body data type must match "Content-Type" header
     });
-    return  response;// parses JSON response into native JavaScript objects
+    return response;// parses JSON response into native JavaScript objects
 
     // Default options are marked with *
   }
