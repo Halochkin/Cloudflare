@@ -246,16 +246,19 @@ class App extends HTMLElement {
     return {wpm: (this.words.length / 5) / minutes, cpm: this.expression.length / minutes}
   }
 
-  async postData(url = '', data = {}) {
-    const response = await fetch(url, {
+  postData(url = '', data = {}) {
+    fetch(url, {
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      body: data // body data type must match "Content-Type" header
-    });
-    // return await response.json();// parses JSON response into native JavaScript objects
-
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    }).then(function (response) {
+      return response.json();
+      // return await response.json();// parses JSON response into native JavaScript objects
+    }).then(function (data) {
+      return data;
+    })
   }
 
   async handleInput(e) {
@@ -309,15 +312,29 @@ class App extends HTMLElement {
       this.previousSessions.set(result, this.sessionTrack);
 
 
+      let data = {
+        sessionId: Date.now(),
+        wpm: result.wpm,
+        cpm: result.cpm,
+        history: this.sessionTrack.join(",")
+      }
 
-      let data1 = JSON.stringify({sessionId: Date.now(), wpm: result.wpm, cpm: result.cpm , history: this.sessionTrack.join(",")});
-
-let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
+      // let response = this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
 
-
-      await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
-      // let finalRes = await res.json();
+      fetch("https://typing-race.maksgalochkin2.workers.dev/json", {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+      }).then(function (response) {
+        return response.json();
+        // return await response.json();// parses JSON response into native JavaScript objects
+      }).then(function (data) {
+        console.log(data)
+        return data;
+      })
 
       return this.refresh();
     }
