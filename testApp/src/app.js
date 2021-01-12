@@ -258,7 +258,11 @@ class App extends HTMLElement {
       },
       redirect: 'follow', // manual, *follow, error
       referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify(data) // body data type must match "Content-Type" header
+
+      body: data.substring(1,data.length-2) // body data type must match "Content-Type" header
+
+
+
     });
     return await response.json();
   }
@@ -314,12 +318,12 @@ class App extends HTMLElement {
       this.previousSessions.set(result, this.sessionTrack);
 
 
-      let data = {
+      let data = JSON.stringify({
         sessionId: Date.now(),
         wpm: result.wpm,
         cpm: result.cpm,
         history: this.sessionTrack.join(",")
-      }
+      });
 
 // let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
 
