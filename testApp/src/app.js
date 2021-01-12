@@ -264,7 +264,7 @@ class App extends HTMLElement {
 
 
     });
-    return await response.json();
+    return response;
   }
 
   async handleInput(e) {
