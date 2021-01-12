@@ -313,8 +313,8 @@ class App extends HTMLElement {
       let data = JSON.stringify({sessionId: Date.now(), wpm: result.wpm, cpm: result.cpm , history: this.sessionTrack.join(",")});
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
-      let finalRes = await res.json();
-      
+      // let finalRes = await res.json();
+
       return this.refresh();
     }
 
