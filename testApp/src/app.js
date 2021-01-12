@@ -247,18 +247,14 @@ class App extends HTMLElement {
   }
 
   async postData(url = '', data = {}) {
-    fetch(url, {
+    const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       body: JSON.stringify(data) // body data type must match "Content-Type" header
-    }).then(function (response) {
-       return response.json();
-      // return await response.json();// parses JSON response into native JavaScript objects
-    }).then(function (data) {
-      return data;
-    })
+    });
+    return await response.json();
   }
 
   async handleInput(e) {
@@ -321,10 +317,7 @@ class App extends HTMLElement {
 
 // let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
 
-      this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data).then(response=>{
-        console.log(response);
-      })
-
+      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
       return this.refresh();
     }
