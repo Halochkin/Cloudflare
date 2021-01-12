@@ -254,7 +254,7 @@ class App extends HTMLElement {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       body: data // body data type must match "Content-Type" header
     });
-    return response.json();// parses JSON response into native JavaScript objects
+    return await response.json();// parses JSON response into native JavaScript objects
 
   }
 
