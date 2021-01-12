@@ -252,7 +252,7 @@ class App extends HTMLElement {
         'Content-Type': 'application/json'
       },
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      body: data // body data type must match "Content-Type" header
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
     });
     return response// parses JSON response into native JavaScript objects
 
@@ -309,7 +309,7 @@ class App extends HTMLElement {
       this.previousSessions.set(result, this.sessionTrack);
 
 
-      let data = JSON.stringify({sessionId: Date.now(), result: result, history: this.sessionTrack});
+      let data = {sessionId: Date.now(), wpm: result.wpm, cpm: result.cpm , history: this.sessionTrack.join(",")};
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
