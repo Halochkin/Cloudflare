@@ -312,7 +312,7 @@ class App extends HTMLElement {
 
       let data = JSON.stringify({sessionId: Date.now(), result: result, history: this.sessionTrack});
 
-      await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
+      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
       return this.refresh();
     }
