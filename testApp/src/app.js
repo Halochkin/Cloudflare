@@ -310,15 +310,10 @@ class App extends HTMLElement {
 
 
 
-      let data = JSON.stringify({sessionId: Date.now(), wpm: result.wpm, cpm: result.cpm , history: this.sessionTrack.join(",")});
+      let data1 = JSON.stringify({sessionId: Date.now(), wpm: result.wpm, cpm: result.cpm , history: this.sessionTrack.join(",")});
 
+let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
 
-
-  // data = data.substr(1, data.length - 2);
-
-
-      data[0] = "'";
-      data[data.length-2] = "'";
 
 
       await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
