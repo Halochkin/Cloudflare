@@ -249,11 +249,11 @@ class App extends HTMLElement {
   async postData(url = '', data = {}) {
     const response = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
-        "Access-Control-Allow-Origin": "*",
+        // 'Accept': 'application/json',
+        'Content-Type': 'application/json'
       },
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'no-cors', // no-cors, *cors, same-origin
+      // mode: 'no-cors', // no-cors, *cors, same-origin
       // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       // credentials: 'same-origin', // include, *same-origin, omit
       // redirect: 'follow', // manual, *follow, error
@@ -261,7 +261,7 @@ class App extends HTMLElement {
       // body: data // body data type must match "Content-Type" header
       body: data // body data type must match "Content-Type" header
     });
-    return response;// parses JSON response into native JavaScript objects
+    return response.json();// parses JSON response into native JavaScript objects
 
     // Default options are marked with *
   }
@@ -316,19 +316,14 @@ class App extends HTMLElement {
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
       this.previousSessions.set(result, this.sessionTrack);
 
-      // let data = {
-      //   title: "foo",
-      //   body: "bar",
-      //   userId: 1
-      // }
 
-      let data = {"halochkin": "abcde"};
-
+      let data = JSON.stringify({halochkin: "abcde"});
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
       let parsedRes = await res.json();
 
-      // console.log("RES", res, parsedRes)
+      console.log("RES", res, parsedRes);
+
       return this.refresh();
     }
 
