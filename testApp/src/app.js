@@ -234,7 +234,7 @@ class App extends HTMLElement {
 
       span2.addEventListener("click", (e) => {
         //closure
-        this.repeatSession(this, input, div2);
+        this.repeatSession(this,parsedSession, input, div2);
       });
 
       this.resultsBoard.appendChild(div);
