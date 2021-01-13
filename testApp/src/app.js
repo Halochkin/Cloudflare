@@ -149,6 +149,7 @@ class App extends HTMLElement {
     this.previousSessions = new Map();
     this.sessionTrack = [];
     this.words = this.expression.trim().split(" ");
+    this.getAllSessions();
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
@@ -175,20 +176,16 @@ class App extends HTMLElement {
   //test function. Map must be replaced to kv
   getAllSessions() {
     if (!this.previousSessions.size)
-       return;
+      return;
 
 
-    fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions",{
+    fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
       method: 'GET',
-    }).then(data=>{
+    }).then(data => {
       data.json();
-    }).then(res=>{
+    }).then(res => {
       console.log(res)
     })
-
-
-
-
 
 
     let div = document.createElement("div");
@@ -215,7 +212,7 @@ class App extends HTMLElement {
       let grandParent = input.parentNode.parentElement;
       let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
       let key = [...this.previousSessions][item][0];
-       this.previousSessions.delete(key);
+      this.previousSessions.delete(key);
       // delete from dom
       grandParent.removeChild(div);
     });
@@ -227,6 +224,7 @@ class App extends HTMLElement {
     });
 
     this.resultsBoard.appendChild(div);
+
     this.repeatSession(this, input, div2);
 
   }
@@ -325,7 +323,7 @@ class App extends HTMLElement {
     if (this.wordIndex === this.words.length - 1 && this.characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
       let result = this.countWPM(Date.now() - this.startTime);
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
-       this.previousSessions.set(result, this.sessionTrack);
+      this.previousSessions.set(result, this.sessionTrack);
 
 
       let data = JSON.stringify({
