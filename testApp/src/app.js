@@ -175,8 +175,8 @@ class App extends HTMLElement {
 
   //test function. Map must be replaced to kv
   async getAllSessions(newOne) {
-    if (!this.previousSessions.size)
-      return;
+    // if (!this.previousSessions.size)
+    //   return;
 
 
     let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
@@ -188,6 +188,10 @@ class App extends HTMLElement {
       return;
 
     console.log(sessions);
+
+    for (const session of sessions) {
+
+    }
 
 
     let div = document.createElement("div");
@@ -338,7 +342,7 @@ class App extends HTMLElement {
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
-      if (!res) // unlogged user, push sessions locally
+      if (!res.status) // unlogged user, push sessions locally
         this.previousSessions.set(result, this.sessionTrack);
 
 
