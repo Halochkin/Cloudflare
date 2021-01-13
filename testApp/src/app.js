@@ -179,7 +179,7 @@ class App extends HTMLElement {
 
 
     fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions",{
-
+      method: 'GET',
     }).then(data=>{
       data.json();
     }).then(res=>{
