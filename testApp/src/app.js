@@ -211,6 +211,7 @@ class App extends HTMLElement {
       span1.classList.add("close-btn")
       span2.classList.add("repeat-btn")
       span1.textContent = "X";
+      span1.id = parsedSession.sessionId;
       span2.textContent = "↻";
 
       input.setAttribute("readonly", "")
