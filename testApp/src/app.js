@@ -193,7 +193,7 @@ class App extends HTMLElement {
 
     let sessions = await request.json();
 
-    if (!sessions && lastSession)
+    if (!sessions.length && lastSession)
       sessions = [lastSession]
     else
       return
@@ -361,12 +361,11 @@ class App extends HTMLElement {
 // let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
-
       if (!res.status) // unlogged user, push sessions locally
         this.previousSessions.set(result, this.sessionTrack);
 
 
-      return this.refresh(data);
+      return this.refresh(data); // post data takes some time and when we try to get that data from kv to render session it will return empty array, so pass data manually here
     }
 
     //error handler
