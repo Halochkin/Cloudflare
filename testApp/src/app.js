@@ -338,7 +338,7 @@ class App extends HTMLElement {
         sessionId: Date.now(),
         wpm: result.wpm.toFixed(2),
         cpm: result.cpm.toFixed(2),
-        history: this.sessionTrack.join(",")
+        history: JSON.stringify(this.sessionTrack)
       });
 
 // let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
