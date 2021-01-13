@@ -265,8 +265,8 @@ class App extends HTMLElement {
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
-    this.getAllSessions(true); // notify that new session has been added, and render only new one
     setTimeout(() => {
+      this.getAllSessions(true); // notify that new session has been added, and render only new one
       this.input.value = null;
     })
     this.render(0, 0, undefined);
