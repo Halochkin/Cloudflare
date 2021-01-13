@@ -175,7 +175,19 @@ class App extends HTMLElement {
   //test function. Map must be replaced to kv
   getAllSessions() {
     if (!this.previousSessions.size)
-      return;
+       return;
+
+
+    fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions",{
+
+    }).then(data=>{
+      console.log(data)
+    })
+
+
+
+
+
 
     let div = document.createElement("div");
     let div2 = document.createElement("div");
@@ -201,13 +213,12 @@ class App extends HTMLElement {
       let grandParent = input.parentNode.parentElement;
       let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
       let key = [...this.previousSessions][item][0];
-
-      this.previousSessions.delete(key);
-
+       this.previousSessions.delete(key);
       // delete from dom
       grandParent.removeChild(div);
-
     });
+
+
     span2.addEventListener("click", (e) => {
       //closure
       this.repeatSession(this, input, div2);
@@ -249,15 +260,15 @@ class App extends HTMLElement {
   async postData(url = '', data = {}) {
     const response = await fetch(url, {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
+      // mode: 'cors', // no-cors, *cors, same-origin
+      // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      // credentials: 'same-origin', // include, *same-origin, omit
       headers: {
         'Content-Type': 'application/json'
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      // redirect: 'follow', // manual, *follow, error
+      // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: data // body data type must match "Content-Type" header
     });
     return await response.json();
@@ -312,13 +323,13 @@ class App extends HTMLElement {
     if (this.wordIndex === this.words.length - 1 && this.characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
       let result = this.countWPM(Date.now() - this.startTime);
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
-      this.previousSessions.set(result, this.sessionTrack);
+       this.previousSessions.set(result, this.sessionTrack);
 
 
       let data = JSON.stringify({
         sessionId: Date.now(),
-        wpm: result.wpm,
-        cpm: result.cpm,
+        wpm: result.wpm.toFixed(2),
+        cpm: result.cpm.toFixed(2),
         history: this.sessionTrack.join(",")
       });
 
