@@ -260,14 +260,14 @@ class App extends HTMLElement {
     this.tail.textContent = this.words.slice(wordIndex + 1, this.words.length).join(" ")  // all next words
   }
 
-  refresh(data) {
+  async refresh() {
     this.expectedCharacter.textContent = "";
     this.correctWords.textContent = "";
     this.inputValues = [];
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
-    this.getAllSessions(true,data); // notify that new session has been added, and render only new one
+    await this.getAllSessions(true);// notify that new session has been added, and render only new one
 
     setTimeout(() => {
       this.input.value = null;
@@ -356,14 +356,14 @@ class App extends HTMLElement {
         history: JSON.stringify(this.sessionTrack)
       });
 
-// let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
-      if (!res.status) // unlogged user, push sessions locally
+
+      if (!res.uId) // unlogged user, push sessions locally //todo, non logged user
         this.previousSessions.set(result, this.sessionTrack);
 
 
-      return this.refresh(data); // post data takes some time and when we try to get that data from kv to render session it will return empty array, so pass data manually here
+      return this.refresh(); // post data takes some time and when we try to get that data from kv to render session it will return empty array, so pass data manually here
     }
 
     //error handler
