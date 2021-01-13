@@ -195,7 +195,7 @@ class App extends HTMLElement {
     if (!sessions || !sessions.length)
       return;
 
-    if(!onlyLast)
+    if(onlyLast)
       sessions = [sessions[sessions.length-1]]
     console.log(sessions);
 
