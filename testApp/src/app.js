@@ -258,20 +258,18 @@ class App extends HTMLElement {
     this.tail.textContent = this.words.slice(wordIndex + 1, this.words.length).join(" ")  // all next words
   }
 
-  async refresh() {
+   refresh() {
     this.expectedCharacter.textContent = "";
     this.correctWords.textContent = "";
     this.inputValues = [];
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
-
-    await this.getAllSessions(true);
-
-
     setTimeout(() => {
       this.input.value = null;
-    },100)
+       this.getAllSessions(true);
+
+    },300)
     this.render(0, 0, undefined);
   }
 
