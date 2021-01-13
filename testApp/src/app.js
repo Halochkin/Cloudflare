@@ -181,23 +181,24 @@ class App extends HTMLElement {
   }
 
 
+  async getAllSessions(onlyLastSession, justTypedData) {
 
-  async getAllSessions(onlyLastSession) { //must pass lastSession because get reques too long, and when end type and push data to kv is too long.
-
-
+   //firs time it will be empty, because put to kv takes some time
     let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
       method: 'GET',
     });
 
     let sessions = await request.json();
 
-    // if (!sessions.length && lastSession)
-    //   sessions = [lastSession]
+    // if first typing, request return nothing, use justTypedData instead
+    if (!sessions.length && justTypedData)
+      sessions.push(justTypedData);
+
+    // render only last session, get only last item
+    if (onlyLastSession)
+      sessions = [sessions[sessions.length - 1]]
 
 
-    if(onlyLastSession)
-      sessions = [sessions[sessions.length-1]]
-    console.log(sessions);
 
     for (const session of sessions) {
       const parsedSession = JSON.parse(session);
@@ -223,7 +224,7 @@ class App extends HTMLElement {
       div.appendChild(span1);
       div.appendChild(span2);
 
-      span1.addEventListener("click", (e) => {
+      span1.addEventListener("click", (e) => { //todo: remove session
         let grandParent = input.parentNode.parentElement;
         let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
         let key = [...this.previousSessions][item][0];
@@ -235,17 +236,13 @@ class App extends HTMLElement {
 
       span2.addEventListener("click", (e) => {
         //closure
-        this.repeatSession(this,parsedSession, input, div2);
+        this.repeatSession(this, parsedSession, input, div2);
       });
 
       this.resultsBoard.appendChild(div);
 
       this.repeatSession(this, parsedSession, input, div2);
     }
-
-
-
-
 
 
   }
@@ -258,18 +255,19 @@ class App extends HTMLElement {
     this.tail.textContent = this.words.slice(wordIndex + 1, this.words.length).join(" ")  // all next words
   }
 
-   refresh() {
+  refresh(justTypedData) {
     this.expectedCharacter.textContent = "";
     this.correctWords.textContent = "";
     this.inputValues = [];
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
+    this.getAllSessions(true, justTypedData); // true means that only last data need to bu updated, not iterate all kv, like at firs time
+
     setTimeout(() => {
       this.input.value = null;
-       this.getAllSessions(true);
 
-    },300)
+    })
     this.render(0, 0, undefined);
   }
 
@@ -345,8 +343,6 @@ class App extends HTMLElement {
     if (this.wordIndex === this.words.length - 1 && this.characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
       let result = this.countWPM(Date.now() - this.startTime);
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
-
-
       let data = JSON.stringify({
         sessionId: Date.now(),
         wpm: result.wpm.toFixed(2),
@@ -357,19 +353,18 @@ class App extends HTMLElement {
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
 
-      if (!res.uId) // unlogged user, push sessions locally //todo, non logged user
-        this.previousSessions.set(result, this.sessionTrack);
+      if (!res.status) // success POST returns status,  unlogged user, push sessions locally
+        this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
 
-      let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
-        method: 'GET',
-      });
+      //uuuuuglyy
+      if(res.uId){
+        data = JSON.parse(data);
+        data.sessionId = res.uId + "-" + data.sessionId;
+        data = JSON.stringify(data);
+      }
 
-      let sessions = await request.json();
-
-      console.log(sessions)
-
-
-      return this.refresh(); // post data takes some time and when we try to get that data from kv to render session it will return empty array, so pass data manually here
+     // post data takes some time, so we will use existing data to not wait
+      return this.refresh(data);
     }
 
     //error handler
