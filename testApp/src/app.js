@@ -268,7 +268,7 @@ class App extends HTMLElement {
     setTimeout(() => {
       this.getAllSessions(true); // notify that new session has been added, and render only new one
       this.input.value = null;
-    })
+    },100)
     this.render(0, 0, undefined);
   }
 
