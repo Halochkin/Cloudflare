@@ -174,17 +174,20 @@ class App extends HTMLElement {
 
 
   //test function. Map must be replaced to kv
-  getAllSessions() {
+  async getAllSessions(newOne) {
     if (!this.previousSessions.size)
       return;
 
 
-    fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
+    let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
       method: 'GET',
-    }).then(data => {
-      data.json().then(r =>
-        console.log(r));
-    })
+    });
+    let sessions = await request.json();
+
+    if (!sessions || sessions.length)
+      return;
+
+    console.log(sessions);
 
 
     let div = document.createElement("div");
@@ -322,7 +325,6 @@ class App extends HTMLElement {
     if (this.wordIndex === this.words.length - 1 && this.characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
       let result = this.countWPM(Date.now() - this.startTime);
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
-      this.previousSessions.set(result, this.sessionTrack);
 
 
       let data = JSON.stringify({
@@ -335,6 +337,10 @@ class App extends HTMLElement {
 // let data = `'{"sessionId":${Date.now()},"wpm":${result.wpm},"cpm":${result.cpm},"history":"${this.sessionTrack.join(",")}"}'`;
 
       let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
+
+      if (!res) // unlogged user, push sessions locally
+        this.previousSessions.set(result, this.sessionTrack);
+
 
       return this.refresh();
     }
