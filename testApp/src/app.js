@@ -153,14 +153,22 @@ class App extends HTMLElement {
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
-  repeatSession(ctx, input, div) {
+  repeatSession(ctx, session, input, div) {
     if (input.value.length)
       input.value = "";
     //get item value position inside map
     let item = Array.prototype.indexOf.call(input.parentNode.parentElement.children, input.parentNode);
 
-    let [speed, characters] = [...ctx.previousSessions][item];
-    for (const character of characters) {
+
+    const parsedHistory = JSON.parse(session.history);
+    const wpm = session.wpm;
+    const cpm = session.cpm;
+    const sessionId = session.sessionId;
+
+    // let [speed, characters] = [...ctx.previousSessions][item];
+
+
+    for (const character of parsedHistory) {
       setTimeout(() => {
         if (character[0] !== "Backspace")
           input.value += character[0];
@@ -168,7 +176,7 @@ class App extends HTMLElement {
           input.value = input.value.slice(0, input.value.length - 1);  //delete character
       }, character[1]);
     }
-    div.textContent = "wpm: " + speed.wpm.toFixed(1) + "    cpm: " + speed.cpm.toFixed(1);
+    div.textContent = "wpm: " + wpm + "    cpm: " + cpm;
 
   }
 
@@ -191,7 +199,6 @@ class App extends HTMLElement {
 
     for (const session of sessions) {
       const parsedSession = JSON.parse(session);
-      const parsedHistory = JSON.parse(parsedSession.history);
 
       let div = document.createElement("div");
       let div2 = document.createElement("div");
@@ -230,7 +237,7 @@ class App extends HTMLElement {
 
       this.resultsBoard.appendChild(div);
 
-      this.repeatSession(this, input, div2);
+      this.repeatSession(this, parsedSession, input, div2);
     }
 
 
