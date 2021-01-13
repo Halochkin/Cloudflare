@@ -182,7 +182,7 @@ class App extends HTMLElement {
 
 
   //test function. Map must be replaced to kv
-  async getAllSessions(allSessions) {
+  async getAllSessions(onlyLast) {
     // if (!this.previousSessions.size)
     //   return;
 
@@ -195,8 +195,8 @@ class App extends HTMLElement {
     if (!sessions || !sessions.length)
       return;
 
-    if(allSessions)
-      sessions = sessions[sessions.length-1]
+    if(!onlyLast)
+      sessions = [sessions[sessions.length-1]]
     console.log(sessions);
 
     for (const session of sessions) {
