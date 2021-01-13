@@ -149,7 +149,7 @@ class App extends HTMLElement {
     this.previousSessions = new Map();
     this.sessionTrack = [];
     this.words = this.expression.trim().split(" ");
-    this.getAllSessions();
+    this.getAllSessions(false);
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
@@ -182,7 +182,7 @@ class App extends HTMLElement {
 
 
   //test function. Map must be replaced to kv
-  async getAllSessions(newOne) {
+  async getAllSessions(allSessions) {
     // if (!this.previousSessions.size)
     //   return;
 
@@ -195,6 +195,8 @@ class App extends HTMLElement {
     if (!sessions || !sessions.length)
       return;
 
+    if(allSessions)
+      sessions = sessions[sessions.length-1]
     console.log(sessions);
 
     for (const session of sessions) {
@@ -262,7 +264,7 @@ class App extends HTMLElement {
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
-    this.getAllSessions();
+    this.getAllSessions(true); // notify that new session has been added, and render only new one
     setTimeout(() => {
       this.input.value = null;
     })
