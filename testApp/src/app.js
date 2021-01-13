@@ -2,7 +2,7 @@ class App extends HTMLElement {
   constructor() {
     super();
     // this.expression = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus maximus erat. Praesent luctus, quam nec consequat sagittis, justo erat iaculis mauris, sodales tristique odio enim non erat. Curabitur dapibus fermentum tellus ac viverra. Sed eros lorem, bibendum sit amet nisl sit amet, ultricies posuere ipsum. "
-    this.expression = "l";
+    this.expression = "Lorem ipsum";
     this.attachShadow({mode: "open"});
     this.shadowRoot.innerHTML = `
 <style>
