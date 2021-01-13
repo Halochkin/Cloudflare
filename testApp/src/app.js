@@ -149,7 +149,7 @@ class App extends HTMLElement {
     this.previousSessions = new Map();
     this.sessionTrack = [];
     this.words = this.expression.trim().split(" ");
-    this.getAllSessions(false);
+    this.getAllSessions(false, undefined);
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
@@ -181,8 +181,8 @@ class App extends HTMLElement {
   }
 
 
-  //test function. Map must be replaced to kv
-  async getAllSessions(onlyLast) {
+
+  async getAllSessions(onlyLast, lastSession) { //must pass lastSession because get reques too long, and when end type and push data to kv is too long.
     // if (!this.previousSessions.size)
     //   return;
 
@@ -190,10 +190,14 @@ class App extends HTMLElement {
     let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
       method: 'GET',
     });
+
     let sessions = await request.json();
 
-    if (!sessions || !sessions.length)
-      return;
+    if (!sessions && lastSession)
+      sessions = [lastSession]
+    else
+      return
+
 
     if(onlyLast)
       sessions = [sessions[sessions.length-1]]
@@ -258,15 +262,16 @@ class App extends HTMLElement {
     this.tail.textContent = this.words.slice(wordIndex + 1, this.words.length).join(" ")  // all next words
   }
 
-  refresh() {
+  refresh(data) {
     this.expectedCharacter.textContent = "";
     this.correctWords.textContent = "";
     this.inputValues = [];
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
+    this.getAllSessions(true,data); // notify that new session has been added, and render only new one
+
     setTimeout(() => {
-      this.getAllSessions(true); // notify that new session has been added, and render only new one
       this.input.value = null;
     },100)
     this.render(0, 0, undefined);
@@ -361,7 +366,7 @@ class App extends HTMLElement {
         this.previousSessions.set(result, this.sessionTrack);
 
 
-      return this.refresh();
+      return this.refresh(data);
     }
 
     //error handler
