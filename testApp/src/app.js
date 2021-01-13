@@ -191,6 +191,8 @@ class App extends HTMLElement {
 
     for (const session of sessions) {
       const parsedSession = JSON.parse(session);
+      const parsedHistory = JSON.parse(parsedSession.history);
+
       let div = document.createElement("div");
       let div2 = document.createElement("div");
       let input = document.createElement("textarea");
