@@ -184,54 +184,57 @@ class App extends HTMLElement {
     });
     let sessions = await request.json();
 
-    if (!sessions || sessions.length)
+    if (!sessions || !sessions.length)
       return;
 
     console.log(sessions);
 
     for (const session of sessions) {
+      const parsedSession = JSON.parse(session);
+      let div = document.createElement("div");
+      let div2 = document.createElement("div");
+      let input = document.createElement("textarea");
+      let span1 = document.createElement("span");
+      let span2 = document.createElement("span");
 
+      span1.classList.add("close-btn")
+      span2.classList.add("repeat-btn")
+      span1.textContent = "X";
+      span2.textContent = "↻";
+
+      input.setAttribute("readonly", "")
+      div2.classList.add("prev-speed");
+      div.classList.add("prev-wrapper")
+
+      div.appendChild(input);
+      div.appendChild(div2);
+      div.appendChild(span1);
+      div.appendChild(span2);
+
+      span1.addEventListener("click", (e) => {
+        let grandParent = input.parentNode.parentElement;
+        let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
+        let key = [...this.previousSessions][item][0];
+        this.previousSessions.delete(key);
+        // delete from dom
+        grandParent.removeChild(div);
+      });
+
+
+      span2.addEventListener("click", (e) => {
+        //closure
+        this.repeatSession(this, input, div2);
+      });
+
+      this.resultsBoard.appendChild(div);
+
+      this.repeatSession(this, input, div2);
     }
 
 
-    let div = document.createElement("div");
-    let div2 = document.createElement("div");
-    let input = document.createElement("textarea");
-    let span1 = document.createElement("span");
-    let span2 = document.createElement("span");
-
-    span1.classList.add("close-btn")
-    span2.classList.add("repeat-btn")
-    span1.textContent = "X";
-    span2.textContent = "↻";
-
-    input.setAttribute("readonly", "")
-    div2.classList.add("prev-speed");
-    div.classList.add("prev-wrapper")
-
-    div.appendChild(input);
-    div.appendChild(div2);
-    div.appendChild(span1);
-    div.appendChild(span2);
-
-    span1.addEventListener("click", (e) => {
-      let grandParent = input.parentNode.parentElement;
-      let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
-      let key = [...this.previousSessions][item][0];
-      this.previousSessions.delete(key);
-      // delete from dom
-      grandParent.removeChild(div);
-    });
 
 
-    span2.addEventListener("click", (e) => {
-      //closure
-      this.repeatSession(this, input, div2);
-    });
 
-    this.resultsBoard.appendChild(div);
-
-    this.repeatSession(this, input, div2);
 
   }
 
