@@ -360,6 +360,14 @@ class App extends HTMLElement {
       if (!res.uId) // unlogged user, push sessions locally //todo, non logged user
         this.previousSessions.set(result, this.sessionTrack);
 
+      let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
+        method: 'GET',
+      });
+
+      let sessions = await request.json();
+
+      console.log(sessions)
+
 
       return this.refresh(); // post data takes some time and when we try to get that data from kv to render session it will return empty array, so pass data manually here
     }
