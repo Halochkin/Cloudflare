@@ -195,8 +195,6 @@ class App extends HTMLElement {
 
     if (!sessions.length && lastSession)
       sessions = [lastSession]
-    else
-      return
 
 
     if(onlyLast)
