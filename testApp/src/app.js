@@ -182,9 +182,7 @@ class App extends HTMLElement {
 
 
 
-  async getAllSessions(onlyLast, lastSession) { //must pass lastSession because get reques too long, and when end type and push data to kv is too long.
-    // if (!this.previousSessions.size)
-    //   return;
+  async getAllSessions(onlyLastSession) { //must pass lastSession because get reques too long, and when end type and push data to kv is too long.
 
 
     let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
@@ -193,11 +191,11 @@ class App extends HTMLElement {
 
     let sessions = await request.json();
 
-    if (!sessions.length && lastSession)
-      sessions = [lastSession]
+    // if (!sessions.length && lastSession)
+    //   sessions = [lastSession]
 
 
-    if(onlyLast)
+    if(onlyLastSession)
       sessions = [sessions[sessions.length-1]]
     console.log(sessions);
 
@@ -267,7 +265,9 @@ class App extends HTMLElement {
     this.sessionTrack = [];
     this.wordIndex = 0;
     this.startTime = undefined;
-    await this.getAllSessions(true);// notify that new session has been added, and render only new one
+
+    await this.getAllSessions(true);
+
 
     setTimeout(() => {
       this.input.value = null;
