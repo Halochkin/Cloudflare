@@ -96,7 +96,11 @@ textarea {
 #main-input {
     margin-left: 3vw;
     width: 75vw;
+}
 
+
+#previous-results:first-child{
+margin-top: -2vw;
 }
 
 #app {
