@@ -27,6 +27,7 @@ header {
 #login-label {
     float: right;
     height: 100%;
+    line-height: 3em;
 }
 
 #header-photo {
@@ -51,6 +52,7 @@ header {
     border-radius: 3px;
     text-decoration: none;
     color: black;
+    background-color: #f37145;
 }
 
 

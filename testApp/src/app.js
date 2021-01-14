@@ -28,7 +28,7 @@ class App extends HTMLElement {
     }
 
     #main-result {
-background-color: khaki;
+    background-color: khaki;
     text-align: center;
     padding: 1px;
     display: block;
