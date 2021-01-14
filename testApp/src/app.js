@@ -227,7 +227,7 @@ class App extends HTMLElement {
         let grandParent = input.parentNode.parentElement;
         // let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
 
-        let data = JSON.stringify({key: e.currentTarget.id});
+        let data = {key: e.currentTarget.id};
 
         let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data );
 
