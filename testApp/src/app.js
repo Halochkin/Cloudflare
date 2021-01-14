@@ -94,7 +94,9 @@ textarea {
 }
 
 #main-input {
-    width: 70vw;
+    margin-left: 3vw;
+    width: 75vw;
+
 }
 
 #app {
