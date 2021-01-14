@@ -70,7 +70,7 @@ textarea {
     background-color: white;
     padding: 1vw;
     margin: 1vw;
-    width: 90vw;
+   width: 85vw;
     box-shadow: 0px 0px 4px 0px #be9f9f;
     border-radius: 0 0 5px 5px;
     overflow: hidden;
@@ -84,6 +84,12 @@ textarea {
     width: 90vw;
     border: 1px solid gray;
     box-shadow: inset 0px 0px 2px 0px #b1adad;
+}
+#previous-results{
+    overflow-y: scroll;
+    padding: 2vw;
+    height: 70vh;
+    overflow-x: hidden;
 }
 
 #main-input {
