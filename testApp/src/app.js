@@ -99,7 +99,7 @@ textarea {
 }
 
 
-#previous-results:first-child{
+.prev-wrapper:first-child{
 margin-top: -2vw;
 }
 
@@ -193,7 +193,7 @@ margin-top: -2vw;
   repeatSession(session, input, div) {
     if (input.value.length)
       input.value = "";
-
+  //todo: disable double repeating  at the same time
     const parsedHistory = JSON.parse(session.history);
     const wpm = session.wpm;
     const cpm = session.cpm;
