@@ -3,12 +3,13 @@ type-racer {
     display: block;
 }
 
-body{
+body {
     margin: 0;
 }
+
 header {
     height: 5vh;
-    background-color: darkblue;
+    background-color: #070707bd;
     padding: 1vh;
     color: white;
     font-family: "Roboto Light";
@@ -48,3 +49,7 @@ header {
     text-decoration: none;
     color: black;
 }
+
+
+
+
