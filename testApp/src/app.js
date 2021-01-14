@@ -28,18 +28,22 @@ class App extends HTMLElement {
     }
 
     #main-result {
-        background-color: khaki;
-        text-align: center;
-        padding: 1px;
-        display: block;
-        float: right;
-        height: fit-content;
-        width: fit-content;
+background-color: khaki;
+    text-align: center;
+    padding: 1px;
+    display: block;
+    float: right;
+    height: fit-content;
+    width: fit-content;
+    border-radius: 3px;
+    padding: 3px;
     }
 
     textarea {
-        width: 60vw;
-        height: auto;
+width: 73vw;
+    height: auto;
+    resize: none;
+    margin: 1vw;
     }
 
     #expected {
@@ -58,24 +62,36 @@ class App extends HTMLElement {
     }
 
     .prev-speed {
-        float: right;
-        width: fit-content;
-        font-size: 2vw;
+    font-size: 1em;
+    display: block;
+    background-color: orange;
+    margin: -1vw -1vw 1vw -1vw;
+    padding: 0.2vw;
     }
 
     .prev-wrapper {
-        border: 0.5px solid gray;
-        background-color: antiquewhite;
-        padding: 1vw;
-        margin: 1vw;
-        width: auto;
+background-color: white;
+    padding: 1vw;
+    margin: 1vw;
+    width: 90vw;
+    box-shadow: 0px 0px 4px 0px #be9f9f;
+    border-radius: 0 0 5px 5px;
+    border-top: 5px solid orange;
     }
 
     #string-field {
         background-color: lightyellow;
-        border-radius: 5px;
-        padding: 10px;
-    }
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid gray;
+    border: 1;
+    box-shadow: 2px;
+    box-shadow: inset 0px 0px 2px 0px #b1adad;
+}
+
+#main-input{
+    width: 70vw;
+}
 
     #app {
         padding: 3vw;
@@ -83,22 +99,36 @@ class App extends HTMLElement {
     }
 
     .close-btn {
-        float: left;
-        margin: 1vh;
-        font-size: 3vw;
-        color: red;
-        font-family: cursive;
-        cursor: pointer;
+    float: left;
+    margin: 10px;
+    font-size: 1em;
+    color: red;
+    background-color: #2a272700;
+    width: 1.3em;
+    text-align: center;
+    height: 1.3em;
+    border-radius: 50%;
+    font-family: cursive;
+    cursor: pointer;
+    box-shadow: inset 0 0 2px 0px #131212;
 
     }
 
     .repeat-btn {
-        color: #607D8B;
-        font-family: cursive;
-        cursor: pointer;
-        float: left;
-        margin: 1vh;
-        font-size: 3vw;
+    color: #4CAF50;
+    font-family: cursive;
+    cursor: pointer;
+    float: left;
+    margin: 10px;
+    box-shadow: inset 0 0 2px 0px #131212;
+    width: 1.3em;
+    text-align: center;
+    line-height: 1.2em;
+    height: 1.3em;
+    border-radius: 50%;
+    font-size: 1em;
+    text-shadow: box-shadow: 10px 5px 5px red;
+    text-shadow: 0px 0px 0px black;
     }
  
     
@@ -153,7 +183,7 @@ class App extends HTMLElement {
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
-  repeatSession(ctx, session, input, div) {
+  repeatSession(session, input, div) {
     if (input.value.length)
       input.value = "";
     //get item value position inside map
@@ -221,24 +251,19 @@ class App extends HTMLElement {
 
       span1.addEventListener("click", async (e) => { //todo: remove session
         let grandParent = input.parentNode.parentElement;
-        // let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
-
         let data = JSON.stringify({key: e.currentTarget.id.toString()});
-
-        let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data );
-
+        let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data);
         grandParent.removeChild(div);
       });
 
 
       span2.addEventListener("click", (e) => {
-        //closure
-        this.repeatSession(this, parsedSession, input, div2);
+        this.repeatSession(parsedSession, input, div2);
       });
 
       this.resultsBoard.appendChild(div);
 
-      this.repeatSession(this, parsedSession, input, div2);
+      this.repeatSession(parsedSession, input, div2);
     }
 
 
@@ -349,8 +374,6 @@ class App extends HTMLElement {
 
       // if (!res.status) // success POST returns status,  unlogged user, push sessions locally
       //   this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
-
-
 
 
       //uuuuuglyy

@@ -3,6 +3,9 @@ type-racer {
     display: block;
 }
 
+body{
+    margin: 0;
+}
 header {
     height: 5vh;
     background-color: darkblue;
