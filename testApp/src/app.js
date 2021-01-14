@@ -80,12 +80,10 @@ background-color: white;
     }
 
     #string-field {
-        background-color: lightyellow;
+    background-color: lightyellow;
     border-radius: 5px;
     padding: 10px;
     border: 1px solid gray;
-    border: 1;
-    box-shadow: 2px;
     box-shadow: inset 0px 0px 2px 0px #b1adad;
 }
 
@@ -232,6 +230,7 @@ background-color: white;
 
     for (const session of sessions) {
       const parsedSession = JSON.parse(session);
+      let rgb = this.random_rgba();
 
       let prevWrapper = document.createElement("div");
       let prevSpeed = document.createElement("div");
@@ -248,8 +247,6 @@ background-color: white;
       input.setAttribute("readonly", "")
       prevSpeed.classList.add("prev-speed");
       prevWrapper.classList.add("prev-wrapper");
-
-      let rgb = this.random_rgba();
 
       prevSpeed.style.backgroundColor = rgb;
       prevWrapper.style.borderTop = '5px solid ' + rgb;
