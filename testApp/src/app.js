@@ -356,6 +356,16 @@ class App extends HTMLElement {
       if (!res.status) // success POST returns status,  unlogged user, push sessions locally
         this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
 
+      // wait untill data will be put into kv
+
+
+      let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
+        method: 'GET',
+      });
+
+      let sessions = await request.json();
+
+
       //uuuuuglyy
       if(res.uId){
         data = JSON.parse(data);
