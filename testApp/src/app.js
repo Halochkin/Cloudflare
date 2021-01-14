@@ -88,7 +88,7 @@ textarea {
 #previous-results{
     overflow-y: scroll;
     padding: 2vw;
-    height: 50vh;
+    height: 48vh;
     overflow-x: hidden;
 }
 
