@@ -129,7 +129,6 @@ textarea {
 </style>
 <div id="app">
 <div id="previous-results"></div>
-<hr>
 
 <br>
 <div id="string-field">
