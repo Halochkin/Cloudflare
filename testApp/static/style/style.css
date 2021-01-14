@@ -1,0 +1,47 @@
+type-racer {
+    background-color: #e3effa;
+    display: block;
+}
+
+header {
+    height: 5vh;
+    background-color: darkblue;
+    padding: 1vh;
+    color: white;
+    font-family: "Roboto Light";
+}
+
+.auth-logo {
+    height: 100%;
+    margin-left: 1vh;
+    float: right
+}
+
+#login-label {
+    float: right;
+    height: 100%;
+}
+
+#header-photo {
+    height: 100%;
+    border-radius: 50%;
+    float: right;
+    border: 2px solid white;
+}
+
+#header-username {
+    float: right;
+    text-align: center;
+    color: white;
+    margin: 1vh;
+}
+
+#logout-btn {
+    float: right;
+    background-color: lightgray;
+    margin: auto;
+    padding: 1vh;
+    border-radius: 3px;
+    text-decoration: none;
+    color: black;
+}
