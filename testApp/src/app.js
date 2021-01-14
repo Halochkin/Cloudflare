@@ -64,7 +64,7 @@ background-color: khaki;
     .prev-speed {
     font-size: 1em;
     display: block;
-    background-color: orange;
+    /*background-color: orange;*/
     margin: -1vw -2vw 1vw -1vw;
     padding: 0.2vw;
     }
@@ -76,7 +76,7 @@ background-color: white;
     width: 90vw;
     box-shadow: 0px 0px 4px 0px #be9f9f;
     border-radius: 0 0 5px 5px;
-    border-top: 5px solid orange;
+    /*border-top: 5px solid orange;*/
     }
 
     #string-field {
@@ -133,12 +133,12 @@ background-color: white;
  
     
 </style>
-<prevWrapper id="app">
-<prevWrapper id="previous-results"></prevWrapper>
+<div id="app">
+<div id="previous-results"></div>
 <hr>
 
 <br>
-<prevWrapper id="string-field">
+<div id="string-field">
     <!--   correct non editable string-->
     <span id="done"></span>
     <!--    current word-->
@@ -146,12 +146,12 @@ background-color: white;
     <span class="current" id="expected"></span>
     <span class="current" id="remains"></span>
     <span id="tail"></span>
-</prevWrapper>
+</div>
 <br>
-<prevWrapper>
+<div>
     <input id="main-input" aria-selected="false" type="text"> <span id="main-result"></span>
-</prevWrapper>
- </prevWrapper>
+</div>
+ </div>
 `;
 
     this.input = this.shadowRoot.querySelector("#main-input");
@@ -183,7 +183,7 @@ background-color: white;
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
-  repeatSession(session, input, prevWrapper) {
+  repeatSession(session, input, div) {
     if (input.value.length)
       input.value = "";
     //get item value position inside map
@@ -206,8 +206,13 @@ background-color: white;
           input.value = input.value.slice(0, input.value.length - 1);  //delete character
       }, character[1]);
     }
-    prevWrapper.textContent = "wpm: " + wpm + "    cpm: " + cpm;
+    div.textContent = "wpm: " + wpm + "    cpm: " + cpm;
 
+  }
+
+  random_rgba() {
+    var o = Math.round, r = Math.random, s = 255;
+    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
   }
 
 
@@ -228,8 +233,8 @@ background-color: white;
     for (const session of sessions) {
       const parsedSession = JSON.parse(session);
 
-      let prevWrapper = document.createElement("prevWrapper");
-      let prevSpeed = document.createElement("prevWrapper");
+      let prevWrapper = document.createElement("div");
+      let prevSpeed = document.createElement("div");
       let input = document.createElement("textarea");
       let closeBtn = document.createElement("span");
       let repeatBtn = document.createElement("span");
@@ -244,6 +249,10 @@ background-color: white;
       prevSpeed.classList.add("prev-speed");
       prevWrapper.classList.add("prev-wrapper");
 
+      let rgb = this.random_rgba();
+
+      prevSpeed.style.backgroundColor = rgb;
+      prevWrapper.style.borderTop = '5px solid ' + rgb;
 
       prevWrapper.appendChild(prevSpeed);
       prevWrapper.appendChild(repeatBtn);
