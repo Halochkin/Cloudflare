@@ -77,9 +77,11 @@ textarea {
 }
 
 #string-field {
-    background-color: lightyellow;
+   background-color: lightyellow;
     border-radius: 5px;
     padding: 10px;
+    margin: 1vw;
+    width: 90vw;
     border: 1px solid gray;
     box-shadow: inset 0px 0px 2px 0px #b1adad;
 }
@@ -95,9 +97,10 @@ textarea {
 
 .close-btn {
     float: left;
-    margin: 10px;
+    /*margin: 10px;*/
     font-size: 1em;
     color: red;
+    margin-top: 1.3em;
     background-color: #2a272700;
     width: 1.3em;
     text-align: center;
@@ -114,7 +117,8 @@ textarea {
     font-family: cursive;
     cursor: pointer;
     float: left;
-    margin: 10px;
+    /*margin: 10px;*/
+    margin-top: 1.3em;
     box-shadow: inset 0 0 2px 0px #131212;
     width: 1.3em;
     text-align: center;
