@@ -14,6 +14,9 @@ header {
     color: white;
     font-family: "Roboto Light";
 }
+#header-logo{
+    font-size: 2.5em;
+}
 
 .auth-logo {
     height: 100%;
