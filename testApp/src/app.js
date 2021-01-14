@@ -55,8 +55,9 @@ textarea {
 }
 
 #main-input {
-    user-select: none;
-    width: 65vw;
+   width: 77vw;
+    padding: 3px;
+    margin-left: 3vw;
 }
 
 .prev-speed {
@@ -80,7 +81,7 @@ textarea {
    background-color: lightyellow;
     border-radius: 5px;
     padding: 1vw;
-    margin: 3vw;
+    margin-left: 3vw;
     width: 85vw;
     border: 1px solid gray;
     box-shadow: inset 0px 0px 2px 0px #b1adad;
