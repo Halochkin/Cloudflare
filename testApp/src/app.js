@@ -277,16 +277,16 @@ class App extends HTMLElement {
   }
 
 
-  request(method, path, body) {
+  async request(method, path, body) {
     const options = {
       method,
       headers: {'Content-Type': 'application/json'}
     }
     if (body)
       options.body = JSON.stringify(body);
-    return fetch(path, options)
+    let res = fetch(path, options);
+    return res.json();
   }
-
 
 
   async handleInput(e) {
@@ -345,18 +345,14 @@ class App extends HTMLElement {
       });
 
 
-      let res = this.request("POST","https://typing-race.maksgalochkin2.workers.dev/json", data ).then(response => response.json());
+      let res = await this.request("POST", "https://typing-race.maksgalochkin2.workers.dev/json", data);
 
 
       // if (!res.status) // success POST returns status,  unlogged user, push sessions locally
       //   this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
 
 
-
-
-      let request = this.request('GET',"https://typing-race.maksgalochkin2.workers.dev/getsessions").then(response => response.json());
-
-
+      let request = await this.request('GET', "https://typing-race.maksgalochkin2.workers.dev/getsessions");
 
 
       //uuuuuglyy
