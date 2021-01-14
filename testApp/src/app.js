@@ -79,9 +79,9 @@ textarea {
 #string-field {
    background-color: lightyellow;
     border-radius: 5px;
-    padding: 10px;
-    margin: 1vw;
-    width: 90vw;
+    padding: 1vw;
+    margin: 3vw;
+    width: 85vw;
     border: 1px solid gray;
     box-shadow: inset 0px 0px 2px 0px #b1adad;
 }
