@@ -97,7 +97,7 @@ textarea {
 
 .close-btn {
     float: left;
-    /*margin: 10px;*/
+    margin: 10px;
     font-size: 1em;
     color: red;
     margin-top: 1.3em;
@@ -117,7 +117,7 @@ textarea {
     font-family: cursive;
     cursor: pointer;
     float: left;
-    /*margin: 10px;*/
+    margin: 10px;
     margin-top: 1.3em;
     box-shadow: inset 0 0 2px 0px #131212;
     width: 1.3em;
