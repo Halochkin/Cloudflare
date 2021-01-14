@@ -40,7 +40,7 @@ background-color: khaki;
     }
 
     textarea {
-width: 73vw;
+    width: 73vw;
     height: auto;
     resize: none;
     margin: 1vw;
@@ -65,7 +65,7 @@ width: 73vw;
     font-size: 1em;
     display: block;
     background-color: orange;
-    margin: -1vw -1vw 1vw -1vw;
+    margin: -1vw -2vw 1vw -1vw;
     padding: 0.2vw;
     }
 
@@ -133,12 +133,12 @@ background-color: white;
  
     
 </style>
-<div id="app">
-<div id="previous-results"></div>
+<prevWrapper id="app">
+<prevWrapper id="previous-results"></prevWrapper>
 <hr>
 
 <br>
-<div id="string-field">
+<prevWrapper id="string-field">
     <!--   correct non editable string-->
     <span id="done"></span>
     <!--    current word-->
@@ -146,12 +146,12 @@ background-color: white;
     <span class="current" id="expected"></span>
     <span class="current" id="remains"></span>
     <span id="tail"></span>
-</div>
+</prevWrapper>
 <br>
-<div>
+<prevWrapper>
     <input id="main-input" aria-selected="false" type="text"> <span id="main-result"></span>
-</div>
- </div>
+</prevWrapper>
+ </prevWrapper>
 `;
 
     this.input = this.shadowRoot.querySelector("#main-input");
@@ -183,7 +183,7 @@ background-color: white;
     this.render(this.wordIndex, this.characterIndex, undefined);
   }
 
-  repeatSession(session, input, div) {
+  repeatSession(session, input, prevWrapper) {
     if (input.value.length)
       input.value = "";
     //get item value position inside map
@@ -206,7 +206,7 @@ background-color: white;
           input.value = input.value.slice(0, input.value.length - 1);  //delete character
       }, character[1]);
     }
-    div.textContent = "wpm: " + wpm + "    cpm: " + cpm;
+    prevWrapper.textContent = "wpm: " + wpm + "    cpm: " + cpm;
 
   }
 
@@ -228,42 +228,43 @@ background-color: white;
     for (const session of sessions) {
       const parsedSession = JSON.parse(session);
 
-      let div = document.createElement("div");
-      let div2 = document.createElement("div");
+      let prevWrapper = document.createElement("prevWrapper");
+      let prevSpeed = document.createElement("prevWrapper");
       let input = document.createElement("textarea");
-      let span1 = document.createElement("span");
-      let span2 = document.createElement("span");
+      let closeBtn = document.createElement("span");
+      let repeatBtn = document.createElement("span");
 
-      span1.classList.add("close-btn")
-      span2.classList.add("repeat-btn")
-      span1.textContent = "X";
-      span1.id = parsedSession.sessionId;
-      span2.textContent = "↻";
+      closeBtn.classList.add("close-btn")
+      repeatBtn.classList.add("repeat-btn")
+      closeBtn.textContent = "X";
+      closeBtn.id = parsedSession.sessionId;
+      repeatBtn.textContent = "↻";
 
       input.setAttribute("readonly", "")
-      div2.classList.add("prev-speed");
-      div.classList.add("prev-wrapper")
+      prevSpeed.classList.add("prev-speed");
+      prevWrapper.classList.add("prev-wrapper");
 
-      div.appendChild(input);
-      div.appendChild(div2);
-      div.appendChild(span1);
-      div.appendChild(span2);
 
-      span1.addEventListener("click", async (e) => { //todo: remove session
+      prevWrapper.appendChild(prevSpeed);
+      prevWrapper.appendChild(repeatBtn);
+      prevWrapper.appendChild(closeBtn);
+      prevWrapper.appendChild(input);
+
+      closeBtn.addEventListener("click", async (e) => { //todo: remove session
         let grandParent = input.parentNode.parentElement;
         let data = JSON.stringify({key: e.currentTarget.id.toString()});
         let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data);
-        grandParent.removeChild(div);
+        grandParent.removeChild(prevWrapper);
       });
 
 
-      span2.addEventListener("click", (e) => {
-        this.repeatSession(parsedSession, input, div2);
+      repeatBtn.addEventListener("click", (e) => {
+        this.repeatSession(parsedSession, input, prevSpeed);
       });
 
-      this.resultsBoard.appendChild(div);
+      this.resultsBoard.appendChild(prevWrapper);
 
-      this.repeatSession(parsedSession, input, div2);
+      this.repeatSession(parsedSession, input, prevSpeed);
     }
 
 
