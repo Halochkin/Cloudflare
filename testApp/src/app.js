@@ -183,7 +183,7 @@ class App extends HTMLElement {
 
   async getAllSessions(onlyLastSession, justTypedData) {
 
-   //firs time it will be empty, because put to kv takes some time
+    //firs time it will be empty, because put to kv takes some time
     let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
       method: 'GET',
     });
@@ -197,7 +197,6 @@ class App extends HTMLElement {
     // render only last session, get only last item
     if (onlyLastSession)
       sessions = [sessions[sessions.length - 1]]
-
 
 
     for (const session of sessions) {
@@ -277,23 +276,18 @@ class App extends HTMLElement {
     return {wpm: (this.words.length / 5) / minutes, cpm: this.expression.length / minutes}
   }
 
-  async postData(url = '', data = {}) {
-    const response = await fetch(url, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      // mode: 'cors', // no-cors, *cors, same-origin
-      // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      // credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      // redirect: 'follow', // manual, *follow, error
-      // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: data // body data type must match "Content-Type" header
-    });
-    return await response.json();
 
+  request(method, path, body) {
+    const options = {
+      method,
+      headers: {'Content-Type': 'application/json'}
+    }
+    if (body)
+      options.body = JSON.stringify(body);
+    return fetch(path, options)
   }
+
+
 
   async handleInput(e) {
     if (!this.startTime)
@@ -351,29 +345,28 @@ class App extends HTMLElement {
       });
 
 
-      let res = await this.postData("https://typing-race.maksgalochkin2.workers.dev/json", data);
-
-      if (!res.status) // success POST returns status,  unlogged user, push sessions locally
-        this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
-
-      // wait untill data will be put into kv
+      let res = this.request("POST","https://typing-race.maksgalochkin2.workers.dev/json", data ).then(response => response.json());
 
 
-      let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
-        method: 'GET',
-      });
+      // if (!res.status) // success POST returns status,  unlogged user, push sessions locally
+      //   this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
 
-      let sessions = await request.json();
+
+
+
+      let request = this.request('GET',"https://typing-race.maksgalochkin2.workers.dev/getsessions").then(response => response.json());
+
+
 
 
       //uuuuuglyy
-      if(res.uId){
+      if (res.uId) {
         data = JSON.parse(data);
         data.sessionId = res.uId + "-" + data.sessionId;
         data = JSON.stringify(data);
       }
 
-     // post data takes some time, so we will use existing data to not wait
+      // post data takes some time, so we will use existing data to not wait
       return this.refresh(data);
     }
 
