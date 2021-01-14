@@ -231,9 +231,6 @@ class App extends HTMLElement {
 
         let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data );
 
-        // let key = [...this.previousSessions][item][0];
-        // this.previousSessions.delete(key);
-        // delete from dom
         grandParent.removeChild(div);
       });
 
@@ -288,7 +285,7 @@ class App extends HTMLElement {
       headers: {'Content-Type': 'application/json'}
     }
     if (body)
-      options.body = JSON.stringify(body);
+      options.body = body;
     let res = await fetch(path, options);
     return res.json();
   }
@@ -342,6 +339,7 @@ class App extends HTMLElement {
     if (this.wordIndex === this.words.length - 1 && this.characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
       let result = this.countWPM(Date.now() - this.startTime);
       this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
+
       let data = JSON.stringify({
         sessionId: Date.now(),
         wpm: result.wpm.toFixed(2),
