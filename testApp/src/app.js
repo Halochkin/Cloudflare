@@ -223,11 +223,16 @@ class App extends HTMLElement {
       div.appendChild(span1);
       div.appendChild(span2);
 
-      span1.addEventListener("click", (e) => { //todo: remove session
+      span1.addEventListener("click", async (e) => { //todo: remove session
         let grandParent = input.parentNode.parentElement;
-        let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
-        let key = [...this.previousSessions][item][0];
-        this.previousSessions.delete(key);
+        // let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
+
+        let data = JSON.stringify({key: e.currentTarget.id});
+
+        let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data );
+
+        // let key = [...this.previousSessions][item][0];
+        // this.previousSessions.delete(key);
         // delete from dom
         grandParent.removeChild(div);
       });
