@@ -2,84 +2,81 @@ class App extends HTMLElement {
   constructor() {
     super();
     // this.expression = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus maximus erat. Praesent luctus, quam nec consequat sagittis, justo erat iaculis mauris, sodales tristique odio enim non erat. Curabitur dapibus fermentum tellus ac viverra. Sed eros lorem, bibendum sit amet nisl sit amet, ultricies posuere ipsum. "
-    this.expression = "Lorem ipsum";
+    this.expression = "Lorem ipsum dolor sit amet";
     this.attachShadow({mode: "open"});
     this.shadowRoot.innerHTML = `
 <style>
-    * {
-        font-size: 20px;
-    }
+* {
+    font-size: 20px;
+}
 
-    .current {
-        text-decoration: underline;
-    }
+.current {
+    text-decoration: underline;
+}
 
-    .err {
-        background-color: rgba(255, 0, 0, 0.8);
-        border-radius: 5px;
-    }
+.err {
+    background-color: rgba(255, 0, 0, 0.8);
+    border-radius: 5px;
+}
 
-    #done {
-        color: forestgreen;
-    }
+#done {
+    color: forestgreen;
+}
 
-    #result {
-        border: 0.5px solid black;
-    }
+#result {
+    border: 0.5px solid black;
+}
 
-    #main-result {
+#main-result {
     background-color: khaki;
     text-align: center;
-    padding: 1px;
     display: block;
     float: right;
     height: fit-content;
     width: fit-content;
     border-radius: 3px;
     padding: 3px;
-    }
+}
 
-    textarea {
+textarea {
     width: 73vw;
     height: auto;
     resize: none;
     margin: 1vw;
-    }
+}
 
-    #expected {
-        background-color: rgba(0, 128, 6, 0.29);
-        border-radius: 5px;
-        font-size: 25px;
-        
-        background-image: url(data:image/gif;base64,R0lGODlhAQAoAPABAERmZv///yH5BAg1AAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAAQAoAAACBYSPqctYACH5BAg1AAAALAAAAAABACgAgP///////wIFhI+py1gAOw==);
+#expected {
+    background-color: rgba(0, 128, 6, 0.29);
+    border-radius: 5px;
+    font-size: 25px;
+
+    background-image: url(data:image/gif;base64,R0lGODlhAQAoAPABAERmZv///yH5BAg1AAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAAQAoAAACBYSPqctYACH5BAg1AAAALAAAAAABACgAgP///////wIFhI+py1gAOw==);
     background-repeat: repeat-y;
 }
-    }
 
-    #main-input {
-        user-select: none;
-        width: 65vw;
-    }
+#main-input {
+    user-select: none;
+    width: 65vw;
+}
 
-    .prev-speed {
+.prev-speed {
     font-size: 1em;
     display: block;
-    /*background-color: orange;*/
-    margin: -1vw -2vw 1vw -1vw;
+    margin: -2vw -1vw 1vw -1vw;
     padding: 0.2vw;
-    }
+}
 
-    .prev-wrapper {
-background-color: white;
+.prev-wrapper {
+    background-color: white;
     padding: 1vw;
     margin: 1vw;
     width: 90vw;
     box-shadow: 0px 0px 4px 0px #be9f9f;
     border-radius: 0 0 5px 5px;
-    /*border-top: 5px solid orange;*/
-    }
+    overflow: hidden;
+}
 
-    #string-field {
+#string-field {
     background-color: lightyellow;
     border-radius: 5px;
     padding: 10px;
@@ -87,16 +84,16 @@ background-color: white;
     box-shadow: inset 0px 0px 2px 0px #b1adad;
 }
 
-#main-input{
+#main-input {
     width: 70vw;
 }
 
-    #app {
-        padding: 3vw;
+#app {
+    padding: 3vw;
 
-    }
+}
 
-    .close-btn {
+.close-btn {
     float: left;
     margin: 10px;
     font-size: 1em;
@@ -110,9 +107,9 @@ background-color: white;
     cursor: pointer;
     box-shadow: inset 0 0 2px 0px #131212;
 
-    }
+}
 
-    .repeat-btn {
+.repeat-btn {
     color: #4CAF50;
     font-family: cursive;
     cursor: pointer;
@@ -127,8 +124,7 @@ background-color: white;
     font-size: 1em;
     text-shadow: box-shadow: 10px 5px 5px red;
     text-shadow: 0px 0px 0px black;
-    }
- 
+}
     
 </style>
 <div id="app">
