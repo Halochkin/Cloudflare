@@ -184,11 +184,7 @@ class App extends HTMLElement {
   async getAllSessions(onlyLastSession, justTypedData) {
 
     //firs time it will be empty, because put to kv takes some time
-    let request = await fetch("https://typing-race.maksgalochkin2.workers.dev/getsessions", {
-      method: 'GET',
-    });
-
-    let sessions = await request.json();
+    let sessions = await this.request('GET', "https://typing-race.maksgalochkin2.workers.dev/getsessions");
 
     // if first typing, request return nothing, use justTypedData instead
     if (!sessions.length && justTypedData)
@@ -227,7 +223,7 @@ class App extends HTMLElement {
         let grandParent = input.parentNode.parentElement;
         // let item = Array.prototype.indexOf.call(grandParent.children, input.parentNode);
 
-        let data = {key: e.currentTarget.id};
+        let data = JSON.stringify({key: e.currentTarget.id});
 
         let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data );
 
@@ -355,7 +351,6 @@ class App extends HTMLElement {
       //   this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
 
 
-      let request = await this.request('GET', "https://typing-race.maksgalochkin2.workers.dev/getsessions");
 
 
       //uuuuuglyy
