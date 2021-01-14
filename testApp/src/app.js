@@ -89,7 +89,7 @@ textarea {
 #previous-results{
     overflow-y: scroll;
     padding: 2vw;
-    height: 48vh;
+    height: 45vh;
     overflow-x: hidden;
 }
 
