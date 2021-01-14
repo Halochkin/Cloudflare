@@ -62,7 +62,7 @@ textarea {
 .prev-speed {
     font-size: 1em;
     display: block;
-    margin: -2vw -1vw 1vw -1vw;
+    margin: -1vw -1vw 1vw -1vw;
     padding: 0.2vw;
 }
 
@@ -162,9 +162,6 @@ textarea {
     this.button = this.shadowRoot.querySelector("button");
     this.input.addEventListener("keydown", this.handleInput.bind(this));
 
-    //fetch event handler
-
-
     this.wordIndex = 0;
     this.characterIndex = 0;
     this.startTime = 0;
@@ -179,17 +176,10 @@ textarea {
   repeatSession(session, input, div) {
     if (input.value.length)
       input.value = "";
-    //get item value position inside map
-    let item = Array.prototype.indexOf.call(input.parentNode.parentElement.children, input.parentNode);
-
 
     const parsedHistory = JSON.parse(session.history);
     const wpm = session.wpm;
     const cpm = session.cpm;
-    const sessionId = session.sessionId;
-
-    // let [speed, characters] = [...ctx.previousSessions][item];
-
 
     for (const character of parsedHistory) {
       setTimeout(() => {
@@ -200,28 +190,23 @@ textarea {
       }, character[1]);
     }
     div.textContent = "wpm: " + wpm + "    cpm: " + cpm;
-
   }
 
   random_rgba() {
-    var o = Math.round, r = Math.random, s = 255;
+    let o = Math.round, r = Math.random, s = 255;
     return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
   }
 
 
   async getAllSessions(onlyLastSession, justTypedData) {
-
     //firs time it will be empty, because put to kv takes some time
     let sessions = await this.request('GET', "https://typing-race.maksgalochkin2.workers.dev/getsessions");
-
     // if first typing, request return nothing, use justTypedData instead
     if (!sessions.length && justTypedData)
       sessions.push(justTypedData);
-
     // render only last session, get only last item
     if (onlyLastSession)
       sessions = [sessions[sessions.length - 1]]
-
 
     for (const session of sessions) {
       const parsedSession = JSON.parse(session);
@@ -244,7 +229,6 @@ textarea {
       prevWrapper.classList.add("prev-wrapper");
 
       prevSpeed.style.backgroundColor = rgb;
-      prevWrapper.style.borderTop = '5px solid ' + rgb;
 
       prevWrapper.appendChild(prevSpeed);
       prevWrapper.appendChild(repeatBtn);
