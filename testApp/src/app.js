@@ -284,7 +284,7 @@ class App extends HTMLElement {
     }
     if (body)
       options.body = JSON.stringify(body);
-    let res = fetch(path, options);
+    let res = await fetch(path, options);
     return res.json();
   }
 
