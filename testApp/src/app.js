@@ -2,7 +2,6 @@ class App extends HTMLElement {
   constructor() {
     super();
     // this.expression = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus maximus erat. Praesent luctus, quam nec consequat sagittis, justo erat iaculis mauris, sodales tristique odio enim non erat. Curabitur dapibus fermentum tellus ac viverra. Sed eros lorem, bibendum sit amet nisl sit amet, ultricies posuere ipsum. "
-    this.expression = "Lorem ipsum dolor sit amet";
     this.attachShadow({mode: "open"});
     this.shadowRoot.innerHTML = `
 <style>
@@ -165,238 +164,79 @@ margin-top: -2vw;
 `;
 
     this.input = this.shadowRoot.querySelector("#main-input");
-    this.result = this.shadowRoot.querySelector("#main-result");
-    this.resultsBoard = this.shadowRoot.querySelector("#previous-results");
-    // sentence
-    this.correctWords = this.shadowRoot.querySelector("#done"); //only correct inputs
-    //separate word
-    this.typedCharacters = this.shadowRoot.querySelector("#typed");  //currently typing word, can
-    this.expectedCharacter = this.shadowRoot.querySelector("#expected");
-    this.remainedCharacters = this.shadowRoot.querySelector("#remains");
 
-    this.tail = this.shadowRoot.querySelector("#tail"); // exclude current and done
-    //input
-    this.button = this.shadowRoot.querySelector("button");
-    this.input.addEventListener("keydown", this.handleInput.bind(this));
-
-    this.wordIndex = 0;
-    this.characterIndex = 0;
-    this.startTime = 0;
-    this.inputValues = [];
-    this.previousSessions = new Map();
-    this.sessionTrack = [];
-    this.words = this.expression.trim().split(" ");
-    this.getAllSessions(false, undefined);
-    this.render(this.wordIndex, this.characterIndex, undefined);
-  }
-
-  repeatSession(session, input, div) {
-    if (input.value.length)
-      input.value = "";
-  //todo: disable double repeating  at the same time
-    const parsedHistory = JSON.parse(session.history);
-    const wpm = session.wpm;
-    const cpm = session.cpm;
-
-    for (const character of parsedHistory) {
-      setTimeout(() => {
-        if (character[0] !== "Backspace")
-          input.value += character[0];
-        else
-          input.value = input.value.slice(0, input.value.length - 1);  //delete character
-      }, character[1]);
-    }
-    div.textContent = "wpm: " + wpm + "    cpm: " + cpm;
-  }
-
-  random_rgba() {
-    let o = Math.round, r = Math.random, s = 255;
-    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
-  }
-
-
-  async getAllSessions(onlyLastSession, justTypedData) {
-    //firs time it will be empty, because put to kv takes some time
-    let sessions = await this.request('GET', "https://typing-race.maksgalochkin2.workers.dev/getsessions");
-    // if first typing, request return nothing, use justTypedData instead
-    if (!sessions.length && justTypedData)
-      sessions.push(justTypedData);
-    // render only last session, get only last item
-    if (onlyLastSession)
-      sessions = [sessions[sessions.length - 1]]
-
-    for (const session of sessions) {
-      const parsedSession = JSON.parse(session);
-      let rgb = this.random_rgba();
-
-      let prevWrapper = document.createElement("div");
-      let prevSpeed = document.createElement("div");
-      let input = document.createElement("textarea");
-      let closeBtn = document.createElement("span");
-      let repeatBtn = document.createElement("span");
-
-      closeBtn.classList.add("close-btn")
-      repeatBtn.classList.add("repeat-btn")
-      closeBtn.textContent = "X";
-      closeBtn.id = parsedSession.sessionId;
-      repeatBtn.textContent = "↻";
-
-      input.setAttribute("readonly", "")
-      prevSpeed.classList.add("prev-speed");
-      prevWrapper.classList.add("prev-wrapper");
-
-      prevSpeed.style.backgroundColor = rgb;
-
-      prevWrapper.appendChild(prevSpeed);
-      prevWrapper.appendChild(repeatBtn);
-      prevWrapper.appendChild(closeBtn);
-      prevWrapper.appendChild(input);
-
-      closeBtn.addEventListener("click", async (e) => { //todo: remove session
-        let grandParent = input.parentNode.parentElement;
-        let data = JSON.stringify({key: e.currentTarget.id.toString()});
-        let res = await this.request("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data);
-        grandParent.removeChild(prevWrapper);
-      });
-
-
-      repeatBtn.addEventListener("click", (e) => {
-        this.repeatSession(parsedSession, input, prevSpeed);
-      });
-
-      this.resultsBoard.appendChild(prevWrapper);
-
-      this.repeatSession(parsedSession, input, prevSpeed);
-    }
-
-
-  }
-
-  render(wordIndex, characterIndex) {
-    let word = wordIndex !== this.words.length - 1 ? this.words[wordIndex] + " " : this.words[wordIndex];
-    this.typedCharacters.textContent = word.slice(0, characterIndex) || ""; // correctly typed *words*
-    this.expectedCharacter.textContent = word.charAt(characterIndex);      //expected character
-    this.remainedCharacters.textContent = word.slice(characterIndex + 1, word.length);
-    this.tail.textContent = this.words.slice(wordIndex + 1, this.words.length).join(" ")  // all next words
-  }
-
-  refresh(justTypedData) {
-    this.expectedCharacter.textContent = "";
-    this.correctWords.textContent = "";
-    this.inputValues = [];
-    this.sessionTrack = [];
-    this.wordIndex = 0;
-    this.startTime = undefined;
-    this.getAllSessions(true, justTypedData); // true means that only last data need to bu updated, not iterate all kv, like at firs time
-
-    setTimeout(() => {
-      this.input.value = null;
-
+    this.input.addEventListener("keydown", e => {
+      if (e.key.length > 1 && e.key !== "Backspace") return;
+      this.dispatchEvent(new CustomEvent("input-keydown", {composed: true, bubbles: true, detail: e}));
     })
-    this.render(0, 0, undefined);
-  }
 
-  //https://www.speedtypingonline.com/typing-equations
-  countWPM(durationMs) {
-    let minutes = (durationMs) / 1000 / 60;
-    return {wpm: (this.words.length / 5) / minutes, cpm: this.expression.length / minutes}
-  }
-
-
-  async request(method, path, body) {
-    const options = {
-      method,
-      headers: {'Content-Type': 'application/json'}
-    }
-    if (body)
-      options.body = body;
-    let res = await fetch(path, options);
-    return res.json();
-  }
-
-
-  async handleInput(e) {
-    if (!this.startTime)
-      this.startTime = Date.now();
-    const key = e.key;
-
-    let selectionStart = e.currentTarget.selectionStart;
-    let selectionEnd = e.currentTarget.selectionEnd;
-    let selectionRange = selectionEnd - selectionStart;
-
-    if (key.length === 1) { //exclude technical keys (Enter etc) but allow all another (even non a-Z) //todo regex here?
-      if (selectionRange) {
-        this.inputValues.splice(selectionStart, selectionRange, key);
-        this.characterIndex = selectionStart + 1;
-      } else {
-        this.inputValues.splice(selectionStart, 0, key);
-        this.characterIndex = this.inputValues.length;
+    const getSeparateWords = (expression) => {
+      let separateWords = expression.trim().split(" ");
+      for (let i = 0; i < separateWords.length - 1; i++) {  //add space to each word beside last one
+        separateWords[i] += " ";
       }
-      this.sessionTrack.push([key, Date.now() - this.startTime, this.characterIndex]);
+      return separateWords;
     }
 
-    if (e.key === "Backspace" && this.inputValues.length) {
-      if (selectionRange) {  //someone selected text and removed
-        this.characterIndex = selectionStart;
-        this.inputValues.splice(selectionStart, selectionRange);
-      } else if (selectionStart !== 0) {
-        this.characterIndex--;
-        this.inputValues.splice(selectionStart - 1, 1);
-      } else
-        this.inputValues.pop();
-      this.sessionTrack.push([key, Date.now() - this.startTime]);
-      this.render(this.wordIndex, this.characterIndex, key);
+    const expression = "Lorem";
+
+    const separateWords = getSeparateWords(expression);
+
+
+    const initialState = {
+      wordIndex: 0,
+      characterIndex: 0,
+
+      startTime: 0,
+      inputValues: [],
+
+
+      sessionHistory: [],
+
+      separateWords: separateWords,
+
+      typedWords: [],
+      typedCharacters: "",
+      sessionResult: "",
+
+      expectedCharacter: separateWords[0][0],
+      remainedCharacters: separateWords[0].slice(1, separateWords[0].length),
+      remainedWords: separateWords.slice(1, separateWords.length).join(" ")
     }
 
-    // When press Space
-    if (key === " " && this.expectedCharacter.textContent === " " && this.input.value === this.words[this.wordIndex] && selectionEnd === this.words[this.wordIndex].length) {
-      this.wordIndex++;    //switch to next word after press Space
-      this.characterIndex = 0;    //start count character from 0
+    this.getImmutableState = (state = initialState) => {
+      return {...state}
+    }
+
+    this.joiState = new JoiState(this.getImmutableState());
+    this.joiState.bindReduce("input-keydown", Reducers.handleInput.bind(this));
+    this.joiState.bindReduce("DOMContentLoaded", Reducers.getAllSessions.bind(this));
+
+    this.joiState.bindObserve(this.render.bind(this), [""]);
+
+    this.render(this.joiState.state);
+  }
+
+
+  render(state) {
+    const typedItem = this.shadowRoot.querySelector("#typed");
+    typedItem.textContent = state.typedCharacters;
+    this.shadowRoot.querySelector("#expected").textContent = state.expectedCharacter;
+    this.shadowRoot.querySelector("#remains").textContent = state.remainedCharacters;
+    this.shadowRoot.querySelector("#tail").textContent = state.remainedWords;
+    this.shadowRoot.querySelector("#done").textContent = state.typedWords && state.typedWords.join("") || "";   // (state.separateWords[state.wordIndex - 1] || "") + " "; // move previous word to non-editable span
+    this.shadowRoot.querySelector("#main-result").textContent = state.sessionResult || "";
+
+    if (state.inputValues.length && state.inputValues[state.inputValues.length - 1] !== state.expectedCharacter)
+      typedItem.classList.add("err");          // add error
+    if (state.typedCharacters === state.inputValues.join("") || state.inputValues.join("") === state.separateWords[state.wordIndex] || state.inputValues.join("") === state.separateWords[state.wordIndex].slice(0, state.characterIndex))
+      typedItem.classList.remove("err");   //remove error
+    if (!state.inputValues.length)
       setTimeout(() => {
-        this.input.value = null;
+        this.shadowRoot.querySelector("#main-input").value = ""
       })
-      this.inputValues = [];    //refresh typed characters
-      this.correctWords.textContent += this.words[this.wordIndex - 1] + " "; // move previous word to non-editable span
-    }
+    return state
 
-    //last character of last word
-    if (this.wordIndex === this.words.length - 1 && this.characterIndex === this.words[this.words.length - 1].length && this.inputValues[this.inputValues.length - 1] === this.expectedCharacter.textContent) {
-      let result = this.countWPM(Date.now() - this.startTime);
-      this.result.textContent = "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0)
-
-      let data = JSON.stringify({
-        sessionId: Date.now(),
-        wpm: result.wpm.toFixed(2),
-        cpm: result.cpm.toFixed(2),
-        history: JSON.stringify(this.sessionTrack)
-      });
-
-
-      let res = await this.request("POST", "https://typing-race.maksgalochkin2.workers.dev/json", data);
-
-
-      // if (!res.status) // success POST returns status,  unlogged user, push sessions locally
-      //   this.previousSessions.set(result, this.sessionTrack); //todo, non logged user
-
-
-      //uuuuuglyy
-      if (res.uId) {
-        data = JSON.parse(data);
-        data.sessionId = res.uId + "-" + data.sessionId;
-        data = JSON.stringify(data);
-      }
-
-      // post data takes some time, so we will use existing data to not wait
-      return this.refresh(data);
-    }
-
-    //error handler
-    if (this.inputValues.length && this.inputValues[this.inputValues.length - 1] !== this.expectedCharacter.textContent)
-      this.typedCharacters.classList.add("err");          // add error
-    if (this.typedCharacters.textContent === this.inputValues.join("") || this.inputValues.join("") === this.words[this.wordIndex] || this.inputValues.join("") === this.words[this.wordIndex].slice(0, this.characterIndex))
-      this.typedCharacters.classList.remove("err");   //remove error
-
-    this.render(this.wordIndex, this.characterIndex, selectionStart)
   }
 
 

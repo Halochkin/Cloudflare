@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JoiStore 2020</title>
+    <script src="../src/Reducers.js"></script>
+
+
+    <script src="../src/joistate/JoiState.js"></script>
+    <script src="../src/joistate/JoiHistory.js"></script>
+    <script src="../src/joistate/JoiGraph.js"></script>
+    <script src="../src/joistate/JoiCompute.js"></script>
+    <script src="../src/joistate/JoiPath.js"></script>
+</head>
+<body>
+<button>Rockets on Moscow</button>
+
+<script>
+
+
+  document.querySelector("button").addEventListener("click", e=> onClick(e))
+
+  const joiState = new JoiState({counter: 0, value: "Max", boolean: true});
+
+  joiState.bindReduce("echo-click", Reducers.customClick);
+
+  joiState.bindObserve(observerFunction, ["boolean"]);  //arguments to change, empty array means all
+
+  function observerFunction(event) {
+    console.log(event);
+  }
+
+  function onClick(e) {
+     return window.dispatchEvent(new CustomEvent("echo-click", {
+       detail: "Total Recall"
+     }))
+  }
+
+</script>
+</body>
+</html>
