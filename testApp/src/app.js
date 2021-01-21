@@ -255,7 +255,7 @@ margin-top: -2vw;
   repeatSession(session, input, div) {
     const parsedHistory = JSON.parse(session.history);
     // to disable sync repeating.
-    if (input.value !== session.expression)
+    if (input.value && input.value !== session.expression)
       return;
 
     if (input.value.length)
