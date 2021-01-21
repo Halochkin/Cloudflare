@@ -208,11 +208,12 @@ margin-top: -2vw;
     this.joiState = new EventJoiStore(this.getImmutableState());
     this.joiState.addEventReducer("input-keydown", Reducers.handleInput.bind(this));
     this.joiState.addEventReducer("DOMContentLoaded", Reducers.getAllSessions.bind(this));
-    this.joiState.observe(this.render.bind(this), [""]);
+
+    this.joiState.observe([""], this.render.bind(this));
 
     this.render(this.joiState.state);
   }
-  
+
   render(state) {
     const typedItem = this.shadowRoot.querySelector("#typed");
     typedItem.textContent = state.typedCharacters;

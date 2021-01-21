@@ -47,14 +47,9 @@ export class Reducers {
 
     let currentWord = state.separateWords[wordIndex];
 
-    // state = JoiGraph.setIn(state, "inputValues", inputValues);
+    state = JoiGraph.setIn(state, "inputValues", inputValues);
     state = JoiGraph.setIn(state, "characterIndex", characterIndex);
-
-
-    if (state.wordIndex !== wordIndex)
-      state = JoiGraph.setIn(state, "wordIndex", wordIndex);
-
-
+    state = JoiGraph.setIn(state, "wordIndex", wordIndex);
     state = JoiGraph.setIn(state, "typedCharacters", currentWord.slice(0, characterIndex));
     state = JoiGraph.setIn(state, "expectedCharacter", currentWord.charAt(characterIndex));
     state = JoiGraph.setIn(state, "remainedCharacters", currentWord.slice(characterIndex + 1, currentWord.length));
@@ -74,8 +69,8 @@ export class Reducers {
         expression: state.separateWords.join("")
       });
 
-      // this.doRequest("POST", "https://typing-race.maksgalochkin2.workers.dev/json", data).then(res => {
-      // })
+      this.doRequest("POST", "https://typing-race.maksgalochkin2.workers.dev/json", data).then(res => {
+      })
       this.renderSessions([data]);
       let newState = this.getImmutableState();  // new state
       return JoiGraph.setIn(newState, "sessionResult", "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0));
@@ -85,9 +80,9 @@ export class Reducers {
   }
 
   static getAllSessions(state) {
-    // this.doRequest('GET', "https://typing-race.maksgalochkin2.workers.dev/getsessions").then(data => {
-    //   this.renderSessions(data);
-    // });
+    this.doRequest('GET', "https://typing-race.maksgalochkin2.workers.dev/getsessions").then(data => {
+      this.renderSessions(data);
+    });
     return state
   }
 }
