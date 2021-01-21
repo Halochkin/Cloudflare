@@ -99,7 +99,6 @@ textarea {
     width: 75vw;
 }
 
-
 .prev-wrapper:first-child{
 margin-top: -2vw;
 }
@@ -184,23 +183,16 @@ margin-top: -2vw;
 
     const separateWords = getSeparateWords(expression);
 
-
     const initialState = {
       wordIndex: 0,
       characterIndex: 0,
-
       startTime: 0,
       inputValues: [],
-
-
       sessionHistory: [],
-
       separateWords: separateWords,
-
       typedWords: [],
       typedCharacters: "",
       sessionResult: "",
-
       expectedCharacter: separateWords[0][0],
       remainedCharacters: separateWords[0].slice(1, separateWords[0].length),
       remainedWords: separateWords.slice(1, separateWords.length).join(" ")
@@ -218,8 +210,7 @@ margin-top: -2vw;
 
     this.render(this.joiState.state);
   }
-
-
+  
   render(state) {
     const typedItem = this.shadowRoot.querySelector("#typed");
     typedItem.textContent = state.typedCharacters;
@@ -237,11 +228,99 @@ margin-top: -2vw;
       setTimeout(() => {
         this.shadowRoot.querySelector("#main-input").value = ""
       })
-    return state
-
+    return state;
   }
 
+  async doRequest(method, path, body) {
+    const options = {
+      method,
+      headers: {'Content-Type': 'application/json'}
+    }
+    if (body)
+      options.body = body;
+    let res = await fetch(path, options);
+    return res.json();
+  }
 
+  countWPM(state, durationMs) {
+    let minutes = (durationMs) / 1000 / 60;
+    return {wpm: (state.separateWords.length / 5) / minutes, cpm: state.separateWords.join("").length / minutes}
+  }
+
+  random_rgba() {
+    let o = Math.round, r = Math.random, s = 255;
+    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
+  }
+
+  repeatSession(session, input, div) {
+    const parsedHistory = JSON.parse(session.history);
+    // to disable sync repeating.
+    if (input.value !== parsedHistory.expression)
+      return;
+
+    if (input.value.length)
+      input.value = "";
+
+    //todo: disable double repeating  at the same time
+    const wpm = session.wpm;
+    const cpm = session.cpm;
+
+    for (const character of parsedHistory) {
+      setTimeout(() => {
+        if (character[0] !== "Backspace")
+          input.value += character[0];
+        else
+          input.value = input.value.slice(0, input.value.length - 1);  //delete character
+      }, character[1]);
+    }
+
+    div.textContent = "wpm: " + wpm + "    cpm: " + cpm;
+  }
+
+  renderSessions(state) {
+    for (const session of state) {
+      const parsedSession = JSON.parse(session);
+      let rgb = this.random_rgba();
+
+      let prevWrapper = document.createElement("div");
+      let prevSpeed = document.createElement("div");
+      let input = document.createElement("textarea");
+
+      let closeBtn = document.createElement("span");
+      let repeatBtn = document.createElement("span");
+
+      closeBtn.classList.add("close-btn");
+      closeBtn.textContent = "X";
+      closeBtn.id = parsedSession.sessionId;
+      closeBtn.addEventListener("click", async (e) => { //todo: remove session
+        let grandParent = input.parentNode.parentElement;
+        let data = JSON.stringify({key: e.currentTarget.id.toString()});
+        await this.doRequest("DELETE", "https://typing-race.maksgalochkin2.workers.dev/delete", data);
+        grandParent.removeChild(prevWrapper);
+      });
+
+      repeatBtn.textContent = "↻";
+      repeatBtn.classList.add("repeat-btn");
+
+      repeatBtn.addEventListener("click", (e) => {
+        this.repeatSession(parsedSession, input, prevSpeed);
+      });
+
+      input.setAttribute("readonly", "");
+
+      prevSpeed.classList.add("previous-speed");
+      prevSpeed.style.backgroundColor = rgb;
+
+      prevWrapper.classList.add("prev-wrapper");
+      prevWrapper.appendChild(prevSpeed);
+      prevWrapper.appendChild(repeatBtn);
+      prevWrapper.appendChild(closeBtn);
+      prevWrapper.appendChild(input);
+
+      this.shadowRoot.querySelector("#previous-results").appendChild(prevWrapper);
+      this.repeatSession(parsedSession, input, prevSpeed);
+    }
+  }
 }
 
 
