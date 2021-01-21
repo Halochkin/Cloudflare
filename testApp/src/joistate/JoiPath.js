@@ -1,6 +1,4 @@
-/**
- * Created by ivar.orstavik and tom.fales 2017.
- */
+
 class JoiPath {
 
   static objectEquals(x, y) {

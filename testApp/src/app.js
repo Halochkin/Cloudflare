@@ -1,4 +1,7 @@
-class App extends HTMLElement {
+ import {EventJoiStore, JoiGraph} from "../src/joistate/EventJoiStore.js";
+ import {Reducers} from "./Reducers.js";
+
+ class App extends HTMLElement {
   constructor() {
     super();
     // this.expression = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus maximus erat. Praesent luctus, quam nec consequat sagittis, justo erat iaculis mauris, sodales tristique odio enim non erat. Curabitur dapibus fermentum tellus ac viverra. Sed eros lorem, bibendum sit amet nisl sit amet, ultricies posuere ipsum. "
@@ -202,15 +205,14 @@ margin-top: -2vw;
       return {...state}
     }
 
-    this.joiState = new JoiState(this.getImmutableState());
-    this.joiState.bindReduce("input-keydown", Reducers.handleInput.bind(this));
-    this.joiState.bindReduce("DOMContentLoaded", Reducers.getAllSessions.bind(this));
-
-    this.joiState.bindObserve(this.render.bind(this), [""]);
+    this.joiState = new EventJoiStore(this.getImmutableState());
+    this.joiState.addEventReducer("input-keydown", Reducers.handleInput.bind(this));
+    this.joiState.addEventReducer("DOMContentLoaded", Reducers.getAllSessions.bind(this));
+    this.joiState.observe(this.render.bind(this), [""]);
 
     this.render(this.joiState.state);
   }
-
+  
   render(state) {
     const typedItem = this.shadowRoot.querySelector("#typed");
     typedItem.textContent = state.typedCharacters;

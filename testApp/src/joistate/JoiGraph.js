@@ -8,7 +8,7 @@
  * a) any properties with value undefined
  * b) any objects without properties
  */
-class JoiGraph {
+export class JoiGraph {
 
   /**
    * @returns {Object} dictionary object with the getOwnProperties of the input object, empty otherwise
@@ -82,7 +82,7 @@ class JoiGraph {
   /**
    * @param obj the object to be queried
    * @param objWithPaths an object with all the paths to be queried as keys
-   * @returns {{}} a new object 
+   * @returns {{}} a new object
    */
   static getInAll(obj, objWithPaths) {
     let res = {};
@@ -223,7 +223,6 @@ class JoiGraph {
     return C;
   }
 
-  //todo start max
   /**
    * Immutable filter that strips out
    * 1) entries of A that are matching exactly entries in B
@@ -266,8 +265,6 @@ class JoiGraph {
       return undefined;
     return C;
   }
-
-  //todo stop max
 
   /**
    * Flattens a normal object tree to an array of {path, value} objects

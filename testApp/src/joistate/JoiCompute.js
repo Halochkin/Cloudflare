@@ -1,3 +1,5 @@
+import {JoiGraph} from "./JoiGraph.js";
+
 class JoiStateStackOverflowError extends Error {
   constructor(message) {
     super(message);
@@ -10,20 +12,19 @@ class JoiStateStackOverflowError extends Error {
  * Both compute and observe functions should only run when the values of the argument paths that they
  * are bound to changes.
  *
- * The state manager, such as JoiState, should use a separate JoiCompute for observers and computers.
+ * The state manager, such as JoiStore, should use a separate JoiCompute for observers and computers.
  * By keeping the observers in a separate container, the state manager can assure that the observers are only run once,
  * after all the computed properties have updated. If not, an observer that listens for two or more computed properties
  * could be called once or twice during each cycle, depending only on the sequence of adding the compute and observe
  * functions, as it would be trigger after one computed parameter changes, or two computed parameters changes.
  */
-class JoiCompute {
+export class JoiCompute {
 
-  constructor(maxStackSize, observe) {
+  constructor(maxStackSize) {
     this.maxStackSize = maxStackSize || 100;
-    this.functionsRegister = {};
-    this.pathRegister = {};
-    this.stack = [{functionsRun: [], pathsCache: {}}];
-    this.observe = observe;
+    this.functionsRegister = {};               //immutable during .update
+    this.pathRegister = {};                    //immutable during .update
+    this.stack = [{functionsRun: [], pathsCache: {}}];    //mutable during .update
   }
 
   bind(func, pathsAsStrings, returnName) {
@@ -44,33 +45,52 @@ class JoiCompute {
   }
 
   /**
-   * this.stack[0] is the values of the last run. By checking the values from the last update,
+   * this.stack[0].pathsCache is the values of the last run. By checking the values from the last update,
    * compute and observe functions with no paramaters changed since last reducer call are not run.
-   * This makes more sense for the developers writing reduce, compute and observe functions.
+   * This makes more sense for the developers writing reduce, compute and observe functions, than rerunning all
+   * the compute functions from scratch after each reducer.
    *
    * @param newReducedState
    * @returns {Object} newly computed state
    */
   update(newReducedState) {
+    this.stack = this._compute(newReducedState, this.stack[0].pathsCache);
+    return JoiGraph.setInAll(newReducedState, this.stack[0].pathsCache);
+  }
+
+  //todo make a test for this function, to see that it makes something from scratch,
+  //todo verify that it does not affect the state of this JoiCompute instance,
+  //todo test that the return props from the computes stay the same.
+  /**
+   * Runs all compute functions from scratch on the input state.
+   * Does not affect the remembered state of this JoiCompute instance.
+   * @param inputState
+   * @returns {{}} inputState with the result from any compute functions added
+   */
+  computeFromScratch(inputState) {
+    const resultStack = this._compute(inputState, {});
+    return JoiGraph.setInAll(inputState, resultStack[0].pathsCache);
+  }
+
+  _compute(newReducedState, previousRun) {
     let pathsCache = JoiGraph.getInAll(newReducedState, this.pathRegister);
     let perFuncPreviousPathsCache = {};
     for (let funKy of Object.getOwnPropertyNames(this.functionsRegister))
-      perFuncPreviousPathsCache[funKy] = this.stack[0].pathsCache;
-    this.stack = JoiCompute.__compute(this.functionsRegister, this.maxStackSize, pathsCache, perFuncPreviousPathsCache, [], this.observe);
-    return JoiGraph.setInAll(newReducedState, this.stack[0].pathsCache);
+      perFuncPreviousPathsCache[funKy] = previousRun;
+    return JoiCompute.__compute(this.functionsRegister, this.maxStackSize, pathsCache, perFuncPreviousPathsCache, []);
   }
 
   /**
    *
-   * @param functions
-   * @param stackRemainderCount
+   * @param functions               read-only
+   * @param stackRemainderCount     count-down
    * @param pathsCache              immutable
    * @param perFuncOldPathsCache    immutable
    * @param stack
    * @returns {Object[]} all the pathsCache, the full stack.
    * @private
    */
-  static __compute(functions, stackRemainderCount, pathsCache, perFuncOldPathsCache, stack, observe) {
+  static __compute(functions, stackRemainderCount, pathsCache, perFuncOldPathsCache, stack) {
     JoiCompute.checkStackCount(stackRemainderCount, stack);
 
     let functionsRun = [];
@@ -100,7 +120,7 @@ class JoiCompute {
       pathsCache = Object.assign({}, pathsCache);
       pathsCache[funcObj.returnPath] = newComputedValue;
       const temporaryResult = [{functionsRun, pathsCache}].concat(stack);
-      return JoiCompute.__compute(functions, stackRemainderCount, pathsCache, perFuncOldPathsCache, temporaryResult, observe);
+      return JoiCompute.__compute(functions, stackRemainderCount, pathsCache, perFuncOldPathsCache, temporaryResult);
     }
     let finalResult = {functionsRun, pathsCache};
     return [finalResult];
@@ -120,7 +140,7 @@ class JoiCompute {
     if (stackRemainderCount < stack.length) {
       let functions = stack.map(card => "[" + card.functionsRun.map(funcObj => funcObj.funKy).join(", ") + "]").slice(0,10);
       throw new JoiStateStackOverflowError(
-        "Infinite loop or too complex computes in JoiState.\n" +
+        "Infinite loop or too complex computes in JoiStore.\n" +
         functions.join("\n")
       );
     }
