@@ -43,6 +43,17 @@ class Reducers {
       inputValues = [];
     }
 
+
+    state = JoiGraph.setIn(state, "inputValues", inputValues);
+    state = JoiGraph.setIn(state, "characterIndex", characterIndex);
+    state = JoiGraph.setIn(state, "wordIndex", wordIndex);
+    state = JoiGraph.setIn(state, "typedCharacters", currentWord.slice(0, characterIndex));
+    state = JoiGraph.setIn(state, "expectedCharacter", currentWord.charAt(characterIndex));
+    state = JoiGraph.setIn(state, "remainedCharacters", currentWord.slice(characterIndex + 1, currentWord.length));
+    state = JoiGraph.setIn(state, "typedWords", [...state.separateWords].slice(0, wordIndex));
+    state = JoiGraph.setIn(state, "sessionHistory", [...state.sessionHistory, [key, Date.now() - state.startTime, characterIndex]]);
+    state = JoiGraph.setIn(state, "remainedWords", [...state.separateWords].slice(wordIndex + 1, state.separateWords.length).join(" "));
+
     //last character of last word
     if (wordIndex === state.separateWords.length - 1 && characterIndex === state.separateWords[state.separateWords.length - 1].length && state.inputValues.join("") === state.typedCharacters) {
       let result = this.countWPM(state, Date.now() - state.startTime);
@@ -64,15 +75,8 @@ class Reducers {
 
     let currentWord = state.separateWords[wordIndex];
 
-    state = JoiGraph.setIn(state, "inputValues", inputValues);
-    state = JoiGraph.setIn(state, "characterIndex", characterIndex);
-    state = JoiGraph.setIn(state, "wordIndex", wordIndex);
-    state = JoiGraph.setIn(state, "typedCharacters", currentWord.slice(0, characterIndex));
-    state = JoiGraph.setIn(state, "expectedCharacter", currentWord.charAt(characterIndex));
-    state = JoiGraph.setIn(state, "remainedCharacters", currentWord.slice(characterIndex + 1, currentWord.length));
-    state = JoiGraph.setIn(state, "typedWords", [...state.separateWords].slice(0, wordIndex));
-    state = JoiGraph.setIn(state, "sessionHistory", [...state.sessionHistory, [key, Date.now() - state.startTime, characterIndex]]);
-    return JoiGraph.setIn(state, "remainedWords", [...state.separateWords].slice(wordIndex + 1, state.separateWords.length).join(" "));
+
+    return state;
   }
 
   static getAllSessions(state) {
