@@ -43,6 +43,7 @@ class Reducers {
       inputValues = [];
     }
 
+    let currentWord = state.separateWords[wordIndex];
 
     state = JoiGraph.setIn(state, "inputValues", inputValues);
     state = JoiGraph.setIn(state, "characterIndex", characterIndex);
@@ -72,10 +73,7 @@ class Reducers {
       let newState = this.getImmutableState();  // new state
       return JoiGraph.setIn(newState, "sessionResult", "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0));
     }
-
-    let currentWord = state.separateWords[wordIndex];
-
-
+    
     return state;
   }
 
