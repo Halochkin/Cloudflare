@@ -30,9 +30,11 @@ class App extends HTMLElement {
     background-color: khaki;
     text-align: center;
     display: block;
+    height: 2em;
     float: right;
-    height: fit-content;
-    width: fit-content;
+    width: 13vw;
+    line-height: 4vh;
+    font-size: 82%;
     border-radius: 3px;
     padding: 3px;
 }
@@ -59,7 +61,7 @@ textarea {
     margin-left: 3vw;
 }
 
-.prev-speed {
+.previous-speed {
     font-size: 1em;
     display: block;
     margin: -1vw -1vw 1vw -1vw;
