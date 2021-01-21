@@ -149,10 +149,12 @@ class Reducers {
 
 
     //last character of last word
-    if (wordIndex === state.separateWords.length - 1 && characterIndex === state.separateWords[state.separateWords.length - 1].length) {
+    if (wordIndex === state.separateWords.length - 1 && characterIndex === state.separateWords[state.separateWords.length - 1].length && state.inputValues.join("") === state.typedCharacters) {
       let result = countWPM(state, Date.now() - state.startTime);
-      state = JoiGraph.setIn(state, "sessionResult", "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0));
 
+      state = JoiGraph.setIn(state, "sessionResult", "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0));
+      state = JoiGraph.setIn(state, "typedCharacters", "");
+      this.render(state);
 
       let data = JSON.stringify({
         sessionId: Date.now(),
@@ -161,12 +163,9 @@ class Reducers {
         history: JSON.stringify([...state.sessionHistory])
       });
 
-
       doRequest("POST", "https://typing-race.maksgalochkin2.workers.dev/json", data).then(res=>{})
-
       renderSessions.call(this, [data]);
-      state = JoiGraph.setIn(state, "typedCharacters", "");
-      return this.getImmutableState();
+      return this.getImmutableState();  // return updated state
     }
 
     return state;

@@ -178,7 +178,7 @@ margin-top: -2vw;
       return separateWords;
     }
 
-    const expression = "Lorem";
+    const expression = "Lorem ipsum";
 
     const separateWords = getSeparateWords(expression);
 
