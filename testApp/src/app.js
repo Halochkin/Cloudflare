@@ -210,7 +210,7 @@ margin-top: -2vw;
 
     this.render(this.joiState.state);
   }
-  
+
   render(state) {
     const typedItem = this.shadowRoot.querySelector("#typed");
     typedItem.textContent = state.typedCharacters;
@@ -255,7 +255,7 @@ margin-top: -2vw;
   repeatSession(session, input, div) {
     const parsedHistory = JSON.parse(session.history);
     // to disable sync repeating.
-    if (input.value !== parsedHistory.expression)
+    if (input.value !== session.expression)
       return;
 
     if (input.value.length)
