@@ -22,7 +22,7 @@ async function doRequest(method, path, body) {
 function repeatSession(session, input, div) {
   const parsedHistory = JSON.parse(session.history);
   // to disable sync repeating. If session already started to repeat then second repeating will be disable
-  if(input.value.length>1 && input.value!==parsedHistory.length)
+  if (input.value.length > 1 && input.value.length !== parsedHistory.length)
     return;
 
   if (input.value.length)
@@ -68,7 +68,7 @@ function renderSessions(state) {
     repeatBtn.textContent = "↻";
     repeatBtn.classList.add("repeat-btn");
     repeatBtn.addEventListener("click", (e) => {
-     let repeat = repeatSession(parsedSession, input, prevSpeed);
+      let repeat = repeatSession(parsedSession, input, prevSpeed);
     });
 
     input.setAttribute("readonly", "");
