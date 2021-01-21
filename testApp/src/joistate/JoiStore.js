@@ -1,8 +1,8 @@
-import {JoiCompute} from "./JoiCompute.js";
-import {JoiGraph} from "./JoiGraph.js";
-export {JoiGraph} from "./JoiGraph.js";
+// import {JoiCompute} from "./JoiCompute.js";
+// import {JoiGraph} from "./JoiGraph.js";
+// export {JoiGraph} from "./JoiGraph.js";
 
-export class JoiStore {
+class JoiStore {
 
   constructor(initial) {
     this.computer = new JoiCompute(100);
@@ -20,11 +20,11 @@ export class JoiStore {
    * @param {Function} reducer a static function such as MyReducers.seducerFunction1
    * @param {{}} data object passed as second argument to the reducer.
    */
-  dispatch(reducer, data){
+  dispatch(reducer, data) {
     this.que.push({reducer, data, start: performance.now()});
     if (this.que.length >= 2) //someone else is already running the que, this flow of control resigns
       return;
-    while (this.que.length > 0){
+    while (this.que.length > 0) {
       this._run(this.que[0]);
       this.que.shift();
     }
@@ -57,7 +57,7 @@ export class JoiStore {
    * Add function to be called after every run triggered by a new action.
    * @param {Function} func
    */
-  onComplete(func){
+  onComplete(func) {
     this.onCompletes.push(func);
   }
 

@@ -1,8 +1,8 @@
-import {JoiStore} from "./JoiStore.js";
-export {JoiGraph, JoiStore} from "./JoiStore.js";
+// import {JoiStore} from "./JoiStore.js";
+// export {JoiGraph, JoiStore} from "./JoiStore.js";
 
 //todo write test for this one
-export class EventJoiStore extends JoiStore{
+ class EventJoiStore extends JoiStore{
 
   constructor(initial) {
     super(initial);

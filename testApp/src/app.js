@@ -1,5 +1,5 @@
- import {EventJoiStore, JoiGraph} from "../src/joistate/EventJoiStore.js";
- import {Reducers} from "./Reducers.js";
+ // import {EventJoiStore, JoiGraph} from "../src/joistate/EventJoiStore.js";
+ // import {Reducers} from "./Reducers.js";
 
  class App extends HTMLElement {
   constructor() {

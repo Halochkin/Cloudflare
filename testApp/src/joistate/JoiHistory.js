@@ -1,4 +1,4 @@
-export class JoiHistory {
+ class JoiHistory {
 
   constructor(state) {
     this.history = [];

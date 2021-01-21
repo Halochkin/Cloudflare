@@ -1,6 +1,6 @@
-import {JoiGraph} from "./joistate/JoiGraph.js";
+// import {JoiGraph} from "./joistate/JoiGraph.js";
 
-export class Reducers {
+class Reducers {
   static handleInput(state, e) {
     let startTime;
     if (!state.startTime) {
