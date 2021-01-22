@@ -1,8 +1,8 @@
-// import {JoiCompute} from "./JoiCompute.js";
-// import {JoiGraph} from "./JoiGraph.js";
-// export {JoiGraph} from "./JoiGraph.js";
+import {JoiCompute} from "./JoiCompute.js";
+import {JoiGraph} from "./JoiGraph.js";
+export {JoiGraph} from "./JoiGraph.js";
 
-  class JoiStore {
+  export class JoiStore {
 
   constructor(initial) {
     this.computer = new JoiCompute(100);
