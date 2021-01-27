@@ -8,7 +8,7 @@
  * a) any properties with value undefined
  * b) any objects without properties
  */
-export class JoiGraph {
+ class JoiGraph {
 
   /**
    * @returns {Object} dictionary object with the getOwnProperties of the input object, empty otherwise

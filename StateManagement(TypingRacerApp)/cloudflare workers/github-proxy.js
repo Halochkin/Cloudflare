@@ -38,14 +38,6 @@ async function makeFetch(url) {
 }
 
 
-function LinkMutator(el) {
-  const src = el.getAttribute('href');
-  el.removeAttribute('href');
-  el.setAttribute('href', src);
-  document.head.appendChild(el);
-
-}
-
 function InlineMutator(el) {
   const src = el.getAttribute('src');
   el.removeAttribute('src');
@@ -83,8 +75,6 @@ async function LinkToStyle(el) {
     if (tagName === "LINK" && item.getAttribute("rel") === "stylesheet")
       await LinkToStyle(item)
 
-
-
     if (tagName === "SCRIPT")
       document.head.appendChild(item);
 
@@ -92,12 +82,11 @@ async function LinkToStyle(el) {
     if (item.tagName === "IMG" && item.classList.contains("auth-logo"))
       InlineMutator(item)
 
-    document.body.appendChild(item)
-
+    res.push(item)
 
   }
 
-  // document.body.appendChild(element);
+  document.body.appendChild(element);
 
 
 })();
