@@ -1,0 +1,40 @@
+<span id="result"></span>
+<script>
+
+  const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/testApp";
+  //todo add as global variable
+  const spanElement = document.querySelector("#result");
+
+  const githubProxy = 'https://github-proxy.maksgalochkin2.workers.dev';
+
+
+  async function makeFetch(path) {
+    return await fetch(githubProxy + path, {mode: "no-cors", AccessControlAllowOrigin: "*"})
+      .then(response => response.text())
+      .then(data => {
+        return data;
+      })
+      .catch(error => console.error(error))
+  }
+
+
+  async function handleRequest(e) {
+    // console.log(e.request)
+    // const url = new URL(e.request.url);
+    // const path = url.pathname;
+    const path = '/test/index.html'
+    let test = await makeFetch(path).then(data=>{
+      spanElement.textContent = data;
+    })
+  }
+
+  window.addEventListener("fetch", async(e)=> await handleRequest(e));
+
+
+  let event = new Event("fetch");
+
+  window.dispatchEvent(event)
+
+
+
+</script>
