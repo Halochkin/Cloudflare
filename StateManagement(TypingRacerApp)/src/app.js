@@ -237,12 +237,12 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
-      // headers: {'Content-Type': 'application/json'}
+      headers: {'Content-Type': 'application/json'}
     }
     if (body)
       options.body = body;
-    let res = await fetch(path, options);
-    let result =  await res.json();
+    // let res = await fetch(path, options);
+    // let result =  await res.json();
     return await fetch(path, options).then(response => response.json()).then(data=> data);
    }
 
