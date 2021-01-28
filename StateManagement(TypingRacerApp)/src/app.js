@@ -1,4 +1,4 @@
- import {EventJoiStore, JoiGraph} from "./joistate/EventJoiStore";
+ import {EventJoiStore, JoiGraph} from "./joistate/EventJoiStore.js";
  import {Reducers} from "./Reducers.js";
 
  class App extends HTMLElement {
