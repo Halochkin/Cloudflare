@@ -69,8 +69,7 @@ export class Reducers {
         expression: state.separateWords.join("")
       });
 
-      this.doRequest("POST", "https://typing-app.maksgalochkin2.workers.dev/json", data).then(res => {
-      })
+      this.doRequest("POST", "https://typing-app.maksgalochkin2.workers.dev/json", data).then(res => res)
       this.renderSessions([data]);
       let newState = this.getImmutableState();  // new state
       return JoiGraph.setIn(newState, "sessionResult", "wpm: " + result.wpm.toFixed(0) + " cpm: " + result.cpm.toFixed(0));
@@ -80,9 +79,7 @@ export class Reducers {
   }
 
   static getAllSessions(state) {
-    this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions").then(data => {
-      this.renderSessions(data);
-    });
+    this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions").then(data => this.renderSessions(data));
     return state
   }
 }
