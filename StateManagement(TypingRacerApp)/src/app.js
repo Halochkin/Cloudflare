@@ -241,9 +241,10 @@ margin-top: -2vw;
     }
     if (body)
       options.body = body;
-    let res = await fetch(path, options);
-    return res.json();
-  }
+    // let res = await fetch(path, options);
+    // return res.json();
+    return await fetch(path, options).then(response => response.json()).then(data=> data);
+   }
 
   countWPM(state, durationMs) {
     let minutes = (durationMs) / 1000 / 60;
