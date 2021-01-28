@@ -81,7 +81,7 @@ function getHeaderElement(credentials) {
   const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev/")
     .then(response => response.text())
     .then(data => data);
-  document.documentElement.innerHTML = getHeaderElement(getUserdata);
+  document.documentElement.innerHTML = getHeaderElement(JSON.parse(getUserdata));
 })();
 
 
