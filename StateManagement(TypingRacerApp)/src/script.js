@@ -18,8 +18,8 @@ function getHeaderElement(credentials) {
 <header>
     <span id="header-logo">TYPING RACE</span>
     <span id="login-label">Log in to store your results
-    <a href="/login/google"><img class="auth-logo" src="../static/img/google.png" alt="google auth"></a>
-    <a href="/login/github"><img class="auth-logo" src="../static/img/github.png" alt="github auth"></a>
+    <a href="/login/google"><img class="auth-logo" src="https://raw.githubusercontent.com/Halochkin/Cloudflare/master/StateManagement(TypingRacerApp)/static/img/google.png" alt="google auth"></a>
+    <a href="/login/github"><img class="auth-logo" src="https://raw.githubusercontent.com/Halochkin/Cloudflare/master/StateManagement(TypingRacerApp)/static/img/github.png" alt="github auth"></a>
     <input id="remember-me" type="checkbox"/><label for="rember-me" style="float: right; color: #ffa429;">Remember Me </label>
     </span>
 </header>`;
