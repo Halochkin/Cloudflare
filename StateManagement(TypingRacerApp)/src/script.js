@@ -87,7 +87,7 @@ function getHeaderElement(credentials) {
     for (const [key, value] of Object.entries(elements)) {
       let element = document.createElement("div");
       element.innerHTML = value;
-      return node.prepend(element.firstElementChild);
+      node.prepend(element.firstElementChild);
     }
   }
 
