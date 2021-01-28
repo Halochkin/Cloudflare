@@ -94,7 +94,6 @@ function getHeaderElement(credentials) {
 
   prependElement(document.body, headerElements)
 
-  document.body.prep = headerElement.head + document.head.innerHTML;
 })();
 
 
