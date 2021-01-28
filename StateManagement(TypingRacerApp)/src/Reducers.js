@@ -79,8 +79,10 @@ export class Reducers {
   }
 
   static getAllSessions(state) {
-    this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions").then(data => this.renderSessions(data));
-    return state
+    setTimeout(() => {
+      this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions").then(data => this.renderSessions(data));
+      return state
+    }, 100)
   }
 }
 
