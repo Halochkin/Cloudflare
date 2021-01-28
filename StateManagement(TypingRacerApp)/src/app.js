@@ -242,7 +242,7 @@ margin-top: -2vw;
     if (body)
       options.body = body;
     let res = await fetch(path, options);
-    return await res.json();
+    return await res.text();
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
    }
 
