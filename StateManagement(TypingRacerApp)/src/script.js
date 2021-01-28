@@ -1,13 +1,5 @@
 function getHeaderElement(credentials) {
   let logged;
-  let base = `
-<head>
-     <meta charset="UTF-8">
-     <title>Typing racer</title>
-     <base href="https://github-proxy.maksgalochkin2.workers.dev"/>
-     <link rel="stylesheet" href="../static/style/style.css">
-     <link rel="shortcut icon" type="image/png" href="../static/img/logo.png"/>
-</head>`;
 
   if (credentials && credentials instanceof Object)
     credentials = JSON.parse(credentials);
@@ -76,7 +68,11 @@ function getHeaderElement(credentials) {
   }
   </script>`;
 
-  return base + (credentials ? logged : notlogged) + script;
+
+  return {
+    header: credentials ? logged : notlogged,
+    script: script
+  }
 }
 
 (async () => {
@@ -84,7 +80,21 @@ function getHeaderElement(credentials) {
     .then(response => response.text())
     .then(data => data);
 
-  document.documentElement.innerHTML = getHeaderElement(getUserdata);
+  const headerElements = getHeaderElement(getUserdata);
+
+
+  const prependElement = (node, elements) => {
+    for (const [key, value] of Object.entries(elements)) {
+      let element = document.createElement("div");
+      element.innerHTML = value;
+      return node.prepend(element.firstElementChild);
+    }
+  }
+
+
+  prependElement(document.body, headerElements)
+
+  document.body.prep = headerElement.head + document.head.innerHTML;
 })();
 
 
