@@ -70,27 +70,26 @@ addEventListener("fetch", e => {
 **2. KV worker**
 ```javascript
 async function handleRequest(request) {
-  let headers = { "Access-Control-Allow-Origin": "https://proxy.max.workers.dev" };
+  let headers = { "Access-Control-Allow-Origin": "https://proxy.maksgalochkin2.workers.dev" };
   const url = new URL(request.url);
   const path = url.pathname;
-  const [ignore, action] = path.split('/');
+  const [ignore, key] = path.split('/');
   const type = path.substr(path.lastIndexOf('.') + 1);
 
-  if (!action)
-    return new Response("no action", { header:  headers });
+  if (!key)
+    return new Response("no action", { header: headers });
 
-  if (action === "data") {
-    if (request.method !== 'GET')
-      return new Response('Not GET request');
-    const value = await KV_STORE.get(action);
-    if (value === null) 
-      return new Response("Value not found", {status: 404});
-    return new Response(value, { headers: { ...headers, 'content-type': 'application/'+ type }});
-  }   
+  if (request.method !== 'GET')
+    return new Response('Not GET request');
+
+  const value = await KV_STORE.get(key);
+  if (value === null)
+    return new Response("Value not found", { status: 404 });
+  return new Response(value, { headers: { ...headers, 'content-type': 'application/' + type } });
 }
 
 addEventListener("fetch", e => {
-    e.respondWith(handleRequest(e.request));
+  e.respondWith(handleRequest(e.request));
 });
 ```
 
