@@ -226,7 +226,7 @@ margin-top: -2vw;
 
     this.joiState = new EventJoiStore(this.getImmutableState());
     this.joiState.addEventReducer("input-keydown", Reducers.handleInput.bind(this));
-    this.joiState.addEventReducer("DOMContentLoaded", async()=> await getAllSessions.bind(this));
+    window.addEventListener("DOMContentLoaded", async()=> await getAllSessions.bind(this));
 
     this.joiState.observe([""], this.render.bind(this));
 
