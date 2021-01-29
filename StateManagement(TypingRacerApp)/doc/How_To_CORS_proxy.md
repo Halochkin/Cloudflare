@@ -1,5 +1,9 @@
 
 
+
+
+
+
 As you may have noticed, we always add a response header named `Access-Control-Allow-Origin` to the static response. The Access-Control-Allow-Origin response header indicates whether the response can be shared with requesting code from the given origin. CORS headers designed to protect sources from access by other sites. If we try to run our application directly on the client (browser side), the browser will apply CORS policies to the domains you are trying to test and block those requests. 
 
 
@@ -59,11 +63,12 @@ addEventListener("fetch", e => {
 <html>
  <script>
   (async function(){
-    document.body = await fetch("https://kv.max.workers.dev/data.json").then(response=> response.json()).then(data=> data);
+    document.body.innerText = await fetch("https://kv.max.workers.dev/data.json").then(response=> response.json()).then(data=> data);
   })();
  </script>
 </html>
 ```
+
 1.2 get value from kv using inline script.
 
 
