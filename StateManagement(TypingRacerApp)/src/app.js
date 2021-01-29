@@ -207,7 +207,7 @@ margin-top: -2vw;
 
     this.joiState = new EventJoiStore(this.getImmutableState());
     this.joiState.addEventReducer("input-keydown", Reducers.handleInput.bind(this));
-    this.joiState.addEventReducer("DOMContentLoaded",  Reducers.getAllSessions.bind(this));
+    this.joiState.addEventReducer("DOMContentLoaded",  async( )=> await Reducers.getAllSessions.bind(this));
 
     this.joiState.observe([""], this.render.bind(this));
 
@@ -242,7 +242,7 @@ margin-top: -2vw;
     if (body)
       options.body = body;
     let res = await fetch(path, options);
-    return await res.text();
+    return await res.json();
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
    }
 
