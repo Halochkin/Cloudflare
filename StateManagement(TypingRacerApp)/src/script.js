@@ -39,6 +39,8 @@ function getHeaderElement(credentials) {
 
    for (let link of document.querySelectorAll(".auth-logo, #logout-btn"))
      link.addEventListener('click', openRequestedSinglePopup);
+   
+   console.log("boo")
 
   function popupParameters() {
     const width = Math.min(600, window.screen.width);
