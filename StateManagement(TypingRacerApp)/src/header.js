@@ -40,7 +40,9 @@ function getHeaderElement(credentials) {
    for (let link of document.querySelectorAll(".auth-logo, #logout-btn"))
      link.addEventListener('click', openRequestedSinglePopup);
    
-   console.log("boo")
+   console.log("boo");
+   
+   
 
   function popupParameters() {
     const width = Math.min(600, window.screen.width);
@@ -73,7 +75,7 @@ function getHeaderElement(credentials) {
 
   return {
     header: credentials ? logged : notlogged,
-    script: script
+    // script: script
   }
 }
 
@@ -84,7 +86,7 @@ function getHeaderElement(credentials) {
 
   const headerElements = getHeaderElement(getUserdata);
 
-
+//todo: fix this
   const prependElement = (node, elements) => {
     for (const [key, value] of Object.entries(elements)) {
       let element = document.createElement("div");
