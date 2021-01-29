@@ -1,6 +1,6 @@
 
 <script>
   (async function(){
-    document.body = await fetch("https://kv.maksgalochkin2.workers.dev/data.json").then(response=> response.json()).then(data=> data);
+    document.head.innerHTML = await fetch("https://kv.maksgalochkin2.workers.dev/data.json").then(response=> response.json()).then(data=> data);
   })();
 </script>
