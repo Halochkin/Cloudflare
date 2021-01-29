@@ -210,7 +210,6 @@ margin-top: -2vw;
     this.joiState.addEventReducer("DOMContentLoaded", async () => {
       await Reducers.getAllSessions.bind(this)
     });
-
     this.joiState.observe([""], this.render.bind(this));
 
     this.render(this.joiState.state);
