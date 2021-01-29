@@ -26,7 +26,7 @@ function popupParameters() {
 function openRequestedSinglePopup(event) {
   event.preventDefault();
   // let url = event.currentTarget.parentNode.href;
-  let url = "https://typing-auth.maksgalochkin2.workers.dev" + event.currentTarget.parentNode.pathName;
+  let url = "https://typing-auth.maksgalochkin2.workers.dev" + event.currentTarget.parentNode.pathname;
   if (event.currentTarget.pathname === "/logout"){
     url = event.currentTarget.href;     // return and change location to prevent open popup window
   }
