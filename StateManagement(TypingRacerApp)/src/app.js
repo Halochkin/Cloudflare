@@ -2,22 +2,22 @@ import {EventJoiStore, JoiGraph} from "./joistate/EventJoiStore.js";
 import {Reducers} from "./Reducers.js";
 
 
-async function getAllSessions() {
- return await doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions")
-    .then(data => this.renderSessions(data));
- }
-
-async function doRequest(method, path, body) {
-  const options = {
-    method,
-    headers: {'Content-Type': 'application/json'}
-  }
-  if (body)
-    options.body = body;
-  let res = await fetch(path, options);
-  return await res.json();
-  // return await fetch(path, options).then(response => response.json()).then(data=> data);
-}
+// async function getAllSessions() {
+//  return await doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions")
+//     .then(data => this.renderSessions(data));
+//  }
+//
+// async function doRequest(method, path, body) {
+//   const options = {
+//     method,
+//     headers: {'Content-Type': 'application/json'}
+//   }
+//   if (body)
+//     options.body = body;
+//   let res = await fetch(path, options);
+//   return await res.json();
+//   // return await fetch(path, options).then(response => response.json()).then(data=> data);
+// }
 
 
 class App extends HTMLElement {
@@ -257,7 +257,7 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
-      headers: {'Content-Type': 'text/plain', "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev"}
+      headers: {'Content-Type': 'application/json'}
     }
     if (body)
       options.body = body;
