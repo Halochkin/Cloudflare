@@ -1,6 +1,25 @@
 import {EventJoiStore, JoiGraph} from "./joistate/EventJoiStore.js";
 import {Reducers} from "./Reducers.js";
 
+
+async function getAllSessions() {
+ return await doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions")
+    .then(data => this.renderSessions(data));
+ }
+
+async function doRequest(method, path, body) {
+  const options = {
+    method,
+    headers: {'Content-Type': 'application/json'}
+  }
+  if (body)
+    options.body = body;
+  let res = await fetch(path, options);
+  return await res.json();
+  // return await fetch(path, options).then(response => response.json()).then(data=> data);
+}
+
+
 class App extends HTMLElement {
   constructor() {
     super();
@@ -207,7 +226,7 @@ margin-top: -2vw;
 
     this.joiState = new EventJoiStore(this.getImmutableState());
     this.joiState.addEventReducer("input-keydown", Reducers.handleInput.bind(this));
-    this.joiState.addEventReducer("DOMContentLoaded", Reducers.getAllSessions.bind(this));
+    this.joiState.addEventReducer("DOMContentLoaded", async()=> await getAllSessions.bind(this));
 
     this.joiState.observe([""], this.render.bind(this));
 
