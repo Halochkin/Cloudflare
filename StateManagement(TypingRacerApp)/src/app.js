@@ -257,7 +257,7 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
-      headers: {'Content-Type': 'application/json'}
+      headers: {'Content-Type': 'text/plain', "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev"}
     }
     if (body)
       options.body = body;

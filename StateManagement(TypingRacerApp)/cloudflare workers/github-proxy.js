@@ -1,92 +1,41 @@
-// const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/testApp";
-// //todo add as global variable
-//
-// async function makeFetch(path) {
-//   return await fetch(link + path)
-//     .then(response => response.text())
-//     .then(data => {
-//       return data
-//     })
-//     .catch(error => console.error(error))
-// }
-//
-// async function handleRequest(request) {
-//   try {
-//     const url = new URL(request.url);
-//     const path = url.pathname;
-//     return await makeFetch(path);
-//   }catch (e) {
-//     return "404 Not found"
-//   }
-// }
-//
-// addEventListener("fetch", e => {
-//   return handleRequest(e.request);
-// });
+const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/StateManagement(TypingRacerApp)";
+//todo add as global variable
+let contentType;
 
-
-const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/testApp";
-
-
-async function makeFetch(url) {
-  return await fetch(url)
+async function makeFetch(path) {
+  return await fetch(link + path)
     .then(response => response.text())
-    .then(data => {
-      return data;
-    })
+    .then(data => data)
     .catch(error => console.error(error))
 }
 
+async function handleRequest(request) {
 
-function InlineMutator(el) {
-  const src = el.getAttribute('src');
-  el.removeAttribute('src');
-  const path = src.slice(2, src.length);
-  el.setAttribute('src', link + path);
-}
+  try {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    let res = await makeFetch(path);
 
-async function LinkToStyle(el) {
-  const href = el.getAttribute('href');
+    const type = path.substr(path.lastIndexOf('.') + 1);
+    //if .css/.img etc
+    if (type === 'js')
+      contentType = 'application/javascript' ;
+    else
+      contentType =  'text/' + type;
 
-  const body = await makeFetch(link + href.slice(2, href.length))
-    .then(response => response)
-    .catch(error => console.error(error))
-  if (body) {
-    const styleElement = document.createElement("style");
-    styleElement.textContent = body;
-    document.head.appendChild(styleElement);
+    if(type === "/")
+      contentType = 'text/html' ;
+
+
+    return new Response(res, { status: 200, headers: { "Content-Type": contentType, "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev/" } }); //'Referrer-Policy': 'unsafe-url',
+  } catch (e) {
+    return "404 Not found"
   }
 }
 
 
-(async () => {
-  const path = window.location.pathname;
-  let body = await makeFetch(githubProxy + path);
-  const element = document.createElement("div");
-  element.innerHTML = body;
-  let allItems = Array.from(element.children);
-
-  let res = [];
-
-  for (let item of allItems) {
-
-    let tagName = item.tagName;
-
-    if (tagName === "LINK" && item.getAttribute("rel") === "stylesheet")
-      await LinkToStyle(item)
-
-    if (tagName === "SCRIPT")
-      document.head.appendChild(item);
 
 
-    if (item.tagName === "IMG" && item.classList.contains("auth-logo"))
-      InlineMutator(item)
-
-    res.push(item)
-
-  }
-
-  document.body.appendChild(element);
-
-
-})();
+addEventListener("fetch", e => {
+  e.respondWith(handleRequest(e.request))
+});

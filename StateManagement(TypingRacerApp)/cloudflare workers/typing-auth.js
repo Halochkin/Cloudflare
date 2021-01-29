@@ -1,23 +1,23 @@
-// const COUNTER_KEY = 'dvAV77q6uaIOSzE_cgq6Bs_q-vojyIglNLW8lWHtiGUuWM03mLCZnaWIqTtlWYhk'
+const COUNTER_KEY = 'dvAV77q6uaIOSzE_cgq6Bs_q-vojyIglNLW8lWHtiGUuWM03mLCZnaWIqTtlWYhk'
 
-// const GITHUB_CLIENTID = 'Iv1.27dccdadf938e8bf'
-// const GITHUB_CLIENTSECRET = '73a0e0caba381a5629bf42cd5c14d9e87d6f982e'
-// const GITHUB_CODE_LINK = 'https://github.com/login/oauth/access_token'
-// const GITHUB_OAUTH_LINK = 'https://github.com/login/oauth/authorize'
-// const GITHUB_REDIRECT = 'https://typing-race.maksgalochkin2.workers.dev/callback/github'
+const GITHUB_CLIENTID = 'Iv1.27dccdadf938e8bf'
+const GITHUB_CLIENTSECRET = '73a0e0caba381a5629bf42cd5c14d9e87d6f982e'
+const GITHUB_CODE_LINK = 'https://github.com/login/oauth/access_token'
+const GITHUB_OAUTH_LINK = 'https://github.com/login/oauth/authorize'
+const GITHUB_REDIRECT = 'https://typing-race.maksgalochkin2.workers.dev/callback/github'
 
-// const GOOGLE_CLIENT_ID = '1052973726979-cra8ku89dp9tvg7m4tvjphp2dnsno6f2.apps.googleusercontent.com'
-// const GOOGLE_CLIENT_SECRET = 'FTI7P9jkzPP6qkV4FfF0uvC'
-// const GOOGLE_CODE_LINK = 'https://oauth2.googleapis.com/token'
-// const GOOGLE_OAUTH_LINK = 'https://accounts.google.com/o/oauth2/v2/auth'
-// const GOOGLE_REDIRECT = 'typing-race.maksgalochkin2.workers.dev/callback/google'
+const GOOGLE_CLIENT_ID = '1052973726979-cra8ku89dp9tvg7m4tvjphp2dnsno6f2.apps.googleusercontent.com'
+const GOOGLE_CLIENT_SECRET = 'FTI7P9jkzPP6qkV4FfF0uvC'
+const GOOGLE_CODE_LINK = 'https://oauth2.googleapis.com/token'
+const GOOGLE_OAUTH_LINK = 'https://accounts.google.com/o/oauth2/v2/auth'
+const GOOGLE_REDIRECT = 'typing-race.maksgalochkin2.workers.dev/callback/google'
 
 
-// const SECRET = 'klasjdfoqjpwoekfj!askdfj'
-// const SESSION_COOKIE_NAME = 'sessionID'
-// const SESSION_ROOT = '.maksgalochkin2.workers.dev'
-// const SESSION_TTL = 2592000
-// const STATE_SECRET_TTL_MS = 180
+const SECRET = 'klasjdfoqjpwoekfj!askdfj'
+const SESSION_COOKIE_NAME = 'sessionID'
+const SESSION_ROOT = '.maksgalochkin2.workers.dev'
+const SESSION_TTL = 2592000
+const STATE_SECRET_TTL_MS = 180
 
 
 const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/testApp";
@@ -35,94 +35,13 @@ async function makeFetch(path) {
 }
 
 
-// function getHeaderElement(credentials) {
-//   let logged;
-//   let base = `
-// <head>
-//      <meta charset="UTF-8">
-//      <title>Typing racer</title>
-//      <link rel="shortcut icon" type="image/png" href="../static/img/logo.png"/>
-// </head>
-//     `
-//
-//   if (credentials)
-//     logged = `
-// <header>
-//     <span id="header-logo">TYPING RACE</span>
-//     <span>
-//      <a id="logout-btn" href="/logout">Logout</a>
-//      <span id="header-username" >${credentials.username}</span>
-//      <img id="header-photo" src="${credentials.photo}"/>
-//     </span>
-// </header>`;
-//
-//   const notlogged = ` <header>
-//     <span id="header-logo">TYPING RACE</span>
-//     <span id="login-label">Log in to store your results
-//     <a href="/login/google"><img class="auth-logo" src="../static/img/google.png" alt="google auth"></a>
-//     <a href="/login/github"><img class="auth-logo" src="../static/img/github.png" alt="github auth"></a>
-//     <input id="remember-me" type="checkbox"/><label for="rember-me" style="float: right; color: #ffa429;">Remember Me </label>
-//     </span>
-//   </header>`;
-//
-//   const script = `
-//
-// <script>
-//
-//   let loginWindow;
-//   let loginWindowUrl;
-//
-//   // handle message event. When we got message event from /callback it means that user logged in, So just change location
-//   function receiveLoginData(e) {
-//        if (e.origin !== "${'https://' + myDomain}" || e.source !== loginWindow)
-//       return;
-//     window.location = e.origin + "/test/index.html";
-//   }
-//
-//   window.addEventListener('message', receiveLoginData);
-//
-//    for (let link of document.querySelectorAll(".auth-logo, #logout-btn"))
-//      link.addEventListener('click', openRequestedSinglePopup);
-//
-//
-//   function popupParameters() {
-//     const width = Math.min(600, window.screen.width);
-//     const height = Math.min(600, window.screen.height);
-//     const left = window.screen.width / 2 - width / 2;
-//     const top = window.screen.height / 2 - height / 2;
-//     return "resizable,scrollbars,status,opener," +
-//       Object.entries({width, height, left, top}).map(kv => kv.join('=')).join(',');
-//   }
-//
-//   function openRequestedSinglePopup(event) {
-//     event.preventDefault();
-//     let url = event.currentTarget.parentNode.href;
-//     if (event.currentTarget.pathname === "/logout"){
-//      url = event.currentTarget.href;     // return and change location to prevent open popup window
-//     }
-//     let input = document.querySelector('input[type=checkbox]');
-//     if (input && input.checked)
-//       url += '?remember-me';
-//     if (!loginWindow || loginWindow.closed) {
-//       loginWindow = window.open(url, "_blank", popupParameters());
-//     } else if (loginWindowUrl !== url)
-//       loginWindow.location = url;
-//     loginWindowUrl = url;
-//     loginWindow.focus();
-//   }
-//   </script>`;
-//
-//   return base + (credentials ? logged : notlogged) + script;
-//
-// }
-
 function randomString(length) {
   const iv = crypto.getRandomValues(new Uint8Array(length));
   return Array.from(iv).map(b => ('00' + b.toString(16)).slice(-2)).join('');
 }
 
 function getCookieValue(cookie, key) {
-  return cookie?.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop();
+  return cookie ?.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`) ?.pop();
 }
 
 function bakeCookie(name, value, domain, ttl) {
@@ -169,14 +88,14 @@ async function passHash(pw) {
 
 async function makeKeyAESGCM(password, iv) {
   const pwHash = await passHash(password);
-  const alg = {name: 'AES-GCM', iv: iv};                            // specify algorithm to use
+  const alg = { name: 'AES-GCM', iv: iv };                            // specify algorithm to use
   return await crypto.subtle.importKey('raw', pwHash, alg, false, ['decrypt', 'encrypt']);  // use pw to generate key
 }
 
 async function encryptAESGCM(password, iv, plaintext) {
   const key = await makeKeyAESGCM(password, iv);
   const ptUint8 = new TextEncoder().encode(plaintext);                               // encode plaintext as UTF-8
-  const ctBuffer = await crypto.subtle.encrypt({name: key.algorithm.name, iv: iv}, key, ptUint8);                   // encrypt plaintext using key
+  const ctBuffer = await crypto.subtle.encrypt({ name: key.algorithm.name, iv: iv }, key, ptUint8);                   // encrypt plaintext using key
   const ctArray = Array.from(new Uint8Array(ctBuffer));                              // ciphertext as byte array
   return ctArray.map(byte => String.fromCharCode(byte)).join('');             // ciphertext as string
 }
@@ -190,7 +109,7 @@ async function encryptData(data, password) {
 async function decryptAESGCM(password, iv, ctStr) {
   const key = await makeKeyAESGCM(password, iv);
   const ctUint8 = new Uint8Array(ctStr.match(/[\s\S]/g).map(ch => ch.charCodeAt(0))); // ciphertext as Uint8Array
-  const plainBuffer = await crypto.subtle.decrypt({name: key.algorithm.name, iv: iv}, key, ctUint8);                 // decrypt ciphertext using key
+  const plainBuffer = await crypto.subtle.decrypt({ name: key.algorithm.name, iv: iv }, key, ctUint8);                 // decrypt ciphertext using key
   return new TextDecoder().decode(plainBuffer);                                       // return the plaintext
 }
 
@@ -207,55 +126,6 @@ async function decryptData(data, password) {
   }
 }
 
-// class InlineMutator {
-//   constructor(cookie, base) {
-//     this.cookie = cookie;
-//     this.firstBase = base;
-//   }
-//
-//   async element(el) {
-//     const src = el.getAttribute('src');
-//     el.removeAttribute('src');
-//     const path = src.slice(2, src.length)
-//     el.setAttribute('src', link + path);
-//   }
-// }
-// //todo combine with Inline Mutator, temporary solution
-// class LinkMutator {
-//   constructor(cookie, base) {
-//     this.cookie = cookie;
-//     this.firstBase = base;
-//   }
-//
-//   async element(el) {
-//     // console.log(el.tagName)
-//     const src = el.getAttribute('href');
-//     el.removeAttribute('href');
-//     const path = src.slice(2, src.length)
-//     el.setAttribute('href', link + path);
-//   }
-// }
-//
-// class LinkToStyle {
-//
-//   constructor(location) {
-//     this.firstBase = location.href;
-//     this.secondBase = undefined;
-//   }
-//
-//   async element(el) {
-//     const href = el.getAttribute('href');
-//     const body = await fetch(href)
-//       .then(response => response.text())
-//       .then(data => {
-//         return data
-//       })
-//       .catch(error => console.error(error))
-//     if (body)
-//       el.replace(`<style>${body}</style>`, { html: true });
-//
-//   }
-// }
 
 function redirectUrl(path, params) {
   return path + '?' + Object.entries(params).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
@@ -280,6 +150,8 @@ async function login(stateSecret, provider) {
       scope: 'user',
     });
 
+    console.log(redirect)
+
   } else
     throw 'BAD: wrong authentification provider';
   return redirect
@@ -288,7 +160,7 @@ async function login(stateSecret, provider) {
 async function fetchAccessToken(path, data) {
   return await fetch(path, {
     method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: Object.entries(data).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&')
   });
 }
@@ -383,7 +255,9 @@ async function handleRequest(request) {
     const path = url.pathname;
     const [ignore, action, provider] = path.split('/');
     let userdata;
-    let headers = {"Content-Type": 'text/html'}
+    let headers = { "Content-Type": 'text/plain', "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev" };
+
+    console.log(action)
 
     if (action === "login") {
       const stateSecret = await encryptData(JSON.stringify({
@@ -422,7 +296,7 @@ async function handleRequest(request) {
       const jwtUatMonths = 6;
       const uatMs = 60 * 60 * 24 * 30 * jwtUatMonths;
       const ttl = state.rm === null ? null : SESSION_TTL;
-      const sessionObject = {uid, username, photo, provider, iat, ttl, v: 27};
+      const sessionObject = { uid, username, photo, provider, iat, ttl, v: 27 };
       const sessionSecret = await encryptData(JSON.stringify(sessionObject), SECRET);
       const sessionArray = sessionSecret.split(".");
 
@@ -441,7 +315,7 @@ async function handleRequest(request) {
 
       const txtIn = selfClosingMessage(JSON.stringify(sessionObject), SESSION_ROOT);
       const jwtCookie = bakeCookie("sessionIDJwtCookie", toBase64url(btoa(JSON.stringify(handledJwt))), SESSION_ROOT, uatMs)
-      return new Response(txtIn, {status: 200, headers: {'Content-Type': 'text/html', 'Set-Cookie': jwtCookie}}); //todo
+      return new Response(txtIn, { status: 200, headers: { 'Content-Type': 'text/html', 'Set-Cookie': jwtCookie } }); //todo
     }
 
 
@@ -463,8 +337,8 @@ async function handleRequest(request) {
         jwtObj.header.iat = Date.now();
         // make new cookie
         let updatedCookie = bakeCookie("sessionIDJwtCookie", toBase64url(btoa(JSON.stringify(jwtObj)), SECRET), SESSION_ROOT, jwtObj.header.Uat)
-        headers = Object.assign(headers, {"Set-Cookie": updatedCookie});
-        userdata = JSON.parse(decryptedPayloadawait);
+        headers = Object.assign(headers, { "Set-Cookie": updatedCookie });
+        userdata = decryptedPayloadawait;
         // userID = "_" + userdata.uid;
       }
     }
@@ -478,15 +352,20 @@ async function handleRequest(request) {
       // headers = headers.assign(headers, { "Set-Cookie": cookieOut });
       // userdata = undefined
       // Response.redirect("https://typing-race.maksgalochkin2.workers.dev/test/index.html")
-      return new Response(txtOut, {status: 200, headers: {'content-type': 'text/html', 'Set-Cookie': cookieOut}});
+      return new Response(txtOut, { status: 200, headers:  Object.assign(headers, {'Set-Cookie': cookieOut } )});
     }
 
 
-    return userdata;
+
+
+
+
+    //todo: fix application settings
+    return new Response(userdata, { headers: headers })
 
 
   } catch (err) {
-    return new Response("My error   " + err, {status: 401});
+    return new Response("My error   " + err, { status: 401 });
   }
 }
 
