@@ -15,7 +15,7 @@ When use Fetch API to get data, it is necessary to use `Content-Type` header. Th
 In response, it tells about the type of returned content, to the client. The browser gets to know about the type of content it has to load on the machine. Every time its byte stream of the file that browsers receive, by the Content-type header, the browser will do something known as MIME sniffing i.e. it will inspect the stream it is receiving and then loads the data accordingly.
 
 
-## Example
+## Examples
 
 Let's look at an example in which there are two workers. The first (**proxy-worker**) makes a request to github and returns the file. The second one (**kv-worker**) returns data from _KV_ using url path.
 
@@ -46,7 +46,7 @@ Here it is necessary to use both `Content-Type` and `Access-Control-Allow-Origin
       const type = path.substr(path.lastIndexOf('.') + 1);
 ```
 
-## Demo
+### Demo1
 
 1. **Proxy-worker**
 
@@ -97,7 +97,6 @@ addEventListener("fetch", e => {
   </script>
  </html>
  ```
-
 3. Self invoking function will do fetch request to `kv-worker`.
 
 **KV-worker**
@@ -109,6 +108,12 @@ async function handleRequest(request) {
   const path = url.pathname;
   const [ignore, key] = path.split('/');
   const type = path.substr(path.lastIndexOf('.') + 1);
+  let contentType;
+
+  if (type === "svg")
+    contentType = 'image/svg+xml'
+  else
+    contentType = 'application/' + type
 
   if (!key)
     return new Response("no action", { header: headers });
@@ -119,16 +124,23 @@ async function handleRequest(request) {
   const value = await KV_STORE.get(key);
   if (value === null)
     return new Response("Value not found", { status: 404 });
-  return new Response(value, { headers: { ...headers, 'content-type': 'application/' + type } });
+  return new Response(value, { headers: { ...headers, 'content-type': contentType } });
 }
 
 addEventListener("fetch", e => {
   e.respondWith(handleRequest(e.request));
 });
 ```
-
+### Demo2
+1. Open `https://proxy.maksgalochkin2.workers.dev/index.html` url to fetch image which use kv data as a src attribute value.
+```html
+<html><img src="https://kv.maksgalochkin2.workers.dev/img.svg"></html>
+```
+Instead of self invoking function, src attribute will produce fetch event which will make request into KV and return svg element as response. HTTP headers are the same as in previous demo.
+  
   
 # Reference
 
-1. [Live demo](https://proxy.maksgalochkin2.workers.dev/inline-script.html);  
+1. [Live demo 1](https://proxy.maksgalochkin2.workers.dev/inline-script.html);  
+1. [Live demo 2](https://proxy.maksgalochkin2.workers.dev/index.html);  
 2. [https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers](HTTP headers);
