@@ -2,8 +2,7 @@
 <script>
   (async function(){
     let response = await fetch("https://kv.maksgalochkin2.workers.dev/data.json").then(response=> response.json()).then(data=> data);
-    console.log(response);
-    document.body = response;
+    document.body.innerText = response;
   })();
 </script>
-</html>>
+</html>
