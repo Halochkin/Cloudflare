@@ -17,7 +17,8 @@ A response that tells the browser to allow requesting code from the origin `http
 1. Open `https://proxy.max.workers.dev/script.js` url in your browser to fetch script file. 
 
 ```javascript
-const link = "https://proxy.max.workers.dev";
+
+const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/StateManagement(TypingRacerApp)/demo/";
 let contentType;
 
 async function makeFetch(path) {
@@ -41,7 +42,7 @@ async function handleRequest(request) {
           contentType =  'text/' + type;
 
         let res = await makeFetch(path);
-        
+        console.log(res)
         return new Response(res, { status: 200, headers: { "Content-Type": contentType} });
     } catch (e) {
         return "404 Not found"
