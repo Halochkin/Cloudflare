@@ -1,7 +1,7 @@
- import {EventJoiStore, JoiGraph} from "./joistate/EventJoiStore.js";
- import {Reducers} from "./Reducers.js";
+import {EventJoiStore, JoiGraph} from "./joistate/EventJoiStore.js";
+import {Reducers} from "./Reducers.js";
 
- class App extends HTMLElement {
+class App extends HTMLElement {
   constructor() {
     super();
     // this.expression = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque faucibus maximus erat. Praesent luctus, quam nec consequat sagittis, justo erat iaculis mauris, sodales tristique odio enim non erat. Curabitur dapibus fermentum tellus ac viverra. Sed eros lorem, bibendum sit amet nisl sit amet, ultricies posuere ipsum. "
@@ -207,7 +207,9 @@ margin-top: -2vw;
 
     this.joiState = new EventJoiStore(this.getImmutableState());
     this.joiState.addEventReducer("input-keydown", Reducers.handleInput.bind(this));
-    this.joiState.addEventReducer("DOMContentLoaded",  async( )=> await Reducers.getAllSessions.bind(this));
+    this.joiState.addEventReducer("DOMContentLoaded", async () => {
+      await Reducers.getAllSessions.bind(this)
+    });
 
     this.joiState.observe([""], this.render.bind(this));
 
@@ -244,7 +246,7 @@ margin-top: -2vw;
     let res = await fetch(path, options);
     return await res.json();
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
-   }
+  }
 
   countWPM(state, durationMs) {
     let minutes = (durationMs) / 1000 / 60;
