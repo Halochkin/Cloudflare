@@ -29,7 +29,7 @@ function getHeaderElement(credentials) {
 
   return {
     header: credentials ? logged : notlogged,
-    script: script
+    // script: script
   }
 }
 
