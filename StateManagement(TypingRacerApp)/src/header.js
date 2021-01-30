@@ -25,7 +25,7 @@ function getHeaderElement(credentials) {
     </span>
 </header>`;
 
-  const script = `<script src="../src/auth.js"></script>`
+  // const script = `<script src="../src/auth.js"></script>`
 
   return {
     header: credentials ? logged : notlogged,
@@ -50,7 +50,14 @@ function getHeaderElement(credentials) {
   }
 
 
-  prependElement(document.body, headerElements)
+  // prependElement(document.body, headerElements)
+
+  document.body.prepend(headerElements.header);
+
+  let script = document.createElement("script");
+  script.src="../src/auth.js";
+  document.body.appendChild(script)
+
 
 })();
 
