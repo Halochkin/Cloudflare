@@ -4,7 +4,7 @@ let loginWindowUrl;
 function receiveLoginData(e) {
   // if (e.origin !== `${'https://' + window.location.origin}` || e.source !== loginWindow)
   //   return;  //todo: add some check
-  window.location = e.origin + "/test/index.html";
+  window.location = window.origin + "/test/index.html";
 }
 
 window.addEventListener('message', receiveLoginData);
