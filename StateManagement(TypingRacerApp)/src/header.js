@@ -33,9 +33,9 @@ function getHeaderElement(credentials) {
 
 (async () => {
   const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev")
-    .then(response => response)
+    .then(response => response.text())
     .then(data => data);
-
+//todo: fix this, it returns  empty string. maybe cors?
   const headerElements = getHeaderElement(getUserdata);
 
 // //todo: fix this
