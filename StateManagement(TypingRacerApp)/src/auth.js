@@ -2,8 +2,8 @@ let loginWindow;
 let loginWindowUrl;
 // handle message event. When we got message event from /callback it means that user logged in, So just change location
 function receiveLoginData(e) {
-  if (e.origin !== `${'https://' + window.location.origin}` || e.source !== loginWindow)
-    return;
+  // if (e.origin !== `${'https://' + window.location.origin}` || e.source !== loginWindow)
+  //   return;  //todo: add some check
   window.location = e.origin + "/test/index.html";
 }
 
