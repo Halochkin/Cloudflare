@@ -24,9 +24,7 @@ function getHeaderElement(credentials) {
     <input id="remember-me" type="checkbox"/><label for="rember-me" style="float: right; color: #ffa429;">Remember Me </label>
     </span>
 </header>`;
-
-  // const script = `<script src="../src/auth.js"></script>`
-
+  
   return {
     header: credentials ? logged : notlogged,
     // script: script
