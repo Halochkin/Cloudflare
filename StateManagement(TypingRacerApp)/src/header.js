@@ -35,7 +35,7 @@ function getHeaderElement(credentials) {
     .then(data => data);
 
   const headerElements = getHeaderElement(getUserdata);
-  
+
   let element = document.createElement("div");
   element.innerHTML = headerElements;
   document.body.prepend(element.firstElementChild);
