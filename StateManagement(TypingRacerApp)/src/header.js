@@ -32,7 +32,7 @@ function getHeaderElement(credentials) {
 }
 
 (async () => {
-  const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev")
+  const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev", {cookies: "asssa"})
     .then(response => response.text())
     .then(data => data);
 //todo: fix this, it returns  empty string. maybe cors?
