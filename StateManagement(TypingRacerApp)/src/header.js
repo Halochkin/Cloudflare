@@ -24,7 +24,7 @@ function getHeaderElement(credentials) {
     <input id="remember-me" type="checkbox"/><label for="rember-me" style="float: right; color: #ffa429;">Remember Me </label>
     </span>
 </header>`;
-  
+
   return {
     header: credentials ? logged : notlogged,
     // script: script
@@ -38,19 +38,21 @@ function getHeaderElement(credentials) {
 
   const headerElements = getHeaderElement(getUserdata);
 
-//todo: fix this
-  const prependElement = (node, elements) => {
-    for (const [key, value] of Object.entries(elements)) {
-      let element = document.createElement("div");
-      element.innerHTML = value;
-      node.prepend(element.firstElementChild);
-    }
-  }
+// //todo: fix this
+//   const prependElement = (node, elements) => {
+//     for (const [key, value] of Object.entries(elements)) {
+//       let element = document.createElement("div");
+//       element.innerHTML = value;
+//       node.prepend(element.firstElementChild);
+//     }
+//   }
 
 
   // prependElement(document.body, headerElements)
+  let element = document.createElement("div");
+  element.innerHTML = headerElements.header;
+  document.body.prepend(element.firstElementChild);
 
-  document.body.prepend(headerElements.header);
 
   let script = document.createElement("script");
   script.src="../src/auth.js";
