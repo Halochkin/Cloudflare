@@ -6,9 +6,10 @@ function getHeaderElement(credentials) {
 
   logged = `
 <header>
+    <base href="">
     <span id="header-logo">TYPING RACE</span>
     <span>
-     <a id="logout-btn" href="/logout">Logout</a>
+     <a id="logout-btn" href="https://typing-auth.maksgalochkin2.workers.dev/logout">Logout</a>
      <span id="header-username" >${credentials.username}</span>
      <img id="header-photo" src="${credentials.photo}"/>
     </span>
@@ -24,59 +25,8 @@ function getHeaderElement(credentials) {
     </span>
 </header>`;
 
-  const script = `
-<script>
-  let loginWindow;
-  let loginWindowUrl;
-  // handle message event. When we got message event from /callback it means that user logged in, So just change location
-  function receiveLoginData(e) {
-       if (e.origin !== "${'https://' + window.location.href}" || e.source !== loginWindow)
-      return;
-    window.location = e.origin + "/test/index.html";
-  }
 
-  window.addEventListener('message', receiveLoginData);
-
-   for (let link of document.querySelectorAll(".auth-logo, #logout-btn"))
-     link.addEventListener('click', openRequestedSinglePopup);
-   
-   console.log("boo");
-   
-   
-
-  function popupParameters() {
-    const width = Math.min(600, window.screen.width);
-    const height = Math.min(600, window.screen.height);
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    return "resizable,scrollbars,status,opener," +
-      Object.entries({width, height, left, top}).map(kv => kv.join('=')).join(',');
-  }
-
-  function openRequestedSinglePopup(event) {
-    event.preventDefault();
-    // let url = event.currentTarget.parentNode.href;
-    let url = "https://typing-auth.maksgalochkin2.workers.dev" + event.currentTarget.parentNode.pathName;
-    if (event.currentTarget.pathname === "/logout"){
-     url = event.currentTarget.href;     // return and change location to prevent open popup window
-    }
-    let input = document.querySelector('input[type=checkbox]');
-    if (input && input.checked)
-      url += '?remember-me';
-    if (!loginWindow || loginWindow.closed) {
-      loginWindow = window.open(url, "_blank", popupParameters());
-    } else if (loginWindowUrl !== url)
-      loginWindow.location = url;
-    loginWindowUrl = url;
-    loginWindow.focus();
-  }
-  </script>`;
-
-
-  return {
-    header: credentials ? logged : notlogged,
-    // script: script
-  }
+  return  credentials ? logged : notlogged;
 }
 
 (async () => {
@@ -85,18 +35,11 @@ function getHeaderElement(credentials) {
     .then(data => data);
 
   const headerElements = getHeaderElement(getUserdata);
+  
+  let element = document.createElement("div");
+  element.innerHTML = headerElements;
+  document.body.prepend(element.firstElementChild);
 
-//todo: fix this
-  const prependElement = (node, elements) => {
-    for (const [key, value] of Object.entries(elements)) {
-      let element = document.createElement("div");
-      element.innerHTML = value;
-      node.prepend(element.firstElementChild);
-    }
-  }
-
-
-  prependElement(document.body, headerElements)
 
 })();
 
