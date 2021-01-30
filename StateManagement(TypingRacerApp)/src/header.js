@@ -33,7 +33,7 @@ function getHeaderElement(credentials) {
 
 (async () => {
   const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev")
-    .then(response => response.json())
+    .then(response => response.text())
     .then(data => data);
 
   const headerElements = getHeaderElement(getUserdata);
