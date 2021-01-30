@@ -25,8 +25,12 @@ function getHeaderElement(credentials) {
     </span>
 </header>`;
 
+  const script = `<script src="../src/auth.js"></script>`
 
-  return  credentials ? logged : notlogged;
+  return {
+    header: credentials ? logged : notlogged,
+    script: script
+  }
 }
 
 (async () => {
@@ -36,10 +40,17 @@ function getHeaderElement(credentials) {
 
   const headerElements = getHeaderElement(getUserdata);
 
-  let element = document.createElement("div");
-  element.innerHTML = headerElements;
-  document.body.prepend(element.firstElementChild);
+//todo: fix this
+  const prependElement = (node, elements) => {
+    for (const [key, value] of Object.entries(elements)) {
+      let element = document.createElement("div");
+      element.innerHTML = value;
+      node.prepend(element.firstElementChild);
+    }
+  }
 
+
+  prependElement(document.body, headerElements)
 
 })();
 
