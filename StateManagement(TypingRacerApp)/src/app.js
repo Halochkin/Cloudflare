@@ -243,12 +243,8 @@ margin-top: -2vw;
 
     if(method==="POST")
       options.headers = {'Content-Type': 'application/json'}
-   setTimeout(async()=>{
      let res = await fetch(path, options);
      return res.json();
-   },100)
-
-
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
   }
 
