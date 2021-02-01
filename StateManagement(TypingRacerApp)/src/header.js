@@ -1,13 +1,10 @@
 function getHeaderElement(credentials) {
   let logged;
-
-
-
   logged = `
 <header>
     <span id="header-logo">TYPING RACE</span>
     <span>
-     <a id="logout-btn" href="/logout">Logout</a>
+     <a id="logout-btn" href="https://typing-auth.maksgalochkin2.workers.dev/test/index.html/logout">Logout</a>
      <span id="header-username" >${credentials.username}</span>
      <img id="header-photo" src="${credentials.photo}"/>
     </span>
@@ -22,11 +19,7 @@ function getHeaderElement(credentials) {
     <input id="remember-me" type="checkbox"/><label for="rember-me" style="float: right; color: #ffa429;">Remember Me </label>
     </span>
 </header>`;
-
-  return {
-    header: JSON.stringify(credentials).length ? logged : notlogged,
-    // script: script
-  }
+  return JSON.stringify(credentials).length ? logged : notlogged;
 }
 
 (async () => {
@@ -37,15 +30,14 @@ function getHeaderElement(credentials) {
   const headerElements = getHeaderElement(getUserdata);
 
 
-
   // prependElement(document.body, headerElements)
   let element = document.createElement("div");
-  element.innerHTML = headerElements.header;
+  element.innerHTML = headerElements;
   document.body.prepend(element.firstElementChild);
 
 
   let script = document.createElement("script");
-  script.src="../src/auth.js";
+  script.src = "../src/auth.js";
   document.body.appendChild(script)
 
 
