@@ -25,26 +25,18 @@ function getHeaderElement(credentials) {
 </header>`;
 
   return {
-    header: credentials ? logged : notlogged,
+    header: JSON.stringify(credentials).length ? logged : notlogged,
     // script: script
   }
 }
 
 (async () => {
   const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev", {cookies: "asssa"})
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => data);
-//todo: fix this, it returns  empty string. maybe cors?
+
   const headerElements = getHeaderElement(getUserdata);
 
-// //todo: fix this
-//   const prependElement = (node, elements) => {
-//     for (const [key, value] of Object.entries(elements)) {
-//       let element = document.createElement("div");
-//       element.innerHTML = value;
-//       node.prepend(element.firstElementChild);
-//     }
-//   }
 
 
   // prependElement(document.body, headerElements)
