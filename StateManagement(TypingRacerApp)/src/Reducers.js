@@ -88,7 +88,7 @@ export class Reducers {
 
     const options = {
       method,
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*",},
       mode: 'no-cors'
     }
 
