@@ -83,15 +83,15 @@ export class Reducers {
     //   .then(data => this.renderSessions(data));
 
 
-    let method = 'GET';
 
+
+    let method = 'GET';
 
     const options = {
       method,
       headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*",},
-      mode: 'no-cors'
+      // mode: 'no-cors'
     }
-
 
     let res = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions", options);
 

@@ -1,40 +1,18 @@
 <span id="result"></span>
 <script>
+  (async ()=>{
+  let method = 'GET';
 
-  const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/testApp";
-  //todo add as global variable
-  const spanElement = document.querySelector("#result");
-
-  const githubProxy = 'https://github-proxy.maksgalochkin2.workers.dev';
-
-
-  async function makeFetch(path) {
-    return await fetch(githubProxy + path, {mode: "no-cors", AccessControlAllowOrigin: "*"})
-      .then(response => response.text())
-      .then(data => {
-        return data;
-      })
-      .catch(error => console.error(error))
+  const options = {
+    method,
+    headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*",},
+    // mode: 'no-cors'
   }
 
+  let res = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions", options);
 
-  async function handleRequest(e) {
-    // console.log(e.request)
-    // const url = new URL(e.request.url);
-    // const path = url.pathname;
-    const path = '/test/index.html'
-    let test = await makeFetch(path).then(data=>{
-      spanElement.textContent = data;
-    })
-  }
+  let finalRes = await res.text();
 
-  window.addEventListener("fetch", async(e)=> await handleRequest(e));
-
-
-  let event = new Event("fetch");
-
-  window.dispatchEvent(event)
-
-
-
+  debugger
+  })();
 </script>
