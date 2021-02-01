@@ -95,7 +95,7 @@ export class Reducers {
 
     let res = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions", options);
 
-    let finalRes = await res.json();
+    let finalRes = await res.text();
 
      this.renderSessions(finalRes);
 
