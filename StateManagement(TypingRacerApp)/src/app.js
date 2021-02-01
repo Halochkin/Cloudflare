@@ -237,7 +237,7 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
-      // headers: {'Content-Type': 'application/json'}
+      headers: {'Content-Type': 'application/json'}
     }
     if (body)
       options.body = body;
