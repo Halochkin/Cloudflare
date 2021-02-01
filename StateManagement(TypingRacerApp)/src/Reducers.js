@@ -83,25 +83,28 @@ export class Reducers {
     //   .then(data => this.renderSessions(data));
 
 
+    let res = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions");
+
+    let res1 = await res.text();
+
+    let res2 = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions").then(data => data.text());
 
 
-    let method = 'GET';
+    let res3 = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions")
+      .then(response => response.text())
+      .then(data => data)
+      .catch(error => console.error(error, " ", path + " blocked by brwoser"))
 
-    const options = {
-      method,
-      headers: {'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*",},
-      // mode: 'no-cors'
-    }
-
-    let res = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions", options);
-
-    let finalRes = await res.text();
-
-     this.renderSessions(finalRes);
+    let res4 = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions")
+      .then(response => response.text())
+      .then(data => data)
+      .catch(error => console.error(error, " ", path + " blocked by brwoser"))
 
 
-    // let res = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions");
-    // this.renderSessions(res);
+
+    console.log(res1)
+
+    this.renderSessions(res);
 
     return state;
   }
