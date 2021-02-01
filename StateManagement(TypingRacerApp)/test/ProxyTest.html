@@ -16,6 +16,17 @@
 
   let finalRes = await res.text();
 
+let headers = {};
+
+let n2headers = { 'Set-Cookie': 123 }
+
+
+
+    return new Response(txtOut, { status: 200, headers: { ...headers, n2headers }  }      )
+
+
+
+
   debugger
   })();
 </script>

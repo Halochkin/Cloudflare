@@ -6,10 +6,9 @@ function getHeaderElement(credentials) {
 
   logged = `
 <header>
-    <base href="">
     <span id="header-logo">TYPING RACE</span>
     <span>
-     <a id="logout-btn" href="https://typing-auth.maksgalochkin2.workers.dev/logout">Logout</a>
+     <a id="logout-btn" href="/logout">Logout</a>
      <span id="header-username" >${credentials.username}</span>
      <img id="header-photo" src="${credentials.photo}"/>
     </span>
