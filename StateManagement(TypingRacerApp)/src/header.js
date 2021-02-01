@@ -19,7 +19,7 @@ function getHeaderElement(credentials) {
     <input id="remember-me" type="checkbox"/><label for="rember-me" style="float: right; color: #ffa429;">Remember Me </label>
     </span>
 </header>`;
-  return JSON.stringify(credentials).length ? logged : notlogged;
+  return JSON.stringify(credentials)!== "{}" ? logged : notlogged;
 }
 
 (async () => {
