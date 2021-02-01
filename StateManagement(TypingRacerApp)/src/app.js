@@ -237,12 +237,15 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
+      credentials: 'include'
     }
     if (body)
       options.body = body;
 
     if(method==="POST")
-      options.headers = {'Content-Type': 'application/json',  "credentials": 'include'}
+      options.headers = {'Content-Type': 'application/json'}
+
+
      let res = await fetch(path, options);
      return res.json();
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
