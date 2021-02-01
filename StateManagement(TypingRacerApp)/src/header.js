@@ -1,8 +1,7 @@
 function getHeaderElement(credentials) {
   let logged;
 
-  if (credentials && credentials instanceof Object)
-    credentials = JSON.parse(credentials);
+
 
   logged = `
 <header>
