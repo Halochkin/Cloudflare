@@ -25,8 +25,7 @@ function getHeaderElement(credentials) {
 (async () => {
   // describe how to pass cookies from github-proxy to typing-auth to be it visible for typing-auth
   const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev", {
-    crossDomain: true,
-    xhrFields: {withCredentials: true}
+    credentials: 'include'
   })
     .then(response => response.json())
     .then(data => data);
