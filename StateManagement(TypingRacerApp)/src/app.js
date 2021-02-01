@@ -242,7 +242,7 @@ margin-top: -2vw;
       options.body = body;
 
     if(method==="POST")
-      options.headers = {'Content-Type': 'application/json'}
+      options.headers = {'Content-Type': 'application/json',  "credentials": 'include'}
      let res = await fetch(path, options);
      return res.json();
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
