@@ -23,7 +23,7 @@ function getHeaderElement(credentials) {
 }
 
 (async () => {
-  const getUserdata = await fetch("https://github-proxy.maksgalochkin2.workers.dev", {cookies: "asssa"})
+  const getUserdata = await fetch("https://typing-auth.maksgalochkin2.workers.dev", {cookies: "asssa"})
     .then(response => response.json())
     .then(data => data);
 
