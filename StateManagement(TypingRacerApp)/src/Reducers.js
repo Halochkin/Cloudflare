@@ -82,8 +82,26 @@ export class Reducers {
     // this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions")
     //   .then(data => this.renderSessions(data));
 
-    let res = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions");
-    this.renderSessions(res)
+
+    let method = 'GET';
+
+
+    const options = {
+      method,
+      headers: {'Content-Type': 'application/json'}
+    }
+
+
+    let res = await fetch(path, options);
+
+    let finalRes = await res.json();
+
+     this.renderSessions(finalRes);
+
+
+    // let res = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions");
+    // this.renderSessions(res);
+
     return state;
   }
 }
