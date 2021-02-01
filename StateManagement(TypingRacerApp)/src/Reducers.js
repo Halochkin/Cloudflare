@@ -85,24 +85,21 @@ export class Reducers {
 
     let res = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions");
 
-    let res1 = await res.text();
+    console.log(res)
 
-    let res2 = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions").then(data => data.text());
 
+    let res2 = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions").then(data => data);
+
+    console.log(res2)
 
     let res3 = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions")
       .then(response => response.text())
       .then(data => data)
       .catch(error => console.error(error, " ", path + " blocked by brwoser"))
 
-    let res4 = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions")
-      .then(response => response.text())
-      .then(data => data)
-      .catch(error => console.error(error, " ", path + " blocked by brwoser"))
 
+    console.log(res3)
 
-
-    console.log(res1)
 
     this.renderSessions(res);
 
