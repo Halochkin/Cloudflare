@@ -237,10 +237,12 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
-      headers: {'Content-Type': 'application/json'}
     }
     if (body)
       options.body = body;
+    if(method==="POST")
+      options.headers = {'Content-Type': 'application/json'}
+
     let res = await fetch(path, options);
     return res.json();
 
