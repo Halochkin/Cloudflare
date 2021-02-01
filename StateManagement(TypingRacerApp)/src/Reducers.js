@@ -81,11 +81,6 @@ export class Reducers {
   static  async getAllSessions(state) {
     this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions")
       .then(data => this.renderSessions(data));
-
-
-    let res = await this.doRequest('GET', "https://typing-app.maksgalochkin2.workers.dev/getsessions");
-    this.renderSessions(res);
-
     return state;
   }
 }
