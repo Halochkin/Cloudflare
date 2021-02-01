@@ -4,7 +4,7 @@ function getHeaderElement(credentials) {
 <header>
     <span id="header-logo">TYPING RACE</span>
     <span>
-     <a id="logout-btn" href="https://typing-auth.maksgalochkin2.workers.dev/test/index.html/logout">Logout</a>
+     <a id="logout-btn" href="https://typing-auth.maksgalochkin2.workers.dev/logout">Logout</a>
      <span id="header-username" >${credentials.username}</span>
      <img id="header-photo" src="${credentials.photo}"/>
     </span>
