@@ -92,7 +92,7 @@ export class Reducers {
     }
 
 
-    let res = await fetch(path, options);
+    let res = await fetch("https://typing-app.maksgalochkin2.workers.dev/getsessions", options);
 
     let finalRes = await res.json();
 
