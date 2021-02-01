@@ -240,11 +240,14 @@ margin-top: -2vw;
     }
     if (body)
       options.body = body;
+
     if(method==="POST")
       options.headers = {'Content-Type': 'application/json'}
+   setTimeout(async()=>{
+     let res = await fetch(path, options);
+     return res.json();
+   },100)
 
-    let res = await fetch(path, options);
-    return res.json();
 
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
   }

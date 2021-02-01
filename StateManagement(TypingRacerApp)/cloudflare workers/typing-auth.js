@@ -1,28 +1,28 @@
-const COUNTER_KEY = 'dvAV77q6uaIOSzE_cgq6Bs_q-vojyIglNLW8lWHtiGUuWM03mLCZnaWIqTtlWYhk'
+// const COUNTER_KEY = 'dvAV77q6uaIOSzE_cgq6Bs_q-vojyIglNLW8lWHtiGUuWM03mLCZnaWIqTtlWYhk'
 
-const GITHUB_CLIENTID = 'Iv1.27dccdadf938e8bf'
-const GITHUB_CLIENTSECRET = '73a0e0caba381a5629bf42cd5c14d9e87d6f982e'
-const GITHUB_CODE_LINK = 'https://github.com/login/oauth/access_token'
-const GITHUB_OAUTH_LINK = 'https://github.com/login/oauth/authorize'
-const GITHUB_REDIRECT = 'https://typing-race.maksgalochkin2.workers.dev/callback/github'
+// const GITHUB_CLIENTID = 'Iv1.27dccdadf938e8bf'
+// const GITHUB_CLIENTSECRET = '73a0e0caba381a5629bf42cd5c14d9e87d6f982e'
+// const GITHUB_CODE_LINK = 'https://github.com/login/oauth/access_token'
+// const GITHUB_OAUTH_LINK = 'https://github.com/login/oauth/authorize'
+// const GITHUB_REDIRECT = 'https://typing-race.maksgalochkin2.workers.dev/callback/github'
 
-const GOOGLE_CLIENT_ID = '1052973726979-cra8ku89dp9tvg7m4tvjphp2dnsno6f2.apps.googleusercontent.com'
-const GOOGLE_CLIENT_SECRET = 'FTI7P9jkzPP6qkV4FfF0uvC'
-const GOOGLE_CODE_LINK = 'https://oauth2.googleapis.com/token'
-const GOOGLE_OAUTH_LINK = 'https://accounts.google.com/o/oauth2/v2/auth'
-const GOOGLE_REDIRECT = 'typing-race.maksgalochkin2.workers.dev/callback/google'
+// const GOOGLE_CLIENT_ID = '1052973726979-cra8ku89dp9tvg7m4tvjphp2dnsno6f2.apps.googleusercontent.com'
+// const GOOGLE_CLIENT_SECRET = 'FTI7P9jkzPP6qkV4FfF0uvC'
+// const GOOGLE_CODE_LINK = 'https://oauth2.googleapis.com/token'
+// const GOOGLE_OAUTH_LINK = 'https://accounts.google.com/o/oauth2/v2/auth'
+// const GOOGLE_REDIRECT = 'typing-race.maksgalochkin2.workers.dev/callback/google'
 
 
-const SECRET = 'klasjdfoqjpwoekfj!askdfj'
-const SESSION_COOKIE_NAME = 'sessionID'
-const SESSION_ROOT = '.maksgalochkin2.workers.dev'
-const SESSION_TTL = 2592000
-const STATE_SECRET_TTL_MS = 180
+// const SECRET = 'klasjdfoqjpwoekfj!askdfj'
+// const SESSION_COOKIE_NAME = 'sessionID'
+// const SESSION_ROOT = '.maksgalochkin2.workers.dev'
+// const SESSION_TTL = 2592000
+// const STATE_SECRET_TTL_MS = 180
 
 
 const link = "https://raw.githubusercontent.com/Halochkin/Cloudflare/master/testApp";
 
-const myDomain = `typing-race.maksgalochkin2.workers.dev`;
+const myDomain = `https://github-proxy.maksgalochkin2.workers.dev`;
 
 
 async function makeFetch(path) {
@@ -238,7 +238,7 @@ async function count() {
 }
 
 async function getOrSetUid(providerId) {
-  const oldUid = await KV_AUTH.get(providerId);
+  const oldUid = await KV_AUTH.get(providerId);b
   if (oldUid)
     return oldUid;
   const newUid = (await count()).toString(36);
@@ -250,14 +250,18 @@ async function getOrSetUid(providerId) {
 
 async function handleRequest(request) {
 
+
+  let cookies1 = request.headers.get('cookie');
+
+
   try {
     const url = new URL(request.url);
     const path = url.pathname;
     const [ignore, action, provider] = path.split('/');
-    let userdata;
-    let headers = { "Content-Type": 'text/plain', "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev" };
+    let userdata = "{}";
+    let headers = { "Content-Type": 'application/json', "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev" };
 
-    console.log(action)
+    // return new Response(JSON.stringify(cookies1), { headers: headers })
 
     if (action === "login") {
       const stateSecret = await encryptData(JSON.stringify({
@@ -318,13 +322,24 @@ async function handleRequest(request) {
       return new Response(txtIn, { status: 200, headers: { 'Content-Type': 'text/html', 'Set-Cookie': jwtCookie } }); //todo
     }
 
+    //todo: this is does not work!!!!
+    if (action === 'logout') {
+      const txtOut = selfClosingMessage(' ', SESSION_ROOT);
+      console.log(txtOut)
+      const cookieOut = bakeCookie("sessionIDJwtCookie", 'LoggingOut', SESSION_ROOT, 0);
+      // headers = headers.assign(headers, { "Set-Cookie": cookieOut });
+      // userdata = undefined
+      // Response.redirect("https://typing-race.maksgalochkin2.workers.dev/test/index.html")
+      return new Response(txtOut, { status: 200, headers: { "Content-Type" : "text/html", 'Set-Cookie': cookieOut } });
+    }
 
     //rolling cookie
     const cookies = request.headers.get('cookie');
     const jwtCookie = getCookieValue(cookies, "sessionIDJwtCookie");
 
 
-    let userID; //hold userID in global scope to use it for session kv value (userid + sessionID)
+
+    let userID, decryptedPayloadawait; //hold userID in global scope to use it for session kv value (userid + sessionID)
 
     if (jwtCookie) {
       let jwtObj = JSON.parse(atob(fromBase64url(jwtCookie)));
@@ -337,26 +352,11 @@ async function handleRequest(request) {
         jwtObj.header.iat = Date.now();
         // make new cookie
         let updatedCookie = bakeCookie("sessionIDJwtCookie", toBase64url(btoa(JSON.stringify(jwtObj)), SECRET), SESSION_ROOT, jwtObj.header.Uat)
-        headers = Object.assign(headers, { "Set-Cookie": updatedCookie });
+        headers = { ...headers, "Set-Cookie": updatedCookie };
         userdata = decryptedPayloadawait;
-        // userID = "_" + userdata.uid;
+        return new Response(userdata, { headers: headers })
       }
     }
-
-
-
-    //todo: this is does not work!!!!
-    if (action === 'logout') {
-      const txtOut = selfClosingMessage(' ', SESSION_ROOT);
-      const cookieOut = bakeCookie("sessionIDJwtCookie", 'LoggingOut', SESSION_ROOT, 0);
-      // headers = headers.assign(headers, { "Set-Cookie": cookieOut });
-      // userdata = undefined
-      // Response.redirect("https://typing-race.maksgalochkin2.workers.dev/test/index.html")
-      return new Response(txtOut, { status: 200, headers:  Object.assign(headers, {'Set-Cookie': cookieOut } )});
-    }
-
-
-
 
 
 

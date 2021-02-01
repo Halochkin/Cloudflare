@@ -53,19 +53,19 @@ async function handleRequest(request) {
 
     let lastSession;
 
-    // if (action === 'json') {
-    //     if (request.method !== 'POST')
-    //         return new Response('not post');
-    //     if (request.headers.get('content-type') !== 'application/json')
-    //         return new Response(request.headers.get('content-type') + "...");
-    //     const json = JSON.stringify(await request.json());
-    //     let session = JSON.parse(json);
-    //     session.sessionId = userID + "-" + session.sessionId;
-    //     lastSession = JSON.stringify(session);
-    //     if (userID)
-    //         await PREVIOUS_RESULTS.put(session.sessionId, JSON.stringify(session));
-    //     return new Response(JSON.stringify({ status: !!userID, uId: userID }), { headers: Object.assign(headers, { 'Content-ype': 'application/json' }) });
-    // }
+    if (action === 'json') {
+        if (request.method !== 'POST')
+            return new Response('not post');
+        if (request.headers.get('content-type') !== 'application/json')
+            return new Response(request.headers.get('content-type') + "...");
+        const json = JSON.stringify(await request.json());
+        let session = JSON.parse(json);
+        session.sessionId = userID + "-" + session.sessionId;
+        lastSession = JSON.stringify(session);
+        if (userID)
+            await PREVIOUS_RESULTS.put(session.sessionId, JSON.stringify(session));
+        return new Response(JSON.stringify({ status: !!userID, uId: userID }), { headers: Object.assign(headers, { 'Content-ype': 'application/json' }) });
+    }
 
 
     // if (action === "delete") {
