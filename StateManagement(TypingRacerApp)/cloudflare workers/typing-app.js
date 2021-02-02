@@ -6,16 +6,73 @@ function getCookieValue(cookie, key) {
   return cookie ?.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`) ?.pop();
 }
 
+let cachedPassHash;
+
+async function passHash(pw) {
+  return cachedPassHash || (cachedPassHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw)));
+}
+
+function hexStringToUint8(str) {
+  return new Uint8Array(str.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+}
+
+function fromBase64url(base64urlStr) {
+  base64urlStr = base64urlStr.replace(/-/g, '+').replace(/_/g, '/');
+  if (base64urlStr.length % 4 === 2)
+    return base64urlStr + '==';
+  if (base64urlStr.length % 4 === 3)
+    return base64urlStr + '=';
+  return base64urlStr;
+}
+
+async function makeKeyAESGCM(password, iv) {
+  const pwHash = await passHash(password);
+  const alg = { name: 'AES-GCM', iv: iv };                            // specify algorithm to use
+  return await crypto.subtle.importKey('raw', pwHash, alg, false, ['decrypt', 'encrypt']);  // use pw to generate key
+}
+
+async function decryptAESGCM(password, iv, ctStr) {
+  const key = await makeKeyAESGCM(password, iv);
+  const ctUint8 = new Uint8Array(ctStr.match(/[\s\S]/g).map(ch => ch.charCodeAt(0))); // ciphertext as Uint8Array
+  const plainBuffer = await crypto.subtle.decrypt({ name: key.algorithm.name, iv: iv }, key, ctUint8);                 // decrypt ciphertext using key
+  return new TextDecoder().decode(plainBuffer);                                       // return the plaintext
+}
+
+
+async function decryptData(data, password) {
+  try {
+    const [ivText, cipherB64url] = data.split('.');
+    const iv = hexStringToUint8(ivText);
+    const cipher = atob(fromBase64url(cipherB64url));
+    const payload = await decryptAESGCM(password, iv, cipher);
+    return payload;
+  } catch (err) {
+    throw 'error decrypting: ' + data;
+  }
+}
+
+
+
+
+
 //KV worker
 async function handleRequest(request) {
   try {
-    let headers = { "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev" };
     let userdata;
 
+    let headers = {
+      "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev",
+      'Content-Type': 'application/json',
+      "Access-Control-Allow-Credentials": true,
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTION, DELETE"
+    };
 
 
 
-    return new Response("JSON.stringify(res)", { headers: { ...headers, 'content-type': 'application/json' } })
+
+
+    // return new Response("JSON.stringify(res)", { headers: { ...headers, 'content-type': 'application/json' } })
 
 
     const url = new URL(request.url);
@@ -24,65 +81,71 @@ async function handleRequest(request) {
     if (!action)
       return new Response("no action", { header: { headers } })
 
-    //rolling cookie
+
+
+    let userID, decryptedPayloadawait, lastSession; //hold userID in global scope to use it for session kv value (userid + sessionID)
+
     const cookies = request.headers.get('cookie');
     const jwtCookie = getCookieValue(cookies, "sessionIDJwtCookie");
 
-    // headers = Object.assign(headers, { "Content-Type": contentType });
-
-    let userID; //hold userID in global scope to use it for session kv value (userid + sessionID)
 
     if (jwtCookie) {
       let jwtObj = JSON.parse(atob(fromBase64url(jwtCookie)));
       //make string to decrypt
       decryptedPayloadawait = await decryptData(jwtObj.header.iv + "." + jwtObj.payload, SECRET);
-
-      //if too old
-      if (Date.now() < jwtObj.header.Iat + jwtObj.header.Uat) {  //fix this, because checkTTL throws errors.  try catch here, I think no. Just check wheather cookies is not expired and return responce with existing cookies. If expired just let browser to make redirect to /callback ???
-        // refesh jwt cookie iat (issue at time)
-        jwtObj.header.iat = Date.now();
-        // make new cookie
-        let updatedCookie = bakeCookie("sessionIDJwtCookie", toBase64url(btoa(JSON.stringify(jwtObj)), SECRET), SESSION_ROOT, jwtObj.header.Uat)
-        headers = Object.assign(headers, { "Set-Cookie": updatedCookie });
-        userdata = JSON.parse(decryptedPayloadawait);
-        userID = "_" + userdata.uid;
-      }
+      userID = "_" + JSON.parse(decryptedPayloadawait).uid;
     }
 
 
-
-    let lastSession;
 
     if (action === 'json') {
-        if (request.method !== 'POST')
-            return new Response('not post');
-        if (request.headers.get('content-type') !== 'application/json')
-            return new Response(request.headers.get('content-type') + "...");
-        const json = JSON.stringify(await request.json());
-        let session = JSON.parse(json);
-        session.sessionId = userID + "-" + session.sessionId;
-        lastSession = JSON.stringify(session);
-        if (userID)
-            await PREVIOUS_RESULTS.put(session.sessionId, JSON.stringify(session));
-        return new Response(JSON.stringify({ status: !!userID, uId: userID }), { headers: Object.assign(headers, { 'Content-ype': 'application/json' }) });
+      let session = await request.json();
+      session.sessionId = userID + "-" + session.sessionId;
+      lastSession = JSON.stringify(session);
+      if (userID)
+        await PREVIOUS_RESULTS.put(session.sessionId, JSON.stringify(session));
+      return new Response(JSON.stringify({ status: !!userID, uId: userID }), { headers: headers });
     }
 
 
-    // if (action === "delete") {
-    //     if (request.method !== 'DELETE')
-    //         return new Response('not delete');
-    //     const json = JSON.stringify(await request.json());
-    //     const key = JSON.parse(json).key;
-    //     await PREVIOUS_RESULTS.delete(key);
-    //     return new Response(JSON.stringify({ deleted: key }), { headers: Object.assign(headers, { 'Content-Type': 'application/json' }) })
+    if (action === "delete") {
 
-    // }
+      const json = JSON.stringify(await request.json());
+
+      return new Response(JSON.stringify({ deleted: json }), { headers: headers });
+
+      const key = JSON.parse(json).key;
+      await PREVIOUS_RESULTS.delete(key);
+      return new Response(JSON.stringify({ deleted: key }), { headers: headers });
+
+
+
+
+      // let sessionId = await request.json();
+      // console.log(sessionId);
+
+      // let session = JSON.parse(sessionId);
+      // console.log(session)
+      // let res =
+      //   const sessionId = JSON.stringify(await request.json());
+
+
+      // let key = JSON.parse(sessionId).key;
+
+
+
+      // return new Response(JSON.stringify({ "val": key }), { headers: headers });
+
+      // let key = JSON.parse(sessionId).key;
+
+      // await PREVIOUS_RESULTS.delete(key);
+
+    }
 
     if (action === "getsessions") {
-      if (request.method !== 'GET')
-        return new Response('not get request');
+      // if (request.method !== 'GET')
+      //     return new Response('not get request'); //describe preflight request
       const values = await PREVIOUS_RESULTS.list();
-      console.log(userID)
       const res = [];
       for (key of values.keys) {
         if (key && key.name.startsWith(userID)) {
@@ -90,22 +153,10 @@ async function handleRequest(request) {
           await res.push(value);
         }
       }
-      return new Response("JSON.stringify(res)", { headers: { ...headers, 'content-type': 'text/plain' } })
+      return new Response(JSON.stringify(res), { headers: headers })
     }
 
-    //todo: this is does not work!!!!
-    // if (action === 'logout') {
-    //     const txtOut = selfClosingMessage(' ', SESSION_ROOT);
-    //     const cookieOut = bakeCookie("sessionIDJwtCookie", 'LoggingOut', SESSION_ROOT, 0);
-    //     // headers = headers.assign(headers, { "Set-Cookie": cookieOut });
-    //     // userdata = undefined
-    //     // Response.redirect("https://typing-race.maksgalochkin2.workers.dev/test/index.html")
-    //     return new Response(txtOut, { status: 200, headers: Object.assign(headers, { 'content-type': 'text/html', 'Set-Cookie': cookieOut }) });
-    // }
-
-
-
-    return new Response(userdata, { status: 200, headers: headers });
+    return new Response("Bad Request", { status: 400, headers: headers });
 
 
   } catch (err) {
