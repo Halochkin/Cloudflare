@@ -242,12 +242,12 @@ margin-top: -2vw;
     if (body)
       options.body = body;
 
-    if(method==="DELETE")
-      options.headers = {'Content-Type': 'application/json'}
+    // if(method==="DELETE")
+    //   options.headers = {'Content-Type': 'application/json'}
 
 
-     let res = await fetch(path, options);
-     return res.json();
+    let res = await fetch(path, options);
+    return res.json();
     // return await fetch(path, options).then(response => response.json()).then(data=> data);
   }
 
@@ -303,8 +303,8 @@ margin-top: -2vw;
       closeBtn.id = parsedSession.sessionId;
       closeBtn.addEventListener("click", async (e) => { //todo: remove session
         let grandParent = input.parentNode.parentElement;
-        let data = JSON.stringify({key: ''+ e.currentTarget.id});
-        await this.doRequest("DELETE", "https://typing-app.maksgalochkin2.workers.dev/delete", data);
+        let data = JSON.stringify({key: '' + e.currentTarget.id});
+        let status = await this.doRequest("DELETE", "https://typing-app.maksgalochkin2.workers.dev/delete", data);
         grandParent.removeChild(prevWrapper);
       });
 
