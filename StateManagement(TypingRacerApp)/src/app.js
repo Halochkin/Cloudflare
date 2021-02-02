@@ -242,8 +242,8 @@ margin-top: -2vw;
     if (body)
       options.body = body;
 
-    // if(method==="POST")
-    //   options.headers = {'Content-Type': 'application/json'}
+    if(method==="DELETE")
+      options.headers = {'Content-Type': 'application/json'}
 
 
      let res = await fetch(path, options);
