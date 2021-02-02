@@ -237,13 +237,13 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
-      credentials: 'include'
+      // credentials: 'include'  //only for auth worker
     }
     if (body)
       options.body = body;
 
-    if(method==="POST")
-      options.headers = {'Content-Type': 'application/json'}
+    // if(method==="POST")
+    //   options.headers = {'Content-Type': 'application/json'}
 
 
      let res = await fetch(path, options);
