@@ -237,7 +237,7 @@ margin-top: -2vw;
   async doRequest(method, path, body) {
     const options = {
       method,
-      // credentials: 'include'  //only for auth worker
+      credentials: 'include' 
     }
     if (body)
       options.body = body;
