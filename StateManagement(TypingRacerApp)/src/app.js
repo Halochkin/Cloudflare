@@ -304,7 +304,7 @@ margin-top: -2vw;
       closeBtn.addEventListener("click", async (e) => { //todo: remove session
         let grandParent = input.parentNode.parentElement;
         let data = JSON.stringify({key: '' + e.currentTarget.id});
-        let status = await this.doRequest("DELETE", "https://typing-app.maksgalochkin2.workers.dev/delete", data);
+        let status = await this.doRequest("DELETE", "https://typing-app.maksgalochkin2.workers.dev/delete", data).then(data => data)
         grandParent.removeChild(prevWrapper);
       });
 
