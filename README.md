@@ -8,6 +8,7 @@ The main task of the application is to be used to test the cloudflare worker fun
 - AES-GCM encryption/decryption
 - http requests and their headers
 - CORS requests
+- Cookies
 - Custom web components
 - Proxy server
 - Google/Github authentication
