@@ -5,6 +5,7 @@
 
 The main task of the application is to be used to test the cloudflare worker functionality as well: 
 - KV (key-value) cloudflare store
+- AES-GCM encryption/decryption
 - http requests and their headers
 - CORS requests
 - Custom web components
