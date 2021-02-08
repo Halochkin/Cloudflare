@@ -223,7 +223,7 @@ async function githubProcessTokenPackage(code, state) {
 
 function selfClosingMessage(msg, domain) {
   return `<script>
-  window.opener.postMessage('${msg}', 'https://${domain}'); 
+  window.opener.postMessage('${msg}', 'https://github-proxy${domain}'); 
   window.close();
 </script>`;
 }
@@ -238,7 +238,7 @@ async function count() {
 }
 
 async function getOrSetUid(providerId) {
-  const oldUid = await KV_AUTH.get(providerId);b
+  const oldUid = await KV_AUTH.get(providerId);
   if (oldUid)
     return oldUid;
   const newUid = (await count()).toString(36);
@@ -259,7 +259,13 @@ async function handleRequest(request) {
     const path = url.pathname;
     const [ignore, action, provider] = path.split('/');
     let userdata = "{}";
-    let headers = { "Content-Type": 'application/json', "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev" };
+    let headers = {
+      "Content-Type": 'application/json',
+      "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev",
+      "Access-Control-Allow-Credentials": true,
+      //  "Access-Control-Allow-Methods: GET, POST");
+      // "Access-Control-Allow-Headers: Content-Type": "*"
+    };
 
     // return new Response(JSON.stringify(cookies1), { headers: headers })
 
@@ -330,7 +336,7 @@ async function handleRequest(request) {
       // headers = headers.assign(headers, { "Set-Cookie": cookieOut });
       // userdata = undefined
       // Response.redirect("https://typing-race.maksgalochkin2.workers.dev/test/index.html")
-      return new Response(txtOut, { status: 200, headers: { "Content-Type" : "text/html", 'Set-Cookie': cookieOut } });
+      return new Response(txtOut, { status: 200, headers: { "Content-Type": "text/html", 'Set-Cookie': cookieOut } });
     }
 
     //rolling cookie
@@ -365,6 +371,7 @@ async function handleRequest(request) {
 
 
   } catch (err) {
+    console.log(err)
     return new Response("My error   " + err, { status: 401 });
   }
 }

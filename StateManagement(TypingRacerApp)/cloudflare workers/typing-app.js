@@ -65,7 +65,7 @@ async function handleRequest(request) {
       'Content-Type': 'application/json',
       "Access-Control-Allow-Credentials": true,
       "Access-Control-Allow-Headers": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTION, DELETE"
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS, DELETE"
     };
 
 
@@ -109,36 +109,15 @@ async function handleRequest(request) {
 
 
     if (action === "delete") {
+      try {
+        const json = await request.json();
+        await PREVIOUS_RESULTS.delete(json.key);
+        return new Response(JSON.stringify({ deleted: json.key }), { headers: headers });
+      }
+      catch (err) {
+        return new Response(JSON.stringify({ deleted: err.message }), { headers: headers });
 
-      const json = JSON.stringify(await request.json());
-
-      return new Response(JSON.stringify({ deleted: json }), { headers: headers });
-
-      const key = JSON.parse(json).key;
-      await PREVIOUS_RESULTS.delete(key);
-      return new Response(JSON.stringify({ deleted: key }), { headers: headers });
-
-
-
-
-      // let sessionId = await request.json();
-      // console.log(sessionId);
-
-      // let session = JSON.parse(sessionId);
-      // console.log(session)
-      // let res =
-      //   const sessionId = JSON.stringify(await request.json());
-
-
-      // let key = JSON.parse(sessionId).key;
-
-
-
-      // return new Response(JSON.stringify({ "val": key }), { headers: headers });
-
-      // let key = JSON.parse(sessionId).key;
-
-      // await PREVIOUS_RESULTS.delete(key);
+      }
 
     }
 
