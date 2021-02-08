@@ -3,6 +3,8 @@
 
  Simple example application for developing fast typing skills. After logging in with Google or Github, you can save your previous speed typing sessions to compete against them. The repository also contains useful information and examples of how to use the Cloudflare worker
 
+<img src="StateManagement(TypingRacerApp)/static/img/1200px-Cloudflare-logo-vector.svg.png" style="text-align: center"/>
+
 The main task of the application is to be used to test the cloudflare worker functionality as well: 
 - KV (key-value) cloudflare store
 - AES-GCM encryption/decryption
@@ -15,3 +17,4 @@ The main task of the application is to be used to test the cloudflare worker fun
 - Test of custom state manager (Similar to Redux, but better=))
 
 [Live demo](https://github-proxy.maksgalochkin2.workers.dev/test/index.html)
+
