@@ -75,14 +75,14 @@ async function unwrapJwtCookie(jwtCookie) {
   if (!jwtCookie)
     return "";
   const jwtObj = JSON.parse(atob(fromBase64url(jwtCookie)));
-  if(!jwtObj)
+  if (!jwtObj)
     throw "Cant decode cookie"
   return jwtObj;
 }
 
-async function decryptJwt(jwtObj, SECRET){
+async function decryptJwt(jwtObj, SECRET) {
   const decryptedPayloadAwait = await decryptData(jwtObj.header.iv + "." + jwtObj.payload, SECRET);
-  if(!decryptedPayloadAwait)
+  if (!decryptedPayloadAwait)
     throw "JWT cant be decrypted, someone try to hack us!!!"
   return "_" + JSON.parse(decryptedPayloadAwait).uid;
 }
@@ -95,7 +95,6 @@ function getAction(path) {
   else
     throw 'Unknown action: ' + path;  //todo: make response or throw an error?
 }
-
 
 
 /**
@@ -133,16 +132,17 @@ async function makeResponse(request, action, userID) {
 }
 
 
-async function observeUserSession(userId, session) {
+async function observeUserSession(userID, session) {
   const sessionId = userID + "-" + session.sessionId;
   await PREVIOUS_RESULTS.put(sessionId, JSON.stringify(session));
 }
 
-function makeJsonResponse(userId, headers) {
+function makeJsonResponse(userID) {
   return new Response(JSON.stringify({userIsLogged: !!userID, uId: userID}), {headers});
 }
 
-async function doJson(request) {
+
+async function doJson(request) {  // pass userID?
   let session = await request.json();
   //todo: should I disable to put values into kv if user does not signed in?
   const sessionId = userID + "-" + session.sessionId;
@@ -152,15 +152,12 @@ async function doJson(request) {
 }
 
 
-
-
-
 const actions = [
   [['request'], getPath, ['path', 'badUrl']],
   [['path'], getAction, ['action', 'badAction']],
 
 
-  [['request', '"headers.cookies"'], /*native*/ 'get', ['cookies']],
+  [['request', '"headers.cookies"'], 'get', ['cookies']],
   [['cookies', '"sessionIDJwtCookie"'], getCookieValue, ['jwtCookie']],
 
   [['jwtCookie'], unwrapJwtCookie, ['jwtObj', 'invalidJwtCookie']],
@@ -174,8 +171,7 @@ const actions = [
 
 
   [['userID', 'session', '&doJson'], observeUserSession, []],
-  [['userId', 'headers', '&doJson'], makeJsonResponse, ['response']]
-
+  [['userID', 'headers', '&doJson'], makeJsonResponse, ['response']]
 
 
 ]
