@@ -71,15 +71,21 @@ function getPath(request) {
 }
 
 
-async function getJwtCookie(jwtCookie) {
+async function unwrapJwtCookie(jwtCookie) {
   if (!jwtCookie)
     return "";
   const jwtObj = JSON.parse(atob(fromBase64url(jwtCookie)));
-  //make string to decrypt
-  const decryptedPayloadAwait = await decryptData(jwtObj.header.iv + "." + jwtObj.payload, SECRET);
-  return "_" + JSON.parse(decryptedPayloadAwait).uid;
+  if(!jwtObj)
+    throw "Cant decode cookie"
+  return jwtObj;
 }
 
+async function decryptJwt(jwtObj, SECRET){
+  const decryptedPayloadAwait = await decryptData(jwtObj.header.iv + "." + jwtObj.payload, SECRET);
+  if(!decryptedPayloadAwait)
+    throw "JWT cant be decrypted, someone try to hack us!!!"
+  return "_" + JSON.parse(decryptedPayloadAwait).uid;
+}
 
 function getAction(path) {
   const segments = path.split('/');
@@ -91,14 +97,18 @@ function getAction(path) {
 }
 
 
+
+/**
+ *
+ * @param request
+ * @param action
+ * @param userID
+ * @returns {Promise<Response>}
+ */
+
 async function makeResponse(request, action, userID) {
   if (action === 'json') {
-    let session = await request.json();
-    //todo: should I disable to put values into kv if user does not signed in?
-    const sessionId = userID + "-" + session.sessionId;
-    if (userID)
-      await PREVIOUS_RESULTS.put(sessionId, JSON.stringify(session));
-    return new Response(JSON.stringify({userIsLogged: !!userID, uId: userID}), {headers});
+
   } else if (action === "delete") {
     try {
       const json = await request.json();
@@ -123,13 +133,49 @@ async function makeResponse(request, action, userID) {
 }
 
 
+async function observeUserSession(userId, session) {
+  const sessionId = userID + "-" + session.sessionId;
+  await PREVIOUS_RESULTS.put(sessionId, JSON.stringify(session));
+}
+
+function makeJsonResponse(userId, headers) {
+  return new Response(JSON.stringify({userIsLogged: !!userID, uId: userID}), {headers});
+}
+
+async function doJson(request) {
+  let session = await request.json();
+  //todo: should I disable to put values into kv if user does not signed in?
+  const sessionId = userID + "-" + session.sessionId;
+  if (userID)
+    await PREVIOUS_RESULTS.put(sessionId, JSON.stringify(session));
+  return new Response(JSON.stringify({userIsLogged: !!userID, uId: userID}), {headers});
+}
+
+
+
+
+
 const actions = [
-  [['request'], getPath, ['path', 'badUrl']],                                         //1
-  [['path'], getAction, ['action', 'badAction']],                                     //2
-  [['request', '"headers.cookies"'], /*native*/ 'get', ['cookies']],                  //3
-  [['cookies', '"sessionIDJwtCookie"'], getCookieValue, ['jwtCookie']],               //4
-  [['jwtCookie'], getJwtCookie, ['decryptedUserID']],                                 //5
-  [['request', 'action', 'decryptedUserID'], makeResponse, ['response']]              //6
+  [['request'], getPath, ['path', 'badUrl']],
+  [['path'], getAction, ['action', 'badAction']],
+
+
+  [['request', '"headers.cookies"'], /*native*/ 'get', ['cookies']],
+  [['cookies', '"sessionIDJwtCookie"'], getCookieValue, ['jwtCookie']],
+
+  [['jwtCookie'], unwrapJwtCookie, ['jwtObj', 'invalidJwtCookie']],
+  [['jwtObj', 'SECRET'], decryptJwt, ['decryptedJwt', 'invalidJwtObj']],
+
+
+  [['decryptedJwt', 'uid'], 'get', ['userId']],
+
+
+  [['action', '"json"', '"delete"', '"getsessions"'], 'equals', ['doJson', 'doDelete', 'doGetsessions', 'invalidAction']],
+
+
+  [['userID', 'session', '&doJson'], observeUserSession, []],
+  [['userId', 'headers', '&doJson'], makeJsonResponse, ['response']]
+
 
 
 ]
@@ -138,66 +184,66 @@ const actions = [
 //KV worker
 async function handleRequest(request) {
   try {
-    // let userdata;
+    let userdata;
 
-    // let headers = {
-    //   "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev",
-    //   'Content-Type': 'application/json',
-    //   "Access-Control-Allow-Credentials": true,
-    //   "Access-Control-Allow-Headers": "*",
-    //   "Access-Control-Allow-Methods": "GET, POST, OPTIONS, DELETE"
-    // };
-    // const url = new URL(request.url);
-    // const path = url.pathname;                                                            //1
-    // const [ignore, action] = path.split('/');                                             //2
-    // if (!action)
-    //   return new Response("no action", {header: {headers}})
-    // let userID, decryptedPayloadawait, lastSession; //hold userID in global scope to use it for session kv value (userid + sessionID)
-    // const cookies = request.headers.get('cookie');                                        //3
-    // const jwtCookie = getCookieValue(cookies, "sessionIDJwtCookie");                      //4
-    //
-    // if (jwtCookie) {
-    //   let jwtObj = JSON.parse(atob(fromBase64url(jwtCookie)));
-    //   //make string to decrypt
-    //   decryptedPayloadawait = await decryptData(jwtObj.header.iv + "." + jwtObj.payload, SECRET);  //5
-    //   userID = "_" + JSON.parse(decryptedPayloadawait).uid;
-    // }
+    let headers = {
+      "Access-Control-Allow-Origin": "https://github-proxy.maksgalochkin2.workers.dev",
+      'Content-Type': 'application/json',
+      "Access-Control-Allow-Credentials": true,
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS, DELETE"
+    };
+    const url = new URL(request.url);
+    const path = url.pathname;                                                            //1
+    const [ignore, action] = path.split('/');                                             //2
+    if (!action)
+      return new Response("no action", {header: {headers}})
+    let userID, decryptedPayloadawait, lastSession; //hold userID in global scope to use it for session kv value (userid + sessionID)
+    const cookies = request.headers.get('cookie');                                        //3
+    const jwtCookie = getCookieValue(cookies, "sessionIDJwtCookie");                      //4
 
-    // if (action === 'json') {                                                             //6
-    //   let session = await request.json();
-    //   session.sessionId = userID + "-" + session.sessionId;
-    //   // lastSession = JSON.stringify(session);
-    //   if (userID)
-    //     await PREVIOUS_RESULTS.put(session.sessionId, JSON.stringify(session));
-    //   return new Response(JSON.stringify({status: !!userID, uId: userID}), {headers: headers});
-    // }
-    //
-    //
-    // if (action === "delete") {
-    //   try {
-    //     const json = await request.json();
-    //     await PREVIOUS_RESULTS.delete(json.key);
-    //     return new Response(JSON.stringify({deleted: json.key}), {headers: headers});
-    //   } catch (err) {
-    //     return new Response(JSON.stringify({deleted: err.message}), {headers: headers});
-    //   }
-    // }
-    //
-    // if (action === "getsessions") {
-    //   // if (request.method !== 'GET')
-    //   //     return new Response('not get request'); //describe preflight request
-    //   const values = await PREVIOUS_RESULTS.list();
-    //   const res = [];
-    //   for (key of values.keys) {
-    //     if (key && key.name.startsWith(userID)) {
-    //       let value = await PREVIOUS_RESULTS.get(key.name);
-    //       await res.push(value);
-    //     }
-    //   }
-    //   return new Response(JSON.stringify(res), {headers: headers})
-    // }
-    //
-    // return new Response("Bad Request", {status: 400, headers: headers});
+    if (jwtCookie) {
+      let jwtObj = JSON.parse(atob(fromBase64url(jwtCookie)));
+      //make string to decrypt
+      decryptedPayloadawait = await decryptData(jwtObj.header.iv + "." + jwtObj.payload, SECRET);  //5
+      userID = "_" + JSON.parse(decryptedPayloadawait).uid;
+    }
+
+    if (action === 'json') {                                                             //6
+      let session = await request.json();
+      session.sessionId = userID + "-" + session.sessionId;
+      // lastSession = JSON.stringify(session);
+      if (userID)
+        await PREVIOUS_RESULTS.put(session.sessionId, JSON.stringify(session));
+      return new Response(JSON.stringify({status: !!userID, uId: userID}), {headers: headers});
+    }
+
+
+    if (action === "delete") {
+      try {
+        const json = await request.json();
+        await PREVIOUS_RESULTS.delete(json.key);
+        return new Response(JSON.stringify({deleted: json.key}), {headers: headers});
+      } catch (err) {
+        return new Response(JSON.stringify({deleted: err.message}), {headers: headers});
+      }
+    }
+
+    if (action === "getsessions") {
+      // if (request.method !== 'GET')
+      //     return new Response('not get request'); //describe preflight request
+      const values = await PREVIOUS_RESULTS.list();
+      const res = [];
+      for (key of values.keys) {
+        if (key && key.name.startsWith(userID)) {
+          let value = await PREVIOUS_RESULTS.get(key.name);
+          await res.push(value);
+        }
+      }
+      return new Response(JSON.stringify(res), {headers: headers})
+    }
+
+    return new Response("Bad Request", {status: 400, headers: headers});
 
 
   } catch (err) {
