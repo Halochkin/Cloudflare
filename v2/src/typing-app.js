@@ -163,12 +163,11 @@ const actions = [
   [['jwtCookie'], unwrapJwtCookie, ['jwtObj', 'invalidJwtCookie']],
   [['jwtObj', 'SECRET'], decryptJwt, ['decryptedJwt', 'invalidJwtObj']],
 
-
   [['decryptedJwt', 'uid'], 'get', ['userId']],
 
 
-  [['action', '"json"', '"delete"', '"getsessions"'], 'equals', ['doJson', 'doDelete', 'doGetsessions', 'invalidAction']],
 
+  [['action', '"json"', '"delete"', '"getsessions"'], 'equals', ['doJson', 'doDelete', 'doGetsessions', 'invalidAction']],
 
   [['userID', 'session', '&doJson'], observeUserSession, []],
   [['userID', 'headers', '&doJson'], makeJsonResponse, ['response']]
