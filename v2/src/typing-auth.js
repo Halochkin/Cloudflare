@@ -408,7 +408,7 @@ const actions = [
   [['&doCallback', 'request', '"state"'], getSearchParams, ['stateParam', 'badProvider']],  //state query param
   [['&doCallback', 'request', '"code"'], getSearchParams, ['codeParam', 'badProvider']],  //code query param
   [['&doCallback', 'stateParam', 'codeParam', 'provider', 'SESSION_ROOT', 'SECRET', 'headers'], makeCallback, ['responseBody', 'responseHeaders']],
-  //todo: I did common response at the end
+  //todo: Do I need to do general response at the end
   // [['&doCallback', 'responseBody', 'responseHeaders'], makeResponse, []], //todo: or make common response at the end, action will define the same txtOut and cookies, depends from action?
   //    /logout
   [['&doLogout', 'headers', 'SESSION_ROOT'], makeLogout, ['responseBody', 'responseHeaders']],
