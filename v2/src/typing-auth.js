@@ -267,15 +267,22 @@ function getHeaders() {
   };
 }
 
+//todo: use local variable or pass second argument to function ( request, err) ???
 function getPath(request) {
   const url = new URL(request.url);
-  return url.pathname;
+  let err = undefined;
+  let pathname = url.pathname;
+  if (!pathname)
+    err = 'Error: Wrong pathname';   // but pathname is undefined also, not sure that it is correct way
+  return [pathname, err];
 }
 
 
 function getSearchParams(request, param) {
   const url = new URL(request.url);
-  return url.searchParams.get(param);
+  let err = undefined;
+  if (!url.searchParams.get(param))
+    return url.searchParams.get(param);
 }
 
 function getAction(path) {
@@ -388,11 +395,17 @@ async function makeRollingCookies(jwtCookie, SECRET, SESSION_ROOT) {
   }
 }
 
+//todo: just create txtOut and headers and use makeResponse or do response directly in this function? Or use make Response for both error and ordinary responses. What is the difference between error and ordinary response?
+function makeErrorResponse(body, headers) {
+  return new Response()
+}
+
+
 const actions = [
   [[], getHeaders, ['headers']],
   [['request', '"headers.cookies"'], 'get', ['cookies']],
   [['request'], getPath, ['path', 'badUrl']],
-  [['request', '"remember-me"'], getSearchParams, ['rememberMeParam', 'badProvider']],  //remember-me
+  [['request', '"remember-me"'], getSearchParams, ['rememberMeParam', 'invalidParams']],  //remember-me
   [['path'], getAction, ['action', 'invalidAction']],
   [['path'], getProvider, ['provider', 'invalidProvider']],
 
@@ -421,10 +434,11 @@ const actions = [
 
   [['responseBody', 'responseHeaders'], makeResponse, []],
 
+  // but what if
+  [['&invalidProvider', '&invalidAction', '&invalidProvider']]
 
-
-  //todo this is about logging mostly, this is something we need to have a better plan for, but I think it is operator level.
-  [['*badUrl', '*badAction', '*invalidAction', '*invalidJwtCookie', '*invalidJwtObj', '*otherErrors???'], make404, ['response']],
+    //todo this is about logging mostly, this is something we need to have a better plan for, but I think it is operator level.
+    [['*badUrl', '*badAction', '*invalidAction', '*invalidJwtCookie', '*invalidJwtObj', '*otherErrors???'], make404, ['response']],
   [['*badUrl', '*badAction', '*invalidAction', '*invalidJwtCookie', '*invalidJwtObj', '*otherErrors???'], someKindOfErrorLogging, []],
   //todo errors!!! yes
 ];
