@@ -393,8 +393,8 @@ const actions = [
   [['request', '"headers.cookies"'], 'get', ['cookies']],
   [['request'], getPath, ['path', 'badUrl']],
   [['request', '"remember-me"'], getSearchParams, ['rememberMeParam', 'badProvider']],  //remember-me
-  [['path'], getAction, ['action', 'badAction']],
-  [['path'], getProvider, ['provider', 'badProvider']],
+  [['path'], getAction, ['action', 'invalidAction']],
+  [['path'], getProvider, ['provider', 'invalidProvider']],
 
   [['action', '"login"', '"callback"', '"logout"'], equals, ['doLogin', 'doCallback', 'doLogout', 'invalidAction']],
   [['provider', '"google"', '"github"'], equals, ['doGoogle', 'doGithub', 'invalidAction']],
@@ -420,6 +420,7 @@ const actions = [
   [['jwtCookie', 'SECRET', 'SESSION_ROOT'], makeRollingCookies, ['responseBody', 'responseHeaders']],
 
   [['responseBody', 'responseHeaders'], makeResponse, []],
+
 
 
   //todo this is about logging mostly, this is something we need to have a better plan for, but I think it is operator level.
