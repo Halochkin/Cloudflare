@@ -86,8 +86,8 @@ If current method does not return `this`, the next method will be called in the 
 
   class IfElseMonad {
     constructor(obj, parent) {
-      this.state = obj;          //[1]
-      this.parent = parent;      //[2]
+      this.state = obj;                                                 //[1]
+      this.parent = parent;                                             //[2]
     }
 
     ifCondition(fun) {
