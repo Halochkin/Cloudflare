@@ -1,0 +1,31 @@
+<script>
+  function Chain(val) {
+    this.myValue = val;
+  }
+
+  Chain.prototype.one = function (fn) {
+    console.log("one");
+    fn(this.myValue);
+    this.myValue = "Goodbye";
+    return this;
+  }
+
+  Chain.prototype.two = function (fn) {
+    console.log("two");
+    fn(this.myValue);
+    return this;
+  }
+  Chain.prototype.three = function (fn) {
+    console.log("three");
+  }
+
+
+  const chainInstance = (value) => new Chain(value);
+
+  chainInstance("Hello")
+    .one(msg => console.log(msg + " world"))
+    .two(msg => console.log(msg + " world"))
+    .three();
+
+</script>
+

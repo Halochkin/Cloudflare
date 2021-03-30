@@ -1,0 +1,35 @@
+<script>
+
+
+  class Either {
+    constructor(val) {
+      this.state = {drink: val};
+    }
+
+    static drink = val => {
+      return new Either(val);
+    }
+
+
+    either(condition, ...args) {
+      const num = condition(this.state);
+      return args[num](this.state);
+    }
+
+  }
+
+  const party = (state) => console.log("party, lets drink " + state.drink);
+  const work =  (state) =>  console.log("work, lets drink " + state.drink);
+  const sleep = (state) => console.log("sleep, lets drink " + state.drink);
+
+
+  (function handleRequest(request) {
+    // const url = new URL(request.url);
+    // const path = url.pathname;
+
+    Either.drink("coffee").either((state) => state.drink === "vodka" ? 0 : state.drink === "coffee" ? 1 : 2, party, work, sleep);
+  })();
+
+
+</script>
+

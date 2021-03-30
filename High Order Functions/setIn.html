@@ -1,0 +1,93 @@
+<script>
+
+  JoiGraph.pathCache = {};
+
+
+  /**
+   * @returns {boolean} true if the input is either undefined or a completely empty object
+   */
+  static
+  isNothing(input)
+  {
+    return input === undefined || (JoiGraph.instanceofObject(input) && Object.getOwnPropertyNames(input).length === 0);
+  }
+
+  function instanceofObject(obj) {
+    return typeof obj === "object" && obj !== null;
+  }
+
+  /**
+   * @returns {boolean} true if the input is either undefined or a completely empty object
+   */
+  function isNothing(input) {
+    return input === undefined || (JoiGraph.instanceofObject(input) && Object.getOwnPropertyNames(input).length === 0);
+  }
+
+  function _deleteInImpl(obj, path) {
+    if (path.length === 0)
+      return undefined;
+    if (!JoiGraph.hasProperty(obj, path[0]))
+      return obj;
+    let child = obj[path[0]];
+    let newChild = JoiGraph._deleteInImpl(child, path.slice(1));
+    if (newChild === undefined) {
+      if (Object.getOwnPropertyNames(obj).length === 1)   //you have just deleted your only child
+        return undefined;
+      let newObj = Object.assign(Object.create(null, {}), obj);
+      delete newObj[path[0]];
+      return newObj;
+    }
+    if (child === newChild)
+      return obj;
+    let newObj = Object.assign(Object.create(null, {}), obj);
+    newObj[path[0]] = newChild;
+    return newObj;
+  }
+
+  static _setInImpl(obj, path, value) {
+    if (path.length === 0)
+      return JoiGraph.equals(obj, value) ? obj : value;               //this is necessary if the value being set is a big one.
+
+    let child = JoiGraph.instanceofObject(obj) ? obj[path[0]] : undefined;
+    let newChild = JoiGraph._setInImpl(child, path.slice(1), value);
+    // if (child === newChild)                 //todo removing this option does not seem to break any tests so far.
+    //   return obj;
+
+    let newObj = Object.assign(Object.create(null, {}), obj);
+    newObj[path[0]] = newChild;
+    return newObj;
+  }
+
+  function equals(A, B) {
+    if (A === B || (JoiGraph.isNothing(A) && JoiGraph.isNothing(B)))
+      return true;
+    if (!JoiGraph.instanceofObject(A) || !JoiGraph.instanceofObject(B))
+      return false;
+    let aProps = Object.getOwnPropertyNames(A);
+    let bProps = Object.getOwnPropertyNames(B);
+    if (aProps.length !== bProps.length)
+      return false;
+    for (let key of aProps) {
+      if (!Object.hasOwnProperty.call(B, key) || !JoiGraph.equals(A[key], B[key]))
+        return false;
+    }
+    return true;
+  }
+
+  static
+  _getInImpl(obj, path)
+  {
+    if (path.length === 0)
+      return obj;
+    let propName = path[0];
+    if (!JoiGraph.hasProperty(obj, propName))
+      return undefined;
+    return JoiGraph._getInImpl(obj[propName], path.slice(1));
+  }
+
+  function _getCachedPath(str) {
+    return JoiGraph.pathCache[str] || (JoiGraph.pathCache[str] = Object.freeze(str.split(".")));
+  }
+
+
+</script>

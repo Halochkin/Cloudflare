@@ -13,24 +13,27 @@ async function makeFetch(path) {
     .catch(error => console.error(error, " ", path + " blocked by brwoser"))
 }
 
-function memoize(original) {
-  const cache = {};
-  const error = {};
-  return function memoized(...args) { //how to await efficiently?
-    const key = JSON.stringify(args);
-    if (cache[key])
-      return cache[key];
-    if (error[key])
-      throw error[key];
-    try {
-      // debugger
-      const res = original(...args);
-      return cache[key] = res;
-    } catch (err) {
-      throw error[key] = err;
-    }
+
+function callSequenceCombinator(...originals) {
+  const invocations = [];
+
+  function readCallSequence() {
+    return [...invocations];
   }
+
+  const regulators = originals.map(original => {
+    return function regulator(...args) {
+      invocations.push(original.name);
+      return original(...args);
+    }
+  });
+  return [...regulators, readCallSequence];
 }
+
+
+
+const [request, response, callSequence ] = callSequenceCombinator(handleRequest, makeFetch);
+
 
 
 async function handleRequest(request) {
@@ -39,10 +42,7 @@ async function handleRequest(request) {
     const url = new URL(request.url);
     const path = url.pathname;
     // if (path) {
-
-    const efficientGet = memoize(makeFetch);
-
-    let res = await memoize(path);  //todo: clarify this
+    let res = await response(path);
 
     const type = path.substr(path.lastIndexOf('.') + 1);
     //if .css/.img etc
@@ -62,7 +62,7 @@ async function handleRequest(request) {
 
 
 
-
 addEventListener("fetch", e => {
-  e.respondWith(handleRequest(e.request))
+  e.respondWith(request(e.request));
+  console.log(callSequence)
 });
