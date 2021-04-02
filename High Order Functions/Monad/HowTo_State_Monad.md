@@ -15,14 +15,31 @@ The essence of the concept is that state is an integral part of functionality; t
 An example of such functionality would be the "normal" output of the layouts you produce, such as animated html elements on the screen or a response object from a web server. But, **in addition to the normal output**, you also need to create a series of **RAPPORTS** from the application instance. These rapports are for different eyes (the developer himself, the unit tester, the user analyzer, the data analyzer, the security expert, the machine learning, you name it).
 However. 
 
-So. What is this rapport? A rapport is a declarative, short, textual description of a slice of time from your app's run. Put simply, the rapport contains **two** things: 
+
+## What is this rapport? 
+
+
+A rapport is a declarative, short, textual description of a slice of time from your app's run. Put simply, the rapport contains **two** things: 
 1) a json description of the _end state_, and 
 2) a _trace of all the key functions_ called to produce this state and their input/output values: the state + the trace. If you have that, all your "other users" will be happy.
 
-However. While your normal user needs a special beast of an output: a weird DOM animation or a custom response object with a text with a more or less custom format. It is like your app running doesn't only have **one** user, but **ten** users. However, all the ten other users are more or less happy seeing a version of more or less the same output: the `rapport`.
+ > _**Rapport = trace + state object.**_
+
+Where _trace_ is simply a list of what happened (most commonly a simple list of functions called in sequence (with input/output values, meta data such as delay, etc).
+
+A _state object_ is a graph with structure and values. It can be cyclical, but most often it is non cyclical. It is one piece of json.
+
+A good rapport is:
+
+1. **Non-redundant**. the same info is not depicted multiple times in neither state nor trace.
+
+2. **Integrates the trace and the state**. The input and output values in the trace can clearly be indentified in the state, and vice versa. this makes for clear optimization and better reading.
+
+3. **Complete**. there is nothing suddenly appearing in the state that cannot be located in the trace, and the trace do not produce values that are not evident in the state.
+
+However, while your normal user needs a special beast of an output: a weird DOM animation or a custom response object with a text with a more or less custom format. It is like your app running doesn't only have **one** user, but **ten** users. However, all the ten other users are more or less happy seeing a version of more or less the same output: the `rapport`.
 
 So, why manage state? You manage state to produce this rapport of "start+end state object" and "start to end trace".
-
 It is possible to make such a concept with the help of the state monad.
 
 ## What is state monad?

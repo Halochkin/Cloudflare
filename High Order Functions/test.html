@@ -1,62 +1,76 @@
 <script>
-  const request = {
-    url: {
-      pathName: "max"
-    },
-    profile: {
-      name: "Max",
-      surname: "Halochkin",
-      info: {
-        age: 25,
-        city: "Lviv"
-      }
-    }
-  }
+  // const request = {
+  //   url: {
+  //     pathName: "max"
+  //   },
+  //   profile: {
+  //     name: "Max",
+  //     surname: "Halochkin",
+  //     info: {
+  //       age: 25,
+  //       city: "Lviv"
+  //     }
+  //   }
+  // }
+  //
+  // class IfElseMonad {
+  //   constructor(obj, parent) {
+  //     this.state = obj;          // При создании нового экземпляра класса .state свойство хранит начальное состояние, которое может быть модифицировано в процессе выполнения.
+  //     this.parent = parent;      // Хранит контекст предьедущего метода, который предоставил контекст текущему.
+  //   }
+  //
+  //   ifCondition(fun) {
+  //     const condition = this.state === null ? false : fun(this.state);
+  //     return new IfElseMonad(condition ? this.state : null, this);
+  //   }
+  //
+  //   else() {    // Позволяет переключится между блоками кода. Поскольку if/else конструкция предусматривает вызов только одного из блоков кода, мы блокируем либо открываем доступ к второму блоку, в зависимости от значения this.state.
+  //     if (this.state === null)  // если ifCondition() возвратил false, и предьдущий callConvert(fun) не вызывал fun(), при следующем вызове .callConvert(fun), fun() будет вызван.
+  //       return new IfElseMonad(this.parent.state, this.parent);
+  //     else
+  //       return new IfElseMonad(null, this);
+  //   }
+  //
+  //   endIf() {
+  //     if (this.state === null)   // гарантирует, что цепочка вызовов возвратит контекст, который имеет .state свойство.
+  //       return new IfElseMonad(this.parent.state, this.parent);
+  //     return new IfElseMonad(this.state, this);
+  //   }
+  //
+  //   callConvert(fun) { //имитирует блок if либо else. Выполнение определенного блока определяется значением this.state. Если значение не равно null, єто означает что предыдущий метод прошел проверку, и fun функция может быть вызвана. Если .state равно null это означает, что условия проверки не были выполнены и func не может біть вызванной, а будет игнорироваться до тех пор, пока этот метод не будет вызван повторно с значением this.state равным не null.
+  //     let newState = this.state ? {...this.state, action: fun(this.state)} : null;
+  //     return new IfElseMonad(newState, this.parent);      //как и в .ifCondition() возвращается контекст, который будет использован для следующего метода в цепи вызовов.
+  //   }
+  //
+  //   callSideEffect(fun) {
+  //     this.state !== null && fun(this.state);  // позволяет отобразить текущее состояние, при несоответствии функции фильтра, может быть равен null, если вызвать в цепочке, которая имеет только один вызов callConvert(fun).
+  //     return this;
+  //   }
+  // }
+  //
+  //
+  // new IfElseMonad({request})                                           // set default value to state. Parent is undefined. We
+  //   .ifCondition((state) => state.request.profile.name === "Max")
+  //   .callConvert(state => state.request.profile.property = 'max')
+  //   .else()
+  //   .callConvert(state => state.action = 'ivar')
+  //   .endIf()
+  //   .callSideEffect(state => console.log(state.request.profile))
 
-  class IfElseMonad {
-    constructor(obj, parent) {
-      this.state = obj;          // При создании нового экземпляра класса .state свойство хранит начальное состояние, которое может быть модифицировано в процессе выполнения.
-      this.parent = parent;      // Хранит контекст предьедущего метода, который предоставил контекст текущему.
-    }
-
-    ifCondition(fun) {
-      const condition = this.state === null ? false : fun(this.state);
-      return new IfElseMonad(condition ? this.state : null, this);
-    }
-
-    else() {    // Позволяет переключится между блоками кода. Поскольку if/else конструкция предусматривает вызов только одного из блоков кода, мы блокируем либо открываем доступ к второму блоку, в зависимости от значения this.state.
-      if (this.state === null)  // если ifCondition() возвратил false, и предьдущий callConvert(fun) не вызывал fun(), при следующем вызове .callConvert(fun), fun() будет вызван.
-        return new IfElseMonad(this.parent.state, this.parent);
-      else
-        return new IfElseMonad(null, this);
-    }
-
-    endIf() {
-      if (this.state === null)   // гарантирует, что цепочка вызовов возвратит контекст, который имеет .state свойство.
-        return new IfElseMonad(this.parent.state, this.parent);
-      return new IfElseMonad(this.state, this);
-    }
-
-    callConvert(fun) { //имитирует блок if либо else. Выполнение определенного блока определяется значением this.state. Если значение не равно null, єто означает что предыдущий метод прошел проверку, и fun функция может быть вызвана. Если .state равно null это означает, что условия проверки не были выполнены и func не может біть вызванной, а будет игнорироваться до тех пор, пока этот метод не будет вызван повторно с значением this.state равным не null.
-      let newState = this.state ? {...this.state, action: fun(this.state)} : null;
-      return new IfElseMonad(newState, this.parent);      //как и в .ifCondition() возвращается контекст, который будет использован для следующего метода в цепи вызовов.
-    }
-
-    callSideEffect(fun) {
-      this.state !== null && fun(this.state);  // позволяет отобразить текущее состояние, при несоответствии функции фильтра, может быть равен null, если вызвать в цепочке, которая имеет только один вызов callConvert(fun).
-      return this;
-    }
-  }
 
 
-  new IfElseMonad({request})                                           // set default value to state. Parent is undefined. We
-    .ifCondition((state) => state.request.profile.name === "Max")
-    .callConvert(state => state.request.profile.property = 'max')
-    .else()
-    .callConvert(state => state.action = 'ivar')
-    .endIf()
-    .callSideEffect(state => console.log(state.request.profile))
 
+
+    let a = function suka(){};
+    let a1 = ()=>{};
+    let d = [];
+
+
+    d.push(a())
+
+    let b = !a;
+    let b1 = !a1;
+  console.log(b,b1);
 
 
 
