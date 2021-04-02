@@ -1,35 +1,28 @@
 <script>
 
-  JoiGraph.pathCache = {};
-
-
-  /**
-   * @returns {boolean} true if the input is either undefined or a completely empty object
-   */
-  static
-  isNothing(input)
-  {
-    return input === undefined || (JoiGraph.instanceofObject(input) && Object.getOwnPropertyNames(input).length === 0);
-  }
+  const pathCache = {};
 
   function instanceofObject(obj) {
     return typeof obj === "object" && obj !== null;
   }
 
-  /**
-   * @returns {boolean} true if the input is either undefined or a completely empty object
-   */
+
+  function hasProperty(obj, propName) {
+    return this.instanceofObject(obj) && propName in obj;
+  }
+
+
   function isNothing(input) {
-    return input === undefined || (JoiGraph.instanceofObject(input) && Object.getOwnPropertyNames(input).length === 0);
+    return input === undefined || (instanceofObject(input) && Object.getOwnPropertyNames(input).length === 0);
   }
 
   function _deleteInImpl(obj, path) {
     if (path.length === 0)
       return undefined;
-    if (!JoiGraph.hasProperty(obj, path[0]))
+    if (!hasProperty(obj, path[0]))
       return obj;
     let child = obj[path[0]];
-    let newChild = JoiGraph._deleteInImpl(child, path.slice(1));
+    let newChild = _deleteInImpl(child, path.slice(1));
     if (newChild === undefined) {
       if (Object.getOwnPropertyNames(obj).length === 1)   //you have just deleted your only child
         return undefined;
@@ -44,12 +37,53 @@
     return newObj;
   }
 
-  static _setInImpl(obj, path, value) {
+  function _getInImpl(obj, path) {
     if (path.length === 0)
-      return JoiGraph.equals(obj, value) ? obj : value;               //this is necessary if the value being set is a big one.
+      return obj;
+    let propName = path[0];
+    if (!hasProperty(obj, propName))
+      return undefined;
+    return _getInImpl(obj[propName], path.slice(1));
+  }
 
-    let child = JoiGraph.instanceofObject(obj) ? obj[path[0]] : undefined;
-    let newChild = JoiGraph._setInImpl(child, path.slice(1), value);
+  function _setInImpl(obj, path, value) {
+    if (path.length === 0)
+      return equals(obj, value) ? obj : value;               //this is necessary if the value being set is a big one.
+    let child = instanceofObject(obj) ? obj[path[0]] : undefined;
+    let newChild = _setInImpl(child, path.slice(1), value);
+    // if (child === newChild)                 //todo removing this option does not seem to break any tests so far.
+    //   return obj;
+    let newObj = Object.assign(Object.create(null, {}), obj);
+    newObj[path[0]] = newChild;
+    return newObj;
+  }
+
+  function equals(A, B) {
+    if (A === B || (isNothing(A) && isNothing(B)))
+      return true;
+    if (!instanceofObject(A) || !instanceofObject(B))
+      return false;
+    let aProps = Object.getOwnPropertyNames(A);
+    let bProps = Object.getOwnPropertyNames(B);
+    if (aProps.length !== bProps.length)
+      return false;
+    for (let key of aProps) {
+      if (!Object.hasOwnProperty.call(B, key) || !equals(A[key], B[key]))
+        return false;
+    }
+    return true;
+  }
+
+  function _getCachedPath(str) {
+    return pathCache[str] || (pathCache[str] = Object.freeze(str.split(".")));
+  }
+
+  function _setInImpl(obj, path, value) {
+    if (path.length === 0)
+      return equals(obj, value) ? obj : value;               //this is necessary if the value being set is a big one.
+
+    let child = instanceofObject(obj) ? obj[path[0]] : undefined;
+    let newChild = _setInImpl(child, path.slice(1), value);
     // if (child === newChild)                 //todo removing this option does not seem to break any tests so far.
     //   return obj;
 
@@ -58,36 +92,67 @@
     return newObj;
   }
 
-  function equals(A, B) {
-    if (A === B || (JoiGraph.isNothing(A) && JoiGraph.isNothing(B)))
-      return true;
-    if (!JoiGraph.instanceofObject(A) || !JoiGraph.instanceofObject(B))
-      return false;
-    let aProps = Object.getOwnPropertyNames(A);
-    let bProps = Object.getOwnPropertyNames(B);
-    if (aProps.length !== bProps.length)
-      return false;
-    for (let key of aProps) {
-      if (!Object.hasOwnProperty.call(B, key) || !JoiGraph.equals(A[key], B[key]))
-        return false;
-    }
-    return true;
-  }
-
-  static
-  _getInImpl(obj, path)
-  {
-    if (path.length === 0)
+  function setIn(obj, path, value) {
+    let cachedPath = _getCachedPath(path);
+    if (isNothing(value))
+      return _deleteInImpl(obj, cachedPath);
+    const prevValue = _getInImpl(obj, cachedPath);
+    if (equals(prevValue, value))
       return obj;
-    let propName = path[0];
-    if (!JoiGraph.hasProperty(obj, propName))
-      return undefined;
-    return JoiGraph._getInImpl(obj[propName], path.slice(1));
+    return _setInImpl(obj, cachedPath, value);
   }
 
-  function _getCachedPath(str) {
-    return JoiGraph.pathCache[str] || (JoiGraph.pathCache[str] = Object.freeze(str.split(".")));
+
+  class JoiStateMonad {
+
+    constructor(obj, parent) {
+      this.state = obj;
+      this.parent = parent;
+    }
+
+    ifCondition(fun) {
+      const condition = this.state === null ? false : fun(this.state);
+      return new JoiStateMonad(condition ? this.state : null, this);
+    }
+
+    setIn(path, fun) {
+      let newState = this.state ? setIn(this.state, path, fun(this.state)) : null;
+      return new JoiStateMonad(newState, this.parent);
+    }
+
+    else() {
+      if (this.state === null)
+        return new JoiStateMonad(this.parent.state, this.parent);
+      else
+        return new JoiStateMonad(null, this);
+    }
+
+
+    endIf() {
+      if (this.state === null)
+        return new JoiStateMonad(this.parent.state, this.parent);
+      return new JoiStateMonad(this.state, this);
+    }
+
+
+    callSideEffect(fun) {
+      this.state !== null && fun(this.state);
+      return this;
+    }
   }
+
+
+  const state = {
+    pathName: "C"
+  }
+
+  new JoiStateMonad(state)
+    .ifCondition(state => state.pathName === 'A')
+    .setIn('action.name', state => state?.pathName?.toUpperCase())
+    .else()
+    .setIn('action.name', () => 'B')
+    .endIf()
+    .callSideEffect(state => console.log(state))
 
 
 </script>
