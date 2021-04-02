@@ -1,9 +1,9 @@
-# cloudflare-tutorial / [typing racer app](https://github-proxy.maksgalochkin2.workers.dev/test/index.html)
+# cloudflare-tutorial / [typing racer app](https://crowdcombinatorproxy.maksgalochkin2.workers.dev/test/index.html)
 
 
  Simple example application for developing fast typing skills. After logging in with Google or Github, you can save your previous speed typing sessions to compete against them. The repository also contains useful information and examples of how to use the Cloudflare worker
 
-<img src="StateManagement(TypingRacerApp)/static/img/1200px-Cloudflare-logo-vector.svg.png" style="text-align: center/>
+<img src="https://raw.githubusercontent.com/Halochkin/Cloudflare/master/StateManagement(TypingRacerApp)/static/img/1200px-Cloudflare-logo-vector.svg.png" style="text-align: center"/>
 
 The main task of the application is to be used to test the cloudflare worker functionality as well: 
 - KV (key-value) cloudflare store

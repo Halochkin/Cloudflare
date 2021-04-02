@@ -1,5 +1,4 @@
-# WhatIs: Method Chaining
-
+# HowTo: IfElse monad
 Quite often in programming, you need to transform a piece of data many times in a row to bring it to the desired final state. Each of these conversions will be performed by a specific function/method and must be performed in a specific order.
 
 Usually you read the code from top to bottom, from left to right. So if you've seen a piece of code that looks something like this, your instinct will read it as follows:
