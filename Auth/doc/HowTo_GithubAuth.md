@@ -95,5 +95,5 @@ async function githubProcessTokenPackage(code) {
   5. Return some userData properties.
  
 ## Reference
-* [Github-auth demo](https://github-auth.maksgalochkin2.workers.dev/login/github)
+* [Github-auth demo](https://github-proxy.maksgalochkin2.workers.dev/test/index.html)
 * [Authorizing OAuth Apps](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/)
