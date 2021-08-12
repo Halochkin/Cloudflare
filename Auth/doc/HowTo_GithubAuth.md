@@ -47,7 +47,7 @@ The authentication lifecycle the same as in [google auth](HowTo_GoogleAuth.md#li
    * `COUNTER_KEY=dvAV77q6uaIOSzE_cgq6Bs_q-vojyIglNLW8lWHtiGUuWM03mLCZnaWIqTtlWYhk` - `counterapi.xyz` key. Check [HowToatomicCounter](https://github.com/orstavik/cloudflare-tutorial/blob/main/docs/2_worker_tricks/HowTo_atomicCounter.md) for description.
    * `SECRET=klasjdfoqjpwoekfj!askdfj` - cypher key.
    * `SESSION_COOKIE_NAME=GOOGLE_SESSIONID` - name of the cookies which contains encrypted sessionSecret. 
-   * `SESSION_ROOT=google-auth.maksgalochkin2` - worker root url.
+   * `SESSION_ROOT=github-auth.maksgalochkin2` - worker root url.
    * `SESSION_TTL=2592000` - session time to live.
    * `STATE_PARAM_TTL=180` - state param time to live.
  Create new _KV_ and inside **KV Namespace Bindings** and define variable:
